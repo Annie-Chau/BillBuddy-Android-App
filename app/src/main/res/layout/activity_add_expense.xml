@@ -19,7 +19,7 @@
         >
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="BillBuddy"
             android:fontFamily="@font/kavoon"
@@ -94,11 +94,14 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <TextView
+                <EditText
+                    android:id="@+id/add_expense_description"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
+                    android:gravity="start"
                     android:hint="Write description"
+                    android:background="@drawable/no_background"
                     android:textColor="@android:color/darker_gray"
                     android:textSize="18sp" />
 
@@ -132,6 +135,7 @@
                 android:orientation="horizontal">
 
                 <Spinner
+                    android:id="@+id/add_expense_currency"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
@@ -142,6 +146,7 @@
                     tools:ignore="RtlSymmetry" />
 
                 <EditText
+                    android:id="@+id/add_expense_money_amount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/input_background"
@@ -160,7 +165,7 @@
                 android:textSize="20sp" />
 
             <Spinner
-                android:id="@+id/paid_by_spinner"
+                android:id="@+id/add_expense_paid_by_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -207,7 +212,7 @@
                     android:textSize="20sp" />
 
                 <Spinner
-                    android:id="@+id/split_type_spinner"
+                    android:id="@+id/add_expense_split_type"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
