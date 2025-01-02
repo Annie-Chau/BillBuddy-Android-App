@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">BillBuddy</string>
+    <string-array name="currency">
+        <item>đ</item>
+        <item>$</item>
+        <item>€</item>
+    </string-array>
 </resources>

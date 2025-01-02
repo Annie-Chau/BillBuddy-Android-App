@@ -1,0 +1,15 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <solid android:color="@android:color/transparent" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+    <item android:right="5dp" android:gravity="fill">
+
+        <bitmap
+            android:gravity="right|center_vertical"
+            android:src="@drawable/up_down_arrow" />
+
+    </item>
+</layer-list>
