@@ -103,7 +103,7 @@
                     android:textSize="18sp" />
 
                 <Button
-                    android:layout_width="wrap_content"
+                    android:layout_width="50dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:backgroundTint="@android:color/transparent"
@@ -241,7 +241,10 @@
                 android:layout_marginTop="16dp"
                 android:backgroundTint="@color/primary"
                 android:text="Save"
-                android:textColor="@android:color/white" />
+                android:insetBottom="0dp"
+                android:textSize="20sp"
+                android:fontFamily="@font/notosansbold"
+                android:textColor="@color/lime" />
 
         </LinearLayout>
 
