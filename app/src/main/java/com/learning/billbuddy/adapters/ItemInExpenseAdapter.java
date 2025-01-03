@@ -11,8 +11,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.List;
-
 public class ItemInExpenseAdapter extends RecyclerView.Adapter<ItemInExpenseAdapter.ViewHolder> {
 
 //    private List<Person> personList;
@@ -46,6 +44,7 @@ public class ItemInExpenseAdapter extends RecyclerView.Adapter<ItemInExpenseAdap
     @Override
     public int getItemCount() {
 //        return personList.size();
+        return -1;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
