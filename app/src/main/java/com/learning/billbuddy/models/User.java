@@ -1,6 +1,16 @@
 package com.learning.billbuddy.models;
 
+import android.util.Log;
+
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class User {
 
@@ -10,17 +20,17 @@ public class User {
     private String phoneNumber;
     private String profilePictureURL; // URL from Firebase storage
     private String registrationMethod; // Enum{"Facebook", "Google", "Email", "Phone number"}
-    private List<Notification> notifications;
+    private List<String> notificationIds;
 
     // Constructor
-    public User(String userID, String name, String email, String phoneNumber, String profilePictureURL, String registrationMethod, List<Notification> notifications) {
+    public User(String userID, String name, String email, String phoneNumber, String profilePictureURL, String registrationMethod, List<String> notificationIds) {
         this.userID = userID;
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.profilePictureURL = profilePictureURL;
         this.registrationMethod = registrationMethod;
-        this.notifications = notifications;
+        this.notificationIds = notificationIds;
     }
 
     // Getters and setters
@@ -72,12 +82,12 @@ public class User {
         this.registrationMethod = registrationMethod;
     }
 
-    public List<Notification> getNotifications() {
-        return notifications;
+    public List<String> getNotificationIds() {
+        return notificationIds;
     }
 
-    public void setNotifications(List<Notification> notifications) {
-        this.notifications = notifications;
+    public void setNotificationIds(List<String> notificationIds) {
+        this.notificationIds = notificationIds;
     }
 
     // Methods
@@ -101,5 +111,43 @@ public class User {
 
     public void createExpense() {
         // Implement create expense logic here
+    }
+
+    public static List<User> fetchAllUsers() {
+        List<User> result = new ArrayList<>();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Listening to real-time updates
+        db.collection("users")
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.e("User Fetching", "Error listening to user updates: " + error);
+                        return;
+                    }
+
+                    result.clear();
+
+                    if (value != null) {
+                        for (DocumentSnapshot document : value.getDocuments()) {
+                            result.add(new User(
+                                    document.getString("userID"),
+                                    document.getString("name"),
+                                    document.getString("email"),
+                                    document.getString("phoneNumber"),
+                                    document.getString("profilePictureURL"),
+                                    document.getString("registrationMethod"),
+                                    (List<String>) document.get("notificationIds")
+                            ));
+                        }
+                    }
+                });
+
+        return result;
+    }
+
+    public List<Notification> getUserNotifications(List<Notification> allNotifications) {
+        return allNotifications.stream()
+                .filter(notification -> this.notificationIds.contains(notification.getNotificationID()))
+                .collect(Collectors.toList());
     }
 }

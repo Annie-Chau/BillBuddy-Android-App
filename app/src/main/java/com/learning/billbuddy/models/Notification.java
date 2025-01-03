@@ -1,6 +1,14 @@
 package com.learning.billbuddy.models;
 
+import android.util.Log;
+
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 public class Notification {
 
@@ -65,4 +73,37 @@ public class Notification {
         this.isRead = true;
         // Add logic here to update the notification status in Firestore
     }
+
+    public static List<Notification> fetchAllNotifications() {
+        List<Notification> result = new ArrayList<>();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Listening to real-time updates
+        db.collection("notifications")
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.e("Notification Fetching", "Error listening to notification updates: " + error);
+                        return;
+                    }
+
+                    result.clear();
+
+                    if (value != null) {
+                        for (DocumentSnapshot document : value.getDocuments()) {
+                            result.add(new Notification(
+                                    document.getId(),
+                                    document.getString("type"),
+                                    document.getString("message"),
+                                    document.getTimestamp("timestamp") != null ?
+                                            Objects.requireNonNull(document.getTimestamp("timestamp")).toDate() : null,
+                                    document.getBoolean("isRead") != null
+                                            && Boolean.TRUE.equals(document.getBoolean("isRead"))
+                            ));
+                        }
+                    }
+                });
+
+        return result;
+    }
+
 }

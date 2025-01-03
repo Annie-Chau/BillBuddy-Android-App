@@ -1,6 +1,13 @@
 package com.learning.billbuddy.models;
 
+import android.util.Log;
+
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Message {
 
@@ -59,4 +66,35 @@ public class Message {
     public void deleteMessage() {
         // Add logic here to delete the message from Firestore
     }
+
+    public static List<Message> fetchAllMessages() {
+        List<Message> result = new ArrayList<>();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Listening to real-time updates
+        db.collection("messages")
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.e("Message Fetching", "Error listening to message updates: " + error);
+                        return;
+                    }
+
+                    result.clear();
+
+                    if (value != null) {
+                        for (DocumentSnapshot document : value.getDocuments()) {
+                            result.add(new Message(
+                                    document.getId(),
+                                    document.getString("senderID"),
+                                    document.getString("content"),
+                                    document.getTimestamp("timestamp") != null ?
+                                            document.getTimestamp("timestamp").toDate() : null
+                            ));
+                        }
+                    }
+                });
+
+        return result;
+    }
+
 }

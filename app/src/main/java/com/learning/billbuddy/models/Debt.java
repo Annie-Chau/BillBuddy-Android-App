@@ -1,6 +1,14 @@
 package com.learning.billbuddy.models;
 
+import android.util.Log;
+
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class Debt {
 
@@ -74,5 +82,37 @@ public class Debt {
     public void resolveDebt() {
         this.status = "Resolved";
         // Add logic here to update the debt status in Firestore
+    }
+
+    public static List<Debt> fetchAllDebts() {
+        List<Debt> result = new ArrayList<>();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Listening to real-time updates
+        db.collection("debts")
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.e("Debt Fetching", "Error listening to debt updates: " + error);
+                        return;
+                    }
+
+                    result.clear();
+
+                    if (value != null) {
+                        for (DocumentSnapshot document : value.getDocuments()) {
+                            result.add(new Debt(
+                                    document.getId(),
+                                    document.getString("fromUserID"),
+                                    document.getString("toUserID"),
+                                    document.get("amount") != null ?
+                                            new BigDecimal(Objects.requireNonNull(document.get("amount")).toString()) : BigDecimal.ZERO,
+                                    document.getString("status"),
+                                    document.getString("groupID")
+                            ));
+                        }
+                    }
+                });
+
+        return result;
     }
 }
