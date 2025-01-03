@@ -10,7 +10,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.learning.billbuddy.models.User;
+
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
+    private final List<User> users = User.fetchAllUsers();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
