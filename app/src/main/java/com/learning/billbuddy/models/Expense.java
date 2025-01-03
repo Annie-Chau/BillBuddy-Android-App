@@ -1,8 +1,15 @@
 package com.learning.billbuddy.models;
 
+import android.util.Log;
+
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class Expense {
 
@@ -125,8 +132,39 @@ public class Expense {
         // Add logic here to update the expense in Firestore
     }
 
-    public void resolveDebt() {
-        // Add logic here to create Debt objects for each participant
-        // and update the expense status in Firestore
+    public static List<Expense> fetchAllExpenses() {
+        List<Expense> result = new ArrayList<>();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Listening to real-time updates
+        db.collection("expenses")
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.e("Expense Fetching", "Error listening to expense updates: " + error);
+                        return;
+                    }
+
+                    result.clear();
+
+                    if (value != null) {
+                        for (DocumentSnapshot document : value.getDocuments()) {
+                            result.add(new Expense(
+                                    document.getId(),
+                                    document.getString("title"),
+                                    document.getString("avatarURL"),
+                                    document.getDouble("amount"),
+                                    document.getString("notes"),
+                                    document.getString("billPictureURL"),
+                                    document.getString("payerID"),
+                                    (List<String>) document.get("participantIDs"),
+                                    (Map<String, Double>) document.get("splits"),
+                                    document.getTimestamp("timestamp") != null ?
+                                            Objects.requireNonNull(document.getTimestamp("timestamp")).toDate() : null
+                            ));
+                        }
+                    }
+                });
+
+        return result;
     }
 }

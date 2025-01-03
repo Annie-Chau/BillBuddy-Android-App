@@ -1,5 +1,7 @@
 package com.learning.billbuddy.models;
 
+import android.util.Log;
+
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -18,17 +20,17 @@ public class User {
     private String phoneNumber;
     private String profilePictureURL; // URL from Firebase storage
     private String registrationMethod; // Enum{"Facebook", "Google", "Email", "Phone number"}
-    private List<String> notificationsId;
+    private List<String> notificationIds;
 
     // Constructor
-    public User(String userID, String name, String email, String phoneNumber, String profilePictureURL, String registrationMethod, List<String> notificationsId) {
+    public User(String userID, String name, String email, String phoneNumber, String profilePictureURL, String registrationMethod, List<String> notificationIds) {
         this.userID = userID;
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.profilePictureURL = profilePictureURL;
         this.registrationMethod = registrationMethod;
-        this.notificationsId = notificationsId;
+        this.notificationIds = notificationIds;
     }
 
     // Getters and setters
@@ -80,12 +82,12 @@ public class User {
         this.registrationMethod = registrationMethod;
     }
 
-    public List<String> getNotificationsId() {
-        return notificationsId;
+    public List<String> getNotificationIds() {
+        return notificationIds;
     }
 
-    public void setNotifications(List<String> notifications) {
-        this.notificationsId = notifications;
+    public void setNotificationIds(List<String> notificationIds) {
+        this.notificationIds = notificationIds;
     }
 
     // Methods
@@ -116,36 +118,36 @@ public class User {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Listening to real-time updates
-        db.collection("users").addSnapshotListener((value, error) -> {
-            if (error != null) {
-                System.err.println("Error listening to user updates: " + error);
-                return;
-            }
+        db.collection("users")
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.e("User Fetching", "Error listening to user updates: " + error);
+                        return;
+                    }
 
-            result.clear();
+                    result.clear();
 
-            if (value != null) {
-                for (DocumentSnapshot document : value.getDocuments()) {
-                    String userID = document.getString("userID");
-                    String name = document.getString("name");
-                    String email = document.getString("email");
-                    String phoneNumber = document.getString("phoneNumber");
-                    String profilePictureURL = document.getString("profilePictureURL");
-                    String registrationMethod = document.getString("registrationMethod");
-                    List<String> notificationsId = (List<String>) document.get("notificationsId");
-
-                    User user = new User(userID, name, email, phoneNumber, profilePictureURL, registrationMethod, notificationsId);
-                    result.add(user);
-                }
-            }
-        });
+                    if (value != null) {
+                        for (DocumentSnapshot document : value.getDocuments()) {
+                            result.add(new User(
+                                    document.getString("userID"),
+                                    document.getString("name"),
+                                    document.getString("email"),
+                                    document.getString("phoneNumber"),
+                                    document.getString("profilePictureURL"),
+                                    document.getString("registrationMethod"),
+                                    (List<String>) document.get("notificationIds")
+                            ));
+                        }
+                    }
+                });
 
         return result;
     }
 
     public List<Notification> getUserNotifications(List<Notification> allNotifications) {
         return allNotifications.stream()
-                .filter(notification -> this.notificationsId.contains(notification.getNotificationID()))
+                .filter(notification -> this.notificationIds.contains(notification.getNotificationID()))
                 .collect(Collectors.toList());
     }
 }
