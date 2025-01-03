@@ -6,4 +6,16 @@
     </style>
 
     <style name="Theme.BillBuddy" parent="Base.Theme.BillBuddy" />
+    <style name="MyDateTimePickerDialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="colorAccent">@color/primary</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/MyPositiveButton</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/MyNegativeButton</item>
+    </style>
+    <style name="MyPositiveButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/primary</item>
+    </style>
+    <style name="MyNegativeButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/light_green</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
 </resources>
