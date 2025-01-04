@@ -4,10 +4,13 @@ import android.util.Log;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.learning.billbuddy.utils.ChatCallback;
 
 import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 public class Chat {
@@ -55,7 +58,7 @@ public class Chat {
                 .collect(Collectors.toList());
     }
 
-    public static List<Chat> fetchAllChats() {
+    public static void fetchAllChats(final ChatCallback callback) {
         List<Chat> result = new ArrayList<>();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -64,6 +67,7 @@ public class Chat {
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
                         Log.e("Chat Fetching", "Error listening to chat updates: " + error);
+                        callback.onCallback(result);
                         return;
                     }
 
@@ -78,9 +82,29 @@ public class Chat {
                             ));
                         }
                     }
+
+                    callback.onCallback(result);
                 });
 
-        return result;
+    }
+
+    public static void createChat(String groupID, List<String> messageIds) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Create a new Chat object
+        Map<String, Object> chatData = new HashMap<>();
+        chatData.put("groupID", groupID);
+        chatData.put("messageIds", messageIds);
+
+        // Add the new chat to the "chats" collection in Firestore
+        db.collection("chats")
+                .add(chatData)
+                .addOnSuccessListener(documentReference -> {
+                    Log.d("Chat Creation", "Chat created with ID: " + documentReference.getId());
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Chat Creation", "Error creating chat: ", e);
+                });
     }
 
 }

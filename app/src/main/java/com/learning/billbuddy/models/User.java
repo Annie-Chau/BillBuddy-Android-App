@@ -6,10 +6,13 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.learning.billbuddy.utils.UserCallback;
 
 import java.util.ArrayList;
 import java.util.EventListener;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class User {
@@ -109,23 +112,18 @@ public class User {
         // Implement send message logic here
     }
 
-    public void createExpense() {
-        // Implement create expense logic here
-    }
-
-    public static List<User> fetchAllUsers() {
-        List<User> result = new ArrayList<>();
+    public static void fetchAllUsers(final UserCallback callback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Listening to real-time updates
         db.collection("users")
                 .addSnapshotListener((value, error) -> {
+                    List<User> result = new ArrayList<>();
                     if (error != null) {
                         Log.e("User Fetching", "Error listening to user updates: " + error);
+                        callback.onCallback(result);
                         return;
                     }
-
-                    result.clear();
 
                     if (value != null) {
                         for (DocumentSnapshot document : value.getDocuments()) {
@@ -140,9 +138,30 @@ public class User {
                             ));
                         }
                     }
-                });
 
-        return result;
+                    callback.onCallback(result);
+                });
+    }
+
+    // Method to create a new user
+    public static void createUser(String userID, String name, String email, String phoneNumber, String profilePictureURL, String registrationMethod, List<String> notificationIds) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Create a new User object
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("userID", userID);
+        userData.put("name", name);
+        userData.put("email", email);
+        userData.put("phoneNumber", phoneNumber);
+        userData.put("profilePictureURL", profilePictureURL);
+        userData.put("registrationMethod", registrationMethod);
+        userData.put("notificationIds", notificationIds);
+
+        // Add the new user to the "users" collection in Firestore
+        db.collection("users")
+                .add(userData)
+                .addOnSuccessListener(documentReference -> Log.d("User Creation", "User created with ID: " + documentReference.getId()))
+                .addOnFailureListener(e -> Log.e("User Creation", "Error creating user", e));
     }
 
     public List<Notification> getUserNotifications(List<Notification> allNotifications) {

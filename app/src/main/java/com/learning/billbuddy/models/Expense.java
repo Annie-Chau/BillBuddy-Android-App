@@ -4,9 +4,11 @@ import android.util.Log;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.learning.billbuddy.utils.ExpenseCallback;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -124,27 +126,34 @@ public class Expense {
     // Methods
     public void addParticipant(String participantID) {
         this.participantIDs.add(participantID);
-        // Add logic here to update the expense in Firestore
+        updateParticipantsInFirestore();
     }
 
     public void removeParticipant(String participantID) {
         this.participantIDs.remove(participantID);
-        // Add logic here to update the expense in Firestore
+        updateParticipantsInFirestore();
     }
 
-    public static List<Expense> fetchAllExpenses() {
-        List<Expense> result = new ArrayList<>();
+    private void updateParticipantsInFirestore() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("expenses").document(this.expenseID)
+                .update("participantIDs", this.participantIDs)
+                .addOnSuccessListener(aVoid -> Log.d("Expense Update", "Participant list successfully updated!"))
+                .addOnFailureListener(e -> Log.e("Expense Update", "Error updating participant list", e));
+    }
+
+    public static void fetchAllExpenses(final ExpenseCallback callback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Listening to real-time updates
         db.collection("expenses")
                 .addSnapshotListener((value, error) -> {
+                    List<Expense> result = new ArrayList<>();
                     if (error != null) {
                         Log.e("Expense Fetching", "Error listening to expense updates: " + error);
+                        callback.onCallback(result);
                         return;
                     }
-
-                    result.clear();
 
                     if (value != null) {
                         for (DocumentSnapshot document : value.getDocuments()) {
@@ -163,8 +172,37 @@ public class Expense {
                             ));
                         }
                     }
-                });
 
-        return result;
+                    callback.onCallback(result);
+                });
+    }
+
+    // Method to create a new expense
+    public static void createExpense(String title, String avatarURL, Double amount, String notes,
+                                     String billPictureURL, String payerID, List<String> participantIDs,
+                                     Map<String, Double> splits, Date timestamp) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Create a new Expense object
+        Map<String, Object> expenseData = new HashMap<>();
+        expenseData.put("title", title);
+        expenseData.put("avatarURL", avatarURL);
+        expenseData.put("amount", amount);
+        expenseData.put("notes", notes);
+        expenseData.put("billPictureURL", billPictureURL);
+        expenseData.put("payerID", payerID);
+        expenseData.put("participantIDs", participantIDs);
+        expenseData.put("splits", splits);
+        expenseData.put("timestamp", timestamp);
+
+        // Add the new expense to the "expenses" collection in Firestore
+        db.collection("expenses")
+                .add(expenseData)
+                .addOnSuccessListener(documentReference -> {
+                    Log.d("Expense Creation", "Expense created with ID: " + documentReference.getId());
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Expense Creation", "Error creating expense: ", e);
+                });
     }
 }

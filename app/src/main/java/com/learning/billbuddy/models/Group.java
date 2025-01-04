@@ -6,9 +6,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.learning.billbuddy.utils.GroupCallback;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Group {
@@ -113,53 +116,24 @@ public class Group {
     // Methods
     public void addMember(String memberID) {
         this.memberIDs.add(memberID);
-        // Add logic here to update the group in Firestore
+        updateMembersInFirestore();
     }
 
     public void removeMember(String memberID) {
         this.memberIDs.remove(memberID);
-        // Add logic here to update the group in Firestore
+        updateMembersInFirestore();
     }
 
-    public void createExpense(Expense expense) {
-        // Add logic here to create an Expense and associate it with this group in Firestore
+    private void updateMembersInFirestore() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("groups").document(this.groupID)
+                .update("memberIDs", this.memberIDs)
+                .addOnSuccessListener(aVoid -> Log.d("Group Update", "Member list successfully updated!"))
+                .addOnFailureListener(e -> Log.e("Group Update", "Error updating member list", e));
     }
 
     public void sendNotification(Notification notification) {
         // Add logic here to send a notification to group members
-    }
-
-    public static List<Group> fetchAllGroups() {
-        List<Group> result = new ArrayList<>();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("groups")
-                .addSnapshotListener((value, error) -> {
-                    if (error != null) {
-                        Log.e("Group Fetching", "Error listening to group updates: " + error);
-                        return;
-                    }
-
-                    result.clear();
-
-                    if (value != null) {
-                        for (DocumentSnapshot document : value.getDocuments()) {
-                            result.add(new Group(
-                                    document.getId(),
-                                    document.getString("name"),
-                                    document.getString("description"),
-                                    document.getString("avatarURL"),
-                                    document.getString("ownerID"),
-                                    (List<String>) document.get("memberIDs"),
-                                    (List<String>) document.get("expenseIDs"),
-                                    (List<String>) document.get("debtIds"),
-                                    (List<String>) document.get("chatIds")
-                            ));
-                        }
-                    }
-                });
-
-        return result;
     }
 
     public List<User> getGroupMembers(List<User> allUsers) {
@@ -184,5 +158,63 @@ public class Group {
         return allChats.stream()
                 .filter(chat -> this.chatIds.contains(chat.getChatID()))
                 .collect(Collectors.toList());
+    }
+
+    public static void fetchAllGroups(final GroupCallback callback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("groups")
+                .addSnapshotListener((value, error) -> {
+                    List<Group> result = new ArrayList<>();
+                    if (error != null) {
+                        Log.e("Group Fetching", "Error listening to group updates: " + error);
+                        callback.onCallback(result);
+                        return;
+                    }
+
+                    if (value != null) {
+                        for (DocumentSnapshot document : value.getDocuments()) {
+                            result.add(new Group(
+                                    document.getId(),
+                                    document.getString("name"),
+                                    document.getString("description"),
+                                    document.getString("avatarURL"),
+                                    document.getString("ownerID"),
+                                    (List<String>) document.get("memberIDs"),
+                                    (List<String>) document.get("expenseIDs"),
+                                    (List<String>) document.get("debtIds"),
+                                    (List<String>) document.get("chatIds")
+                            ));
+                        }
+                    }
+
+                    callback.onCallback(result);
+                });
+    }
+
+    // Method to create a new group
+    public static void createGroup(String name, String description, String avatarURL, String ownerID, List<String> memberIDs, List<String> expenseIDs, List<String> debtIds, List<String> chatIds) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Create a new Group object
+        Map<String, Object> groupData = new HashMap<>();
+        groupData.put("name", name);
+        groupData.put("description", description);
+        groupData.put("avatarURL", avatarURL);
+        groupData.put("ownerID", ownerID);
+        groupData.put("memberIDs", memberIDs);
+        groupData.put("expenseIDs", expenseIDs);
+        groupData.put("debtIds", debtIds);
+        groupData.put("chatIds", chatIds);
+
+        // Add the new group to the "groups" collection in Firestore
+        db.collection("groups")
+                .add(groupData)
+                .addOnSuccessListener(documentReference -> {
+                    Log.d("Group Creation", "Group created with ID: " + documentReference.getId());
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Group Creation", "Error creating group: ", e);
+                });
     }
 }

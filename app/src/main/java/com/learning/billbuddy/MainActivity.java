@@ -2,6 +2,7 @@ package com.learning.billbuddy;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
@@ -12,10 +13,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.learning.billbuddy.models.User;
 
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity {
-    private final List<User> users = User.fetchAllUsers();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +30,13 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, AddExpense.class);
             startActivity(intent);
+        });
+    }
+
+    // Example for fetch user and use it
+    private void fetchUsers() {
+        User.fetchAllUsers(users -> {
+            Log.d("User", users.toString());
         });
     }
 }
