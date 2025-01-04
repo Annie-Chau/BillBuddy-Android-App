@@ -62,3 +62,5 @@ public class ItemInExpenseAdapter extends RecyclerView.Adapter<ItemInExpenseAdap
         }
     }
 }
+
+

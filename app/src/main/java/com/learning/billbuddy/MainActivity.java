@@ -2,6 +2,7 @@ package com.learning.billbuddy;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
@@ -10,6 +11,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.learning.billbuddy.models.User;
 import com.learning.billbuddy.views.authentication.Login;
 
 public class MainActivity extends AppCompatActivity {
@@ -29,6 +31,13 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, Login.class);
             startActivity(intent);
+        });
+    }
+
+    // Example for fetch user and use it
+    private void fetchUsers() {
+        User.fetchAllUsers(users -> {
+            Log.d("User", users.toString());
         });
     }
 }
