@@ -12,6 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.learning.billbuddy.models.User;
+import com.learning.billbuddy.views.authentication.Login;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
         Button button = findViewById(R.id.to_add_expense);
         button.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, AddExpense.class);
+            Intent intent = new Intent(MainActivity.this, Login.class);
             startActivity(intent);
         });
     }
