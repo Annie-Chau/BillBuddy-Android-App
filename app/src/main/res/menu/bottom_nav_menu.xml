@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/vacation"
+        android:icon="@drawable/ic_money_check_dollar_icon"
+        android:title="BillBudy" />
+    <item
+        android:id="@+id/gift"
+        android:icon="@drawable/ic_person_icon"
+        android:title="Profile" />
+    <item
+        android:id="@+id/food"
+        android:icon="@drawable/ic_info"
+        android:title="Infromation" />
+</menu>
