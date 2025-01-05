@@ -44,7 +44,7 @@ public class ItemInExpenseAdapter extends RecyclerView.Adapter<ItemInExpenseAdap
     @Override
     public int getItemCount() {
 //        return personList.size();
-        return 0;
+        return -1;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -62,3 +62,5 @@ public class ItemInExpenseAdapter extends RecyclerView.Adapter<ItemInExpenseAdap
         }
     }
 }
+
+

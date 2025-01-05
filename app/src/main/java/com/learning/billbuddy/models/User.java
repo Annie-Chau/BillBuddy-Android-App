@@ -1,6 +1,19 @@
 package com.learning.billbuddy.models;
 
+import android.util.Log;
+
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.learning.billbuddy.utils.UserCallback;
+
+import java.util.ArrayList;
+import java.util.EventListener;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class User {
 
@@ -10,17 +23,17 @@ public class User {
     private String phoneNumber;
     private String profilePictureURL; // URL from Firebase storage
     private String registrationMethod; // Enum{"Facebook", "Google", "Email", "Phone number"}
-    private List<Notification> notifications;
+    private List<String> notificationIds;
 
     // Constructor
-    public User(String userID, String name, String email, String phoneNumber, String profilePictureURL, String registrationMethod, List<Notification> notifications) {
+    public User(String userID, String name, String email, String phoneNumber, String profilePictureURL, String registrationMethod, List<String> notificationIds) {
         this.userID = userID;
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.profilePictureURL = profilePictureURL;
         this.registrationMethod = registrationMethod;
-        this.notifications = notifications;
+        this.notificationIds = notificationIds;
     }
 
     // Getters and setters
@@ -72,12 +85,12 @@ public class User {
         this.registrationMethod = registrationMethod;
     }
 
-    public List<Notification> getNotifications() {
-        return notifications;
+    public List<String> getNotificationIds() {
+        return notificationIds;
     }
 
-    public void setNotifications(List<Notification> notifications) {
-        this.notifications = notifications;
+    public void setNotificationIds(List<String> notificationIds) {
+        this.notificationIds = notificationIds;
     }
 
     // Methods
@@ -99,7 +112,61 @@ public class User {
         // Implement send message logic here
     }
 
-    public void createExpense() {
-        // Implement create expense logic here
+    public static void fetchAllUsers(final UserCallback callback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Listening to real-time updates
+        db.collection("users")
+                .addSnapshotListener((value, error) -> {
+                    List<User> result = new ArrayList<>();
+                    if (error != null) {
+                        Log.e("User Fetching", "Error listening to user updates: " + error);
+                        callback.onCallback(result);
+                        return;
+                    }
+
+                    if (value != null) {
+                        for (DocumentSnapshot document : value.getDocuments()) {
+                            result.add(new User(
+                                    document.getString("userID"),
+                                    document.getString("name"),
+                                    document.getString("email"),
+                                    document.getString("phoneNumber"),
+                                    document.getString("profilePictureURL"),
+                                    document.getString("registrationMethod"),
+                                    (List<String>) document.get("notificationIds")
+                            ));
+                        }
+                    }
+
+                    callback.onCallback(result);
+                });
+    }
+
+    // Method to create a new user
+    public static void createUser(String userID, String name, String email, String phoneNumber, String profilePictureURL, String registrationMethod, List<String> notificationIds) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Create a new User object
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("userID", userID);
+        userData.put("name", name);
+        userData.put("email", email);
+        userData.put("phoneNumber", phoneNumber);
+        userData.put("profilePictureURL", profilePictureURL);
+        userData.put("registrationMethod", registrationMethod);
+        userData.put("notificationIds", notificationIds);
+
+        // Add the new user to the "users" collection in Firestore
+        db.collection("users")
+                .add(userData)
+                .addOnSuccessListener(documentReference -> Log.d("User Creation", "User created with ID: " + documentReference.getId()))
+                .addOnFailureListener(e -> Log.e("User Creation", "Error creating user", e));
+    }
+
+    public List<Notification> getUserNotifications(List<Notification> allNotifications) {
+        return allNotifications.stream()
+                .filter(notification -> this.notificationIds.contains(notification.getNotificationID()))
+                .collect(Collectors.toList());
     }
 }
