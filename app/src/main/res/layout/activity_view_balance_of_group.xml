@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ViewBalanceOfGroup">
+
+    <!-- Add return button and add name -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/return_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:background="@android:color/transparent"
+            android:drawableStart="@drawable/ic_return_arrow_icon"
+            android:contentDescription="Return Button"/>
+
+        <!-- Spacer to push TextView to the right -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="BillBuddy"
+            android:layout_marginTop="20dp"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary"
+            android:fontFamily="@font/kavoon"
+            android:layout_marginEnd="20dp"/>
+    </LinearLayout>
+
+    <!-- Add an ImageView for the group -->
+    <ImageView
+    android:id="@+id/group_image"
+    android:layout_width="100dp"
+    android:layout_height="100dp"
+    android:layout_marginTop="40dp"
+    android:layout_gravity="center"
+    android:background="@drawable/rounded_border_image_view"
+    android:src="@drawable/example_image_1"
+    android:contentDescription="Group Image"
+    android:scaleType="centerCrop"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
+
+        <!-- Add a TextView for the group name -->
+        <TextView
+            android:id="@+id/group_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Group Name"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginTop="10dp"/>
+
+        <!-- Add a Button for rename -->
+        <ImageButton
+            android:id="@+id/rename_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_edit_icon"
+            android:contentDescription="Rename Button"
+            android:scaleType="centerInside"/>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginTop="16dp">
+
+            <RadioGroup
+                android:id="@+id/segment_button_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/segment_button_background"
+                android:padding="2dp"
+                android:layout_gravity="center_horizontal">
+
+                <RadioButton
+                    android:id="@+id/rb_expense"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Expense"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:background="@drawable/segment_button_left"
+                    android:button="@null"
+                    android:paddingVertical="12dp"
+                    android:paddingHorizontal="24dp" />
+
+                <RadioButton
+                    android:id="@+id/rb_balance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Balance"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:background="@drawable/segment_button_right"
+                    android:button="@null"
+                    android:paddingVertical="12dp"
+                    android:paddingHorizontal="24dp" />
+            </RadioGroup>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/rounded_green_background"
+                android:padding="16dp"
+                android:layout_marginTop="20dp"
+                android:gravity="center">
+
+                <!-- Thumbs-up Icon -->
+                <ImageView
+                    android:id="@+id/thumb_icon"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/ic_thump_up_icon"
+                    android:contentDescription="Thumb Icon"
+                    android:layout_marginEnd="16dp" />
+
+                <!-- Text Section -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Upper Text -->
+                    <TextView
+                        android:id="@+id/owed_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="You are owed"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
+
+                    <!-- Amount Text -->
+                    <TextView
+                        android:id="@+id/amount_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="₫ 1,000,320.00"
+                        android:textSize="24sp"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Add a clickable textview -->
+            <TextView
+                android:id="@+id/view_all_suggested_reimbursements"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/blue"
+                android:text="View All Suggested Reimbursements"
+                android:textSize="20sp"
+                android:layout_marginTop="10dp"
+                android:gravity="center_horizontal"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
