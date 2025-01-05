@@ -21,6 +21,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+            android:name=".AddUserInfo"
+            android:exported="false" />
+        <activity
+            android:name=".views.authentication.Register"
+            android:exported="false" />
+        <activity
+            android:name=".views.authentication.Login"
+            android:exported="false" />
+        <activity
+            android:name=".AddExpense"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
