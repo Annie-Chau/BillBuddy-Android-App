@@ -110,7 +110,7 @@
 
         <!-- Sign In Button -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/signInButton"
+            android:id="@+id/login_submit_button"
             app:cornerRadius="8dp"
             android:layout_width="match_parent"
             android:layout_height="50dp"

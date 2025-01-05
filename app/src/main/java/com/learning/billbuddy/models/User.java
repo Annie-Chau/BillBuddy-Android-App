@@ -144,11 +144,12 @@ public class User {
     }
 
     // Method to create a new user
-    public static void createUser(String userID, String name, String email, String phoneNumber, String profilePictureURL, String registrationMethod, List<String> notificationIds) {
+    public static void createUser(String name, String email, String phoneNumber, String profilePictureURL, String registrationMethod, List<String> notificationIds) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Create a new User object
         Map<String, Object> userData = new HashMap<>();
+        String userID = db.collection("users").document().getId();
         userData.put("userID", userID);
         userData.put("name", name);
         userData.put("email", email);
@@ -159,8 +160,9 @@ public class User {
 
         // Add the new user to the "users" collection in Firestore
         db.collection("users")
-                .add(userData)
-                .addOnSuccessListener(documentReference -> Log.d("User Creation", "User created with ID: " + documentReference.getId()))
+                .document(userID)
+                .set(userData)
+                .addOnSuccessListener(documentReference -> Log.d("User Creation", "User created with ID: " + userID))
                 .addOnFailureListener(e -> Log.e("User Creation", "Error creating user", e));
     }
 

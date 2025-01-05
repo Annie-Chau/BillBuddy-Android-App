@@ -10,7 +10,7 @@
     android:paddingBottom="16dp"
     android:orientation="vertical"
     android:gravity="center_horizontal"
-    tools:context=".views.authentication.Signup">
+    tools:context=".views.authentication.Register">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -64,46 +64,20 @@
             android:layout_marginBottom="4dp"/>
 
         <EditText
-            android:id="@+id/login_email_text_input"
+            android:id="@+id/sign_up_email_text_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:height="40dp"
+            android:background="@color/text_field_background_color"
+            android:drawableStart="@drawable/mail_icon"
+            android:drawablePadding="8dp"
+            android:drawableTint="@color/black"
+            android:fontFamily="@font/archivo_variable"
             android:hint="@string/enter_your_email"
-            android:background="@color/text_field_background_color"
-            android:height="40dp"
-            android:drawableStart="@drawable/mail_icon"
-            android:textStyle="bold"
-            android:fontFamily="@font/archivo_variable"
-            android:drawablePadding="8dp"
+            android:padding="8dp"
             android:textSize="14sp"
-            android:layout_marginBottom="16dp"
-            android:drawableTint="@color/black"
-            android:padding="8dp"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fontFamily="@font/archivo_variable"
-            android:text="Username"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:layout_marginBottom="4dp"/>
-
-        <EditText
-            android:id="@+id/signup_username_text_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Enter your username"
-            android:background="@color/text_field_background_color"
-            android:height="40dp"
-            android:drawableStart="@drawable/mail_icon"
-            android:textStyle="bold"
-            android:fontFamily="@font/archivo_variable"
-            android:drawablePadding="8dp"
-            android:textSize="14sp"
-            android:layout_marginBottom="16dp"
-            android:drawableTint="@color/black"
-            android:padding="8dp"/>
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="match_parent"
@@ -163,7 +137,7 @@
 
         <!-- Sign In Button -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/signInButton"
+            android:id="@+id/signup_confirm_button"
             app:cornerRadius="8dp"
             android:layout_width="match_parent"
             android:layout_height="50dp"
