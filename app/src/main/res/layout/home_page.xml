@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
@@ -132,9 +131,9 @@
         <FrameLayout
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="90dp"
-            android:layout_gravity="bottom|center"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_gravity="bottom|end"
             android:background="@drawable/round_square_primary">
 
             <ImageButton
@@ -147,16 +146,6 @@
                 app:tint="@color/white" />
         </FrameLayout>
     </FrameLayout>
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:background="@color/bottom_navigation"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintEnd_toStartOf="parent"
-        app:menu="@menu/bottom_nav_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
