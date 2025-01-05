@@ -25,7 +25,7 @@ public class AddUserInfo extends AppCompatActivity {
     private ImageButton changeAvatarButton;
     private EditText nameInput, phoneInput;
     private MaterialButton submitButton;
-    String email, password, registrationMethod;
+    String userId, email, password, registrationMethod;
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -34,6 +34,7 @@ public class AddUserInfo extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_user_info);
 
+        userId = getIntent().getStringExtra("userId");
         email = getIntent().getStringExtra("email");
         password = getIntent().getStringExtra("password");
         registrationMethod = getIntent().getStringExtra("registrationMethod");
@@ -70,7 +71,7 @@ public class AddUserInfo extends AppCompatActivity {
             return;
         }
 
-        User.createUser(name, email, phone, "XXX", registrationMethod, new ArrayList<>());
+        User.createUser(userId, name, email, phone, "XXX", registrationMethod, new ArrayList<>());
         Toast.makeText(AddUserInfo.this, "User created successfully!", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(AddUserInfo.this, Objects.equals(registrationMethod, "Google Account") ? MainActivity.class : Login.class);
         startActivity(intent);

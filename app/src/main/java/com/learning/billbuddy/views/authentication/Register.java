@@ -110,14 +110,14 @@ public class Register extends AppCompatActivity {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        // Sign up success
-                        firebaseAuth.signOut();
-
-                        // Navigate to Add Info Activity
                         Intent intent = new Intent(Register.this, AddUserInfo.class);
+                        intent.putExtra("userId", firebaseAuth.getCurrentUser().getUid());
                         intent.putExtra("email", email);
                         intent.putExtra("password", password);
                         intent.putExtra("registrationMethod", "Email");
+                        firebaseAuth.signOut();
+
+                        // Navigate to Add Info Activity
                         startActivity(intent);
                         finish();
                     } else {
@@ -154,6 +154,7 @@ public class Register extends AppCompatActivity {
                             // New user, go to AddUserInfo activity
                             Intent intent = new Intent(Register.this, AddUserInfo.class);
                             assert user != null;
+                            intent.putExtra("userId", user.getUid());
                             intent.putExtra("email", user.getEmail());
                             intent.putExtra("password", "");
                             intent.putExtra("registrationMethod", "Google Account");
