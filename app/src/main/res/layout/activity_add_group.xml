@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".AddExpense">
+    tools:context=".AddGroupActivity">
 
     <TextView
         android:layout_width="match_parent"
@@ -73,6 +73,7 @@
             android:paddingHorizontal="30dp">
 
             <EditText
+                android:id="@+id/title_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Enter title"
@@ -93,6 +94,7 @@
             android:paddingHorizontal="30dp">
 
             <EditText
+                android:id="@+id/description_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Enter description"
