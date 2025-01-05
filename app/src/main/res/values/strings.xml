@@ -1,5 +1,10 @@
 <resources>
     <string name="app_name">BillBuddy</string>
+    <string name="sign_in">Sign In</string>
+    <string name="password">Password</string>
+    <string name="email">Email</string>
+    <string name="enter_your_password">Enter your password</string>
+    <string name="enter_your_email">Enter your email</string>
     <string-array name="currency">
         <item>đ</item>
         <item>$</item>
