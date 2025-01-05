@@ -59,19 +59,7 @@ public class AddGroupActivity extends AppCompatActivity {
             memberIDs.add(ownerID); // Add the owner to the memberIDs list
 
             // Create a new group
-            String groupID = UUID.randomUUID().toString();
-            Group group = new Group(groupID, title, description, "", ownerID, memberIDs, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-
-            // Save the group to Firestore
-            db.collection("groups").document(groupID).set(group)
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(AddGroupActivity.this, "Group created successfully", Toast.LENGTH_SHORT).show();
-                        finish(); // Close the activity
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.w("AddGroupActivity", "Error adding document", e);
-                        Toast.makeText(AddGroupActivity.this, "Error creating group", Toast.LENGTH_SHORT).show();
-                    });
+            Group.createGroup(title, description, "", ownerID, memberIDs, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         });
     }
 }

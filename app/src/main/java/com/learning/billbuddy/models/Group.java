@@ -195,9 +195,11 @@ public class Group {
     // Method to create a new group
     public static void createGroup(String name, String description, String avatarURL, String ownerID, List<String> memberIDs, List<String> expenseIDs, List<String> debtIds, List<String> chatIds) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String groupID = db.collection("groups").getId();
 
         // Create a new Group object
         Map<String, Object> groupData = new HashMap<>();
+        groupData.put("groupID", groupID);
         groupData.put("name", name);
         groupData.put("description", description);
         groupData.put("avatarURL", avatarURL);
@@ -209,9 +211,10 @@ public class Group {
 
         // Add the new group to the "groups" collection in Firestore
         db.collection("groups")
-                .add(groupData)
+                .document(groupID)
+                .set(groupData)
                 .addOnSuccessListener(documentReference -> {
-                    Log.d("Group Creation", "Group created with ID: " + documentReference.getId());
+                    Log.d("Group Creation", "Group created with ID: " + groupID);
                 })
                 .addOnFailureListener(e -> {
                     Log.e("Group Creation", "Error creating group: ", e);
