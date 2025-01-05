@@ -144,12 +144,11 @@ public class User {
     }
 
     // Method to create a new user
-    public static void createUser(String name, String email, String phoneNumber, String profilePictureURL, String registrationMethod, List<String> notificationIds) {
+    public static void createUser(String userID, String name, String email, String phoneNumber, String profilePictureURL, String registrationMethod, List<String> notificationIds) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Create a new User object
         Map<String, Object> userData = new HashMap<>();
-        String userID = db.collection("users").document().getId();
         userData.put("userID", userID);
         userData.put("name", name);
         userData.put("email", email);
