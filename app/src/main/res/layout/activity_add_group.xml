@@ -8,126 +8,110 @@
     android:orientation="vertical"
     android:paddingHorizontal="30dp"
     android:paddingBottom="30dp"
-    tools:context=".AddGroup">
+    tools:context=".AddExpense">
 
-    <!-- Header Section -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="30dp"
+        android:fontFamily="@font/kavoon"
+        android:text="BillBuddy"
+        android:textColor="@color/primary"
+        android:textSize="24sp" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginVertical="30dp"
         android:gravity="center_vertical">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Add Group"
-            android:textSize="24sp"
+            android:layout_weight="1"
+            android:fontFamily="@font/kavoon"
+            android:gravity="center"
+            android:layout_marginLeft="50dp"
+            android:text="Add BillBuddy"
             android:textColor="@color/black"
-            android:textStyle="bold"
-            android:layout_weight="1" />
+            android:textSize="18sp" />
 
         <Button
             android:id="@+id/add_group_cancel_button"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="34dp"
             android:backgroundTint="@android:color/transparent"
             android:fontFamily="@font/notosansregular"
+            android:minHeight="0dp"
+            android:padding="0dp"
+            android:insetBottom="0dp"
             android:text="Cancel"
             android:textColor="@color/primary"
-            android:textSize="18sp"
-            android:layout_marginStart="8dp" />
+            android:textSize="20sp" />
+
     </LinearLayout>
 
-    <!-- Content Section -->
-    <ScrollView
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:text="Title"
+        android:textSize="18sp"
+        android:layout_marginTop="20dp" />
 
-        <LinearLayout
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter title"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Description"
+        android:textSize="18sp"
+        android:layout_marginTop="20dp" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter description"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Participants"
+        android:textSize="18sp"
+        android:layout_marginTop="20dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/participants_layout">
+
+        <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:hint="Enter participant's email"
+            android:layout_marginBottom="10dp" />
 
-            <!-- Title Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Title"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:textSize="20sp" />
+        <Button
+            android:id="@+id/add_participant_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Participant"
+            android:textColor="@color/primary"
+            android:layout_gravity="end" />
+    </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
+    <Button
+        android:id="@+id/create_billbuddy_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Create BillBuddy"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@color/primary"
+        android:layout_marginTop="30dp" />
 
-                <EditText
-                    android:id="@+id/add_group_enter_title"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="E.g. Drinks"
-                    android:padding="12dp"
-                    android:background="@drawable/input_background"
-                    android:inputType="text"
-                    android:textColor="#000000"
-                    android:textSize="18sp"/>
-
-                <ImageButton
-                    android:id="@+id/add_group_btn_emoji"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/input_background"
-                    android:src="@drawable/ic_smiley_face_icon"
-                    android:contentDescription="Emoji Icon"
-                    android:layout_marginStart="8dp" />
-
-            </LinearLayout>
-
-            <!-- Description Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Description"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:textSize="20sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="176dp"
-                android:background="@drawable/search_box_background"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <EditText
-                    android:id="@+id/add_expense_description"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:hint="Write description"
-                    android:background="@drawable/no_background"
-                    android:textColor="@android:color/darker_gray"
-                    android:gravity="start|top"
-                    android:textSize="20sp" />
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/add_expense_btn_add"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Create"
-                android:background="@color/primary"
-                android:textColor="@color/white"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:gravity="center" />
-        </LinearLayout>
-
-    </ScrollView>
 </LinearLayout>
