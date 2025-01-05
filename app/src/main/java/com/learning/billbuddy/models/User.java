@@ -25,6 +25,12 @@ public class User {
     private String registrationMethod; // Enum{"Facebook", "Google", "Email", "Phone number"}
     private List<String> notificationIds;
 
+    // No-argument constructor
+    public User() {
+        // Default constructor required for calls to DataSnapshot.getValue(User.class)
+    }
+
+
     // Constructor
     public User(String userID, String name, String email, String phoneNumber, String profilePictureURL, String registrationMethod, List<String> notificationIds) {
         this.userID = userID;
