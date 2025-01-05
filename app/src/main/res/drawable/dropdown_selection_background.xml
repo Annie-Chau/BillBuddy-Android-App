@@ -19,4 +19,7 @@
         </shape>
     </item>
 
+    <!-- Dropdown Icon Layer -->
+    <item android:drawable="@drawable/ic_dropdown_arrow" android:right="16dp" android:gravity="end|center_vertical" />
+
 </layer-list>

@@ -13,14 +13,14 @@
         android:theme="@style/Theme.BillBuddy"
         tools:targetApi="31">
         <activity
-            android:name=".AddExpense"
-            android:exported="false" />
-        <activity
-            android:name=".views.authentication.Signup"
-            android:exported="false" />
-        <activity
-            android:name=".views.authentication.Login"
-            android:exported="false" />
+            android:name=".ViewBalanceOfGroup"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -30,6 +30,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".AddExpense"
+            android:exported="false" />
+        <activity
+            android:name=".views.authentication.Signup"
+            android:exported="false" />
+        <activity
+            android:name=".views.authentication.Login"
+            android:exported="false" />
+        <activity
+            android:name=".AddGroup"
+            android:exported="true" />
     </application>
 
 </manifest>
