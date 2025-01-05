@@ -1,12 +1,17 @@
 package com.learning.billbuddy;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -17,6 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.learning.billbuddy.models.User;
 import com.learning.billbuddy.views.authentication.Login;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -25,7 +31,10 @@ public class AddUserInfo extends AppCompatActivity {
     private ImageButton changeAvatarButton;
     private EditText nameInput, phoneInput;
     private MaterialButton submitButton;
+    private ImageView userAvatar;
     String userId, email, password, registrationMethod;
+
+    private static final int PICK_IMAGE_REQUEST = 1;
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -44,14 +53,10 @@ public class AddUserInfo extends AppCompatActivity {
         nameInput = findViewById(R.id.sign_up_name_text_input);
         phoneInput = findViewById(R.id.sign_up_phone_text_input);
         submitButton = findViewById(R.id.signup_confirm_button);
+        userAvatar = findViewById(R.id.user_avatar);
 
         // Set up click listener for the submit button
         submitButton.setOnClickListener(v -> submitUserInfo());
-
-        // Set an onClickListener for the changeAvatarButton (You'll need to implement image selection/capture)
-        changeAvatarButton.setOnClickListener(v -> {
-            // TODO: Implement image selection/capture logic here
-        });
 
         // Apply window insets to the main layout
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -59,6 +64,28 @@ public class AddUserInfo extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // Change the avatar of the user
+        changeAvatarButton.setOnClickListener(v -> openGalerry());
+    }
+
+    private void openGalerry() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            Uri imageUri = data.getData();
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                userAvatar.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void submitUserInfo() {
