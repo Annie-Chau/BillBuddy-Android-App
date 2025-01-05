@@ -159,8 +159,9 @@ public class User {
 
         // Add the new user to the "users" collection in Firestore
         db.collection("users")
-                .add(userData)
-                .addOnSuccessListener(documentReference -> Log.d("User Creation", "User created with ID: " + documentReference.getId()))
+                .document(userID)
+                .set(userData)
+                .addOnSuccessListener(documentReference -> Log.d("User Creation", "User created with ID: " + userID))
                 .addOnFailureListener(e -> Log.e("User Creation", "Error creating user", e));
     }
 

@@ -11,5 +11,6 @@
     <color name="transparent_light_green">#80A2CD85</color>
     <color name="text_field_background_color">#f3f4f6</color>
     <color name="lime">#E4EA8F</color>
+    <color name="gray">#E5E4E2</color>
     <color name="bottom_navigation">#ecf5e6</color>
 </resources>
