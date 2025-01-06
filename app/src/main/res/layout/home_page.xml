@@ -1,148 +1,128 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
-    android:orientation="vertical">
+    android:background="@color/background">
 
-    <FrameLayout
+    <!-- Main Content Area -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="18dp">
 
+        <!-- Header Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="18dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintLeft_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginBottom="16dp"
-                android:orientation="horizontal">
+                android:fontFamily="@font/kavoon"
+                android:text="BillBuddy"
+                android:textColor="@color/primary"
+                android:textSize="24sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:fontFamily="@font/kavoon"
-                    android:text="BillBuddy"
-                    android:textColor="@color/primary"
-                    android:textSize="24sp" />
-
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1" />
-
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@android:color/transparent"
-                    android:src="@drawable/notification_icon"
-                    app:tint="@color/black" />
-            </LinearLayout>
-
-            <EditText
-                android:id="@+id/home_view_search_text_field"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:height="40dp"
-                android:background="@drawable/round_primary_border"
-                android:drawableStart="@drawable/search_icon"
-                android:drawablePadding="8dp"
-                android:drawableTint="@color/black"
-                android:fontFamily="@font/archivo_variable"
-                android:hint="Search"
-                android:padding="8dp"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:gravity="end"
-                android:orientation="horizontal">
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/small_round_primary"
-                    android:textAlignment="center">
-
-                    <androidx.appcompat.widget.AppCompatSpinner
-                        android:id="@+id/home_spinner_filter_selection"
-                        android:layout_width="130dp"
-                        android:layout_height="40dp"
-                        android:textAlignment="center"></androidx.appcompat.widget.AppCompatSpinner>
-                </FrameLayout>
-            </LinearLayout>
-
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <!--           TODO: ADD CODE TO DISPLAY />-->
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="36dp"
-                        android:layout_marginBottom="8dp"
-                        android:fontFamily="@font/inter_regular"
-                        android:text="December 24, 2024"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <include layout="@layout/group_card" />
-
-                    <include layout="@layout/group_card" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="36dp"
-                        android:layout_marginBottom="8dp"
-                        android:fontFamily="@font/inter_regular"
-                        android:text="December 24, 2024"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <include layout="@layout/group_card" />
-
-                    <include layout="@layout/group_card" />
-                </LinearLayout>
-            </ScrollView>
-        </LinearLayout>
-
-        <FrameLayout
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="20dp"
-            android:layout_gravity="bottom|end"
-            android:background="@drawable/round_square_primary">
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <ImageButton
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:id="@+id/to_add_group_btn"
-                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:backgroundTint="@android:color/transparent"
-                android:src="@drawable/ic_plus"
-                app:tint="@color/white" />
-        </FrameLayout>
-    </FrameLayout>
+                android:src="@drawable/notification_icon"
+                app:tint="@color/black" />
+        </LinearLayout>
+
+        <!-- Search Bar -->
+        <EditText
+            android:id="@+id/home_view_search_text_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:height="40dp"
+            android:background="@drawable/round_primary_border"
+            android:drawableStart="@drawable/search_icon"
+            android:drawablePadding="8dp"
+            android:drawableTint="@color/black"
+            android:fontFamily="@font/archivo_variable"
+            android:hint="Search"
+            android:padding="8dp"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <!-- Filter Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/small_round_primary"
+                android:textAlignment="center">
+
+                <androidx.appcompat.widget.AppCompatSpinner
+                    android:id="@+id/home_spinner_filter_selection"
+                    android:layout_width="130dp"
+                    android:layout_height="40dp"
+                    android:textAlignment="center" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <!-- Group List Container -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/group_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:scrollbars="vertical" />
+    </LinearLayout>
+
+    <!-- Floating Button Section -->
+    <LinearLayout
+        android:id="@+id/floating_button_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Circular Button -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/to_add_group_btn"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/ic_plus"
+            android:contentDescription="Add Group Button"
+            app:backgroundTint="@color/primary"
+            android:scaleType="center"
+            android:layout_gravity="center"
+            app:tint="@color/white" />
+
+        <!-- Text Below the Button -->
+        <TextView
+            android:id="@+id/add_group_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Group"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:layout_marginTop="8dp"
+            android:gravity="center" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
