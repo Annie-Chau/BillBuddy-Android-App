@@ -192,10 +192,10 @@ public class Group {
                 });
     }
 
-    // Method to create a new group
+    // Method to create a new group in Firestore
     public static void createGroup(String name, String description, String avatarURL, String ownerID, List<String> memberIDs, List<String> expenseIDs, List<String> debtIds, List<String> chatIds) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String groupID = db.collection("groups").getId();
+        String groupID = db.collection("groups").document().getId();
 
         // Create a new Group object
         Map<String, Object> groupData = new HashMap<>();
@@ -213,11 +213,7 @@ public class Group {
         db.collection("groups")
                 .document(groupID)
                 .set(groupData)
-                .addOnSuccessListener(documentReference -> {
-                    Log.d("Group Creation", "Group created with ID: " + groupID);
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("Group Creation", "Error creating group: ", e);
-                });
+                .addOnSuccessListener(aVoid -> Log.d("Group Creation", "Group created with ID: " + groupID))
+                .addOnFailureListener(e -> Log.e("Group Creation", "Error creating group: ", e));
     }
 }
