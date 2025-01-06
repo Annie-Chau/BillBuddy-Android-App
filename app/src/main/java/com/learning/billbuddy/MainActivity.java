@@ -14,7 +14,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.learning.billbuddy.models.User;
 import com.learning.billbuddy.views.authentication.Login;
 import com.learning.billbuddy.views.home.HomePage;
-import com.learning.billbuddy.views.profile.TempProfilePage;
+import com.learning.billbuddy.views.profile.Profile;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
 //                    bundle.putSerializable("user", currentUser);
 //                    selectedFragment.setArguments(bundle);
                 } else if (itemId == R.id.bottom_navigation_profile) {
-                    selectedFragment = new TempProfilePage();
+                    selectedFragment = new Profile();
 //                    Bundle bundle = new Bundle();
 //                    bundle.putSerializable("user", currentUser);
 //                    selectedFragment.setArguments(bundle);
