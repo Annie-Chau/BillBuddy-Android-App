@@ -86,7 +86,8 @@ public class AddGroupActivity extends AppCompatActivity {
         }
 
         // Check if Firestore has the email
-        db.collection("users").whereEqualTo("email", email)
+        db.collection("users")
+                .whereEqualTo("email", email)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     if (!querySnapshot.isEmpty()){
@@ -96,12 +97,12 @@ public class AddGroupActivity extends AppCompatActivity {
 
                         if (memberIDs.contains(userID)){
                             Toast.makeText(this, "User already added", Toast.LENGTH_LONG).show();
-                        }else{
+                        } else {
                             memberIDs.add(userID);
                             updateMembersList();
                             Toast.makeText(this, "User added successfully", Toast.LENGTH_LONG).show();
                         }
-                    }else{
+                    } else {
                         Toast.makeText(this, "No user found with this email", Toast.LENGTH_SHORT).show();
                     }
                 }).addOnFailureListener(e -> Toast.makeText(this, "Failed to add member", Toast.LENGTH_SHORT).show());
@@ -145,8 +146,7 @@ public class AddGroupActivity extends AppCompatActivity {
                 ownerID,
                 memberIDs,
                 new ArrayList<>(), // Expense IDs
-                new ArrayList<>(), // Debt IDs
-                new ArrayList<>()  // Chat IDs
+                new ArrayList<>()  // Debt IDs
         );
 
         Toast.makeText(this, "Group created successfully!", Toast.LENGTH_SHORT).show();
