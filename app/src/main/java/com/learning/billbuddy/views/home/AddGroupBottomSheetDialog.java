@@ -63,6 +63,7 @@ public class AddGroupBottomSheetDialog extends BottomSheetDialogFragment {
         memberEmailEditText = view.findViewById(R.id.add_member_email);
         membersListTextView = view.findViewById(R.id.members_list);
 
+
         // Retrieve the current logged-in user's ID from arguments
         if (getContext() != null) {
             ownerID = getArguments().getString("OWNER_ID");
