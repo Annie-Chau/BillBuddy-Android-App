@@ -20,6 +20,8 @@ public class Message {
     private String content;
     private Date timestamp;
 
+    public Message() {}
+
     // Constructor
     public Message(String messageID, String senderID, String content, Date timestamp) {
         this.messageID = messageID;

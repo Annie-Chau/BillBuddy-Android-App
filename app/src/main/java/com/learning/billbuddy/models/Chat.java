@@ -26,6 +26,7 @@ public class Chat {
         this.messageIds = messageIds;
     }
 
+    public Chat() {}
     // Getters and setters
     public String getChatID() {
         return chatID;
