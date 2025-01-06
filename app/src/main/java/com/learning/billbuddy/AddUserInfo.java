@@ -17,6 +17,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.learning.billbuddy.models.User;
@@ -79,6 +80,11 @@ public class AddUserInfo extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             Uri imageUri = data.getData();
+            // Use Glide to load the image into the ImageView with a circular crop
+            Glide.with(this)
+                    .load(imageUri)
+                    .circleCrop()
+                    .into(userAvatar);
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
                 userAvatar.setImageBitmap(bitmap);
