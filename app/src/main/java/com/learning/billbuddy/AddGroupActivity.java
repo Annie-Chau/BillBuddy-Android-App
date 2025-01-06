@@ -1,15 +1,20 @@
 package com.learning.billbuddy;
 
+import static com.learning.billbuddy.models.Group.createGroup;
+
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.learning.billbuddy.models.Group;
 
@@ -20,6 +25,17 @@ import java.util.UUID;
 public class AddGroupActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
+    private EditText titleEditText;
+    private EditText descriptionEditText;
+    private Button createButton;
+    private Button cancelButton;
+    private ImageButton emojiButton;
+    private Button addMemberButton;
+    private EditText memberEmailEditText;
+    // Owner ID (current logged-in user)
+    private String ownerID;
+    private TextView membersListTextView;
+    private List<String> memberIDs = new ArrayList<>(); // List to store group members
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -28,38 +44,112 @@ public class AddGroupActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        // Retrieve the data passed from HomePage
-        String ownerID = getIntent().getStringExtra("OWNER_ID");
-        String ownerName = getIntent().getStringExtra("OWNER_NAME");
+        // Reference UI elements
+        titleEditText = findViewById(R.id.add_group_enter_title);
+        descriptionEditText = findViewById(R.id.add_expense_description);
+        createButton = findViewById(R.id.add_expense_btn_add);
+        cancelButton = findViewById(R.id.add_group_cancel_button);
+        emojiButton = findViewById(R.id.add_group_btn_emoji);
+        addMemberButton = findViewById(R.id.add_member_button);
+        memberEmailEditText = findViewById(R.id.add_member_email);
+        membersListTextView = findViewById(R.id.members_list);
 
-        // Display the creator's name
-        TextView creatorNameTextView = findViewById(R.id.creator_name);
-        creatorNameTextView.setText(ownerName);
+        // Retrieve the current logged-in user's ID
+        ownerID = getIntent().getStringExtra("OWNER_ID"); // pass this from the previous activity
+        if (ownerID == null || ownerID.isEmpty()) {
+            Log.e("AddGroupActivity", "Owner ID is null");
+            Toast.makeText(this, "Error: User not logged in!", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
 
-        // Get references to the input fields
-        EditText titleEditText = findViewById(R.id.title_edit_text);
-        EditText descriptionEditText = findViewById(R.id.description_edit_text);
-        EditText participantEmailEditText = findViewById(R.id.participant_email);
+        // Add the owner to the group members list
+        memberIDs.add(ownerID);
+        // Update the members list in the UI
+        updateMembersList();
 
-        // Get reference to the create button
-        Button createBillBuddyButton = findViewById(R.id.create_billbuddy_button);
 
-        createBillBuddyButton.setOnClickListener(v -> {
-            String title = titleEditText.getText().toString().trim();
-            String description = descriptionEditText.getText().toString().trim();
-            String participantEmail = participantEmailEditText.getText().toString().trim();
+        createButton.setOnClickListener(v -> createGroup());
+        cancelButton.setOnClickListener(v -> finish());
+        addMemberButton.setOnClickListener(v -> addMember());
 
-            if (title.isEmpty() || description.isEmpty()) {
-                Toast.makeText(AddGroupActivity.this, "Title and description are required", Toast.LENGTH_SHORT).show();
-                return;
+    }
+
+    // Method to add a new member
+    private void addMember(){
+        String email = memberEmailEditText.getText().toString().trim();
+        // Validate email
+        if (TextUtils.isEmpty(email)){
+            memberEmailEditText.setError("Email is required");
+            memberEmailEditText.requestFocus();
+            return;
+        }
+
+        // Check if Firestore has the email
+        db.collection("users").whereEqualTo("email", email)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()){
+                        // Get the user's ID from the doc
+                        DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+                        String userID = document.getString("userID");
+
+                        if (memberIDs.contains(userID)){
+                            Toast.makeText(this, "User already added", Toast.LENGTH_LONG).show();
+                        }else{
+                            memberIDs.add(userID);
+                            updateMembersList();
+                            Toast.makeText(this, "User added successfully", Toast.LENGTH_LONG).show();
+                        }
+                    }else{
+                        Toast.makeText(this, "No user found with this email", Toast.LENGTH_SHORT).show();
+                    }
+                }).addOnFailureListener(e -> Toast.makeText(this, "Failed to add member", Toast.LENGTH_SHORT).show());
+    }
+
+    // Update the list of members
+    private void updateMembersList(){
+        StringBuilder membersText = new StringBuilder("Current members:");
+        for(int i = 0; i < memberIDs.size(); i++){
+            if(i == 0){
+                membersText.append("\n- Owner");
+            }else{
+                membersText.append("\n- Member ").append(i);
             }
+        }
+        membersListTextView.setText(membersText.toString());
+    }
 
-            // Create a list of participants
-            List<String> memberIDs = new ArrayList<>();
-            memberIDs.add(ownerID); // Add the owner to the memberIDs list
+    // Method to create a new group
+    private void createGroup(){
+        String title = titleEditText.getText().toString().trim();
+        String description = descriptionEditText.getText().toString().trim();
 
-            // Create a new group
-            Group.createGroup(title, description, "", ownerID, memberIDs, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-        });
+        // Validate inputs
+        if (TextUtils.isEmpty(title)){
+            titleEditText.setError("Group Title is required");
+            titleEditText.requestFocus();
+            return;
+        }
+
+        if (memberIDs.size() < 2) { // A group must have at least two members
+            Toast.makeText(this, "A group must have at least two members", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // Create the group in Firestore
+        Group.createGroup(
+                title,
+                description.isEmpty() ? "No description provided" : description,
+                "", // Avatar URL placeholder
+                ownerID,
+                memberIDs,
+                new ArrayList<>(), // Expense IDs
+                new ArrayList<>(), // Debt IDs
+                new ArrayList<>()  // Chat IDs
+        );
+
+        Toast.makeText(this, "Group created successfully!", Toast.LENGTH_SHORT).show();
+        finish();
     }
 }
