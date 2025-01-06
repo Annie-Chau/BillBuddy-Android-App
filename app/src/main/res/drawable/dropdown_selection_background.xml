@@ -9,7 +9,7 @@
     </item>
 
     <!-- Main Background Layer -->
-    <item android:top="2dp" android:left="2dp"> <!-- Offset shadow to the bottom-right -->
+    <item> <!-- Offset shadow to the bottom-right -->
         <shape>
             <solid android:color="#F8F8F8" /> <!-- Background color -->
             <corners android:radius="8dp" />

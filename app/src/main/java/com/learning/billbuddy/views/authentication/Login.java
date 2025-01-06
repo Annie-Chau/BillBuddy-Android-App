@@ -21,8 +21,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.android.material.button.MaterialButton;
+import com.learning.billbuddy.AddUserInfo;
 import com.learning.billbuddy.MainActivity;
 import com.learning.billbuddy.R;
+
+import java.util.Objects;
 
 public class Login extends AppCompatActivity {
 
@@ -125,12 +128,29 @@ public class Login extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = firebaseAuth.getCurrentUser();
-                        Toast.makeText(Login.this, "Google Sign-In successful! Welcome " + (user != null ? user.getDisplayName() : "User"), Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(Login.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
+
+                        // Check if the user is new
+                        boolean isNewUser = Objects.requireNonNull(task.getResult().getAdditionalUserInfo()).isNewUser();
+
+                        if (isNewUser) {
+                            // New user, go to AddUserInfo activity
+                            Intent intent = new Intent(Login.this, AddUserInfo.class);
+                            assert user != null;
+                            intent.putExtra("userId", user.getUid());
+                            intent.putExtra("email", user.getEmail());
+                            intent.putExtra("password", "");
+                            intent.putExtra("registrationMethod", "Google Account");
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            // Existing user, go to MainActivity
+                            Intent intent = new Intent(Login.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
                     } else {
-                        Toast.makeText(Login.this, "Authentication failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(Login.this, "Google sign-in failed: " +
+                                Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
     }
