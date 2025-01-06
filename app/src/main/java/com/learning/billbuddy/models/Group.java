@@ -26,6 +26,9 @@ public class Group {
     private List<String> debtIds;
     private List<String> chatIds;
 
+    public Group() {
+        // Default constructor for Firestore deserialization
+    }
 
     // Constructor
     public Group(String groupID, String name, String description, String avatarURL, String ownerID, List<String> memberIDs, List<String> expenseIDs, List<String> debtIds, List<String> chatIds) {

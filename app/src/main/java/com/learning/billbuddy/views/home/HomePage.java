@@ -8,10 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -20,12 +23,20 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.learning.billbuddy.AddGroupActivity;
 import com.learning.billbuddy.R;
+import com.learning.billbuddy.GroupAdapter;
+import com.learning.billbuddy.models.Group;
 import com.learning.billbuddy.models.User;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HomePage extends Fragment {
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private RecyclerView groupRecyclerView;
+    private GroupAdapter groupAdapter;
+    private List<Group> groupList;
 
     @Nullable
     @Override
@@ -34,57 +45,89 @@ public class HomePage extends Fragment {
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        groupRecyclerView = view.findViewById(R.id.group_list);
 
-        logAllUsers(); // Log all user documents
+        // Setup RecyclerView
+        groupList = new ArrayList<>();
+        groupAdapter = new GroupAdapter(requireContext(), groupList);
+        groupRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        groupRecyclerView.setAdapter(groupAdapter);
 
-        ImageButton addParticipantButton = view.findViewById(R.id.to_add_group_btn);
-        addParticipantButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FirebaseUser currentUser = mAuth.getCurrentUser();
-                if (currentUser != null) {
-                    String firebaseAuthID = currentUser.getUid();
-                    Log.d("HomePage", "Current Firebase Auth ID: " + firebaseAuthID);
-                    db.collection("users").whereEqualTo("userID", firebaseAuthID).get().addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            QuerySnapshot querySnapshot = task.getResult();
-                            if (querySnapshot != null && !querySnapshot.isEmpty()) {
-                                for (QueryDocumentSnapshot document : querySnapshot) {
-                                    User user = document.toObject(User.class);
-                                    if (user != null) {
-                                        Log.d("HomePage", "User found: " + user.getName());
-                                        Intent intent = new Intent(requireActivity(), AddGroupActivity.class);
-                                        intent.putExtra("OWNER_ID", user.getUserID());
-                                        intent.putExtra("OWNER_NAME", user.getName());
-                                        startActivity(intent);
-                                        Log.d("HomePage", "Starting AddGroupActivity");
-                                    }
-                                }
-                            } else {
-                                Log.d("HomePage", "No matching documents found");
-                            }
-                        } else {
-                            Log.d("HomePage", "get failed with ", task.getException());
-                        }
-                    });
-                } else {
-                    Log.d("HomePage", "No authenticated user found");
-                }
-            }
-        });
+        loadUserGroups();
 
         return view;
+
+//        logAllUsers(); // Log all user documents
+//
+//        ImageButton addParticipantButton = view.findViewById(R.id.to_add_group_btn);
+//        addParticipantButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                FirebaseUser currentUser = mAuth.getCurrentUser();
+//                if (currentUser != null) {
+//                    String firebaseAuthID = currentUser.getUid();
+//                    Log.d("HomePage", "Current Firebase Auth ID: " + firebaseAuthID);
+//                    db.collection("users").whereEqualTo("userID", firebaseAuthID).get().addOnCompleteListener(task -> {
+//                        if (task.isSuccessful()) {
+//                            QuerySnapshot querySnapshot = task.getResult();
+//                            if (querySnapshot != null && !querySnapshot.isEmpty()) {
+//                                for (QueryDocumentSnapshot document : querySnapshot) {
+//                                    User user = document.toObject(User.class);
+//                                    if (user != null) {
+//                                        Log.d("HomePage", "User found: " + user.getName());
+//                                        Intent intent = new Intent(requireActivity(), AddGroupActivity.class);
+//                                        intent.putExtra("OWNER_ID", user.getUserID());
+//                                        intent.putExtra("OWNER_NAME", user.getName());
+//                                        startActivity(intent);
+//                                        Log.d("HomePage", "Starting AddGroupActivity");
+//                                    }
+//                                }
+//                            } else {
+//                                Log.d("HomePage", "No matching documents found");
+//                            }
+//                        } else {
+//                            Log.d("HomePage", "get failed with ", task.getException());
+//                        }
+//                    });
+//                } else {
+//                    Log.d("HomePage", "No authenticated user found");
+//                }
+//            }
+//        });
+
     }
 
-    private void logAllUsers() {
-        db.collection("users").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    Log.d("HomePage", "User Document: " + document.getData());
-                }
-            } else {
-                Log.d("HomePage", "Error getting documents: ", task.getException());
-            }
-        });
+//    private void logAllUsers() {
+//        db.collection("users").get().addOnCompleteListener(task -> {
+//            if (task.isSuccessful()) {
+//                for (QueryDocumentSnapshot document : task.getResult()) {
+//                    Log.d("HomePage", "User Document: " + document.getData());
+//                }
+//            } else {
+//                Log.d("HomePage", "Error getting documents: ", task.getException());
+//            }
+//        });
+//    }
+
+    private void loadUserGroups() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            String currentUserId = currentUser.getUid();
+            db.collection("groups")
+                    .whereArrayContains("memberIDs", currentUserId)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            groupList.clear();
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Group group = document.toObject(Group.class);
+                                groupList.add(group);
+                            }
+                            groupAdapter.notifyDataSetChanged();
+                        } else {
+                            Log.e("HomePage", "Error loading groups", task.getException());
+                        }
+                    });
+        }
     }
 }
