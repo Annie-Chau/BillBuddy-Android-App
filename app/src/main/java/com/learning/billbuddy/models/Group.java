@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Group {
@@ -24,11 +25,10 @@ public class Group {
     private List<String> memberIDs; // List of User.userIDs, minimum 2 including the admin
     private List<String> expenseIDs;
     private List<String> debtIds;
-    private List<String> chatIds;
 
 
     // Constructor
-    public Group(String groupID, String name, String description, String avatarURL, String ownerID, List<String> memberIDs, List<String> expenseIDs, List<String> debtIds, List<String> chatIds) {
+    public Group(String groupID, String name, String description, String avatarURL, String ownerID, List<String> memberIDs, List<String> expenseIDs, List<String> debtIds) {
         this.groupID = groupID;
         this.name = name;
         this.description = description;
@@ -37,7 +37,6 @@ public class Group {
         this.memberIDs = memberIDs;
         this.expenseIDs = expenseIDs;
         this.debtIds = debtIds;
-        this.chatIds = chatIds;
     }
 
     // Getters and setters
@@ -105,14 +104,6 @@ public class Group {
         this.debtIds = debtIds;
     }
 
-    public List<String> getChatIds() {
-        return chatIds;
-    }
-
-    public void setChatIds(List<String> chatIds) {
-        this.chatIds = chatIds;
-    }
-
     // Methods
     public void addMember(String memberID) {
         this.memberIDs.add(memberID);
@@ -154,9 +145,9 @@ public class Group {
                 .collect(Collectors.toList());
     }
 
-    public List<Chat> getGroupChats(List<Chat> allChats) {
+    public List<Chat> getGroupChat(List<Chat> allChats) {
         return allChats.stream()
-                .filter(chat -> this.chatIds.contains(chat.getChatID()))
+                .filter(chat -> Objects.equals(chat.getGroupID(), this.groupID))
                 .collect(Collectors.toList());
     }
 
@@ -182,8 +173,7 @@ public class Group {
                                     document.getString("ownerID"),
                                     (List<String>) document.get("memberIDs"),
                                     (List<String>) document.get("expenseIDs"),
-                                    (List<String>) document.get("debtIds"),
-                                    (List<String>) document.get("chatIds")
+                                    (List<String>) document.get("debtIds")
                             ));
                         }
                     }
@@ -193,7 +183,7 @@ public class Group {
     }
 
     // Method to create a new group in Firestore
-    public static void createGroup(String name, String description, String avatarURL, String ownerID, List<String> memberIDs, List<String> expenseIDs, List<String> debtIds, List<String> chatIds) {
+    public static void createGroup(String name, String description, String avatarURL, String ownerID, List<String> memberIDs, List<String> expenseIDs, List<String> debtIds) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String groupID = db.collection("groups").document().getId();
 
@@ -207,7 +197,6 @@ public class Group {
         groupData.put("memberIDs", memberIDs);
         groupData.put("expenseIDs", expenseIDs);
         groupData.put("debtIds", debtIds);
-        groupData.put("chatIds", chatIds);
 
         // Add the new group to the "groups" collection in Firestore
         db.collection("groups")
