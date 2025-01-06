@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,7 +37,7 @@ public class HomePage extends Fragment {
 
         logAllUsers(); // Log all user documents
 
-        Button addParticipantButton = view.findViewById(R.id.Navigate_to_add_group);
+        ImageButton addParticipantButton = view.findViewById(R.id.to_add_group_btn);
         addParticipantButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
