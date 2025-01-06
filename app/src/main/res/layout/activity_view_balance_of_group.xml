@@ -19,6 +19,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginVertical="30dp"
+            android:paddingHorizontal="10dp"
             android:gravity="center_vertical">
 
             <!-- Add a return button -->
@@ -26,8 +27,8 @@
                 android:id="@+id/return_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginStart="5dp"
+
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_return_arrow_icon"
                 android:contentDescription="Return Button"
@@ -43,7 +44,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="BillBuddy"
-                android:layout_marginTop="20dp"
                 android:textSize="30sp"
                 android:textStyle="bold"
                 android:textColor="@color/primary"
@@ -63,35 +63,44 @@
             android:contentDescription="Group Image"
             android:scaleType="centerCrop" />
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_horizontal">
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            >
 
-            <!-- Add a TextView for the group name -->
             <TextView
                 android:id="@+id/group_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:maxWidth="270dp"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:text="Group Name"
                 android:textSize="25sp"
                 android:textStyle="bold"
                 android:textColor="@color/black"
-                android:layout_marginTop="10dp" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
 
-            <!-- Add a Button for rename -->
             <ImageButton
                 android:id="@+id/rename_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginStart="10dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_edit_icon"
                 android:contentDescription="Rename Button"
-                android:scaleType="centerInside" />
-        </LinearLayout>
+                app:layout_constraintLeft_toRightOf="@id/group_name"
+                app:layout_constraintBaseline_toBaselineOf="parent"
+                android:scaleType="centerInside"
+                android:layout_marginStart="3dp" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         <!-- ScrollView for remaining content -->
         <ScrollView
@@ -103,7 +112,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp"
-                android:layout_marginTop="16dp">
+                >
 
                 <RadioGroup
                     android:id="@+id/segment_button_group"
@@ -116,31 +125,27 @@
 
                     <RadioButton
                         android:id="@+id/rb_expense"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_width="130dp"
+                        android:layout_height="30dp"
                         android:text="Expense"
                         android:gravity="center"
                         android:textColor="@color/black"
                         android:textStyle="bold"
                         android:background="@drawable/segment_button_left"
                         android:button="@null"
-                        android:paddingVertical="12dp"
-                        android:paddingHorizontal="24dp" />
+                         />
 
                     <RadioButton
                         android:id="@+id/rb_balance"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_width="130dp"
+                        android:layout_height="30dp"
                         android:text="Balance"
                         android:gravity="center"
                         android:textColor="@color/black"
                         android:textStyle="bold"
                         android:background="@drawable/segment_button_right"
                         android:button="@null"
-                        android:paddingVertical="12dp"
-                        android:paddingHorizontal="24dp" />
+                        />
                 </RadioGroup>
 
                 <LinearLayout
@@ -196,8 +201,9 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/blue"
                     android:text="View All Suggested Reimbursements"
-                    android:textSize="20sp"
-                    android:layout_marginTop="10dp"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/notosansregular"
+                    android:layout_marginTop="15dp"
                     android:gravity="center_horizontal" />
             </LinearLayout>
         </ScrollView>
