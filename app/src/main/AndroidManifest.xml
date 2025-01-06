@@ -26,9 +26,6 @@
             android:name=".views.authentication.Login"
             android:exported="false" />
         <activity
-            android:name=".AddExpense"
-            android:exported="false" />
-        <activity
             android:name=".AddGroupActivity"
             android:exported="false" />
         <activity
@@ -41,17 +38,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AddExpense"
+            android:name=".AddExpenseActivity"
             android:exported="false" />
-        <activity
-            android:name=".views.authentication.Signup"
-            android:exported="false" />
-        <activity
-            android:name=".views.authentication.Login"
-            android:exported="false" />
-        <activity
-            android:name=".AddGroup"
-            android:exported="true" />
     </application>
 
 </manifest>

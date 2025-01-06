@@ -126,16 +126,23 @@
             </ScrollView>
         </LinearLayout>
 
-        <Button
-            android:id="@+id/Navigate_to_add_group"
+        <FrameLayout
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_marginRight="20dp"
             android:layout_marginBottom="20dp"
             android:layout_gravity="bottom|end"
-            android:background="@drawable/round_square_primary"
-            android:text=""
-            android:backgroundTint="@android:color/transparent" />
+            android:background="@drawable/round_square_primary">
+
+            <ImageButton
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:id="@+id/to_add_group_btn"
+                android:layout_gravity="center"
+                android:backgroundTint="@android:color/transparent"
+                android:src="@drawable/ic_plus"
+                app:tint="@color/white" />
+        </FrameLayout>
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

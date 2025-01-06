@@ -6,178 +6,200 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingHorizontal="30dp"
-    android:paddingBottom="30dp"
     tools:context=".AddGroupActivity">
 
-    <!-- Header Section -->
-    <LinearLayout
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_marginVertical="30dp"
-        android:gravity="center_vertical">
+        android:paddingHorizontal="30dp"
+        android:fontFamily="@font/kavoon"
+        android:text="BillBuddy"
+        android:textColor="@color/primary"
+        android:textSize="24sp" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Add Group"
-            android:textSize="24sp"
-            android:textColor="@color/black"
-            android:textStyle="bold"
-            android:layout_weight="1" />
-
-        <Button
-            android:id="@+id/add_group_cancel_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@android:color/transparent"
-            android:fontFamily="@font/notosansregular"
-            android:text="Cancel"
-            android:textColor="@color/primary"
-            android:textSize="18sp"
-            android:layout_marginStart="8dp" />
-    </LinearLayout>
-
-    <!-- Content Section -->
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:paddingHorizontal="30dp"
+        android:paddingBottom="30dp"
+        android:background="@drawable/round_top_background"
+        android:layout_weight="1">
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-            <!-- Title Section -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Title"
-                android:textStyle="bold"
+                android:text="Add Group"
+                android:textSize="18sp"
                 android:textColor="@color/black"
-                android:textSize="20sp" />
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:gravity="center"
+                />
 
+            <Button
+                android:id="@+id/add_group_cancel_button"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                style="@style/TransparentButtonStyle"
+                android:fontFamily="@font/notosansregular"
+                android:padding="0dp"
+                android:insetBottom="0dp"
+                android:letterSpacing="-0.01"
+                android:text="Cancel"
+                android:layout_gravity="end"
+                android:textColor="@color/primary"
+                android:textSize="16sp"
+                android:layout_marginStart="8dp" />
+
+        </FrameLayout>
+
+            <!--Header Section-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
+                android:orientation="vertical">
 
-                <EditText
-                    android:id="@+id/add_group_enter_title"
-                    android:layout_width="0dp"
+                <!-- Title Section -->
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="E.g. Drinks"
-                    android:padding="12dp"
-                    android:background="@drawable/input_background"
-                    android:inputType="text"
-                    android:textColor="#000000"
-                    android:textSize="18sp"/>
+                    android:text="Title"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:layout_marginBottom="10dp"
+                    android:textSize="16sp" />
 
-                <ImageButton
-                    android:id="@+id/add_group_btn_emoji"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/input_background"
-                    android:src="@drawable/ic_smiley_face_icon"
-                    android:contentDescription="Emoji Icon"
-                    android:layout_marginStart="8dp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
 
-            </LinearLayout>
+                    <EditText
+                        android:id="@+id/add_group_enter_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="E.g. Drinks"
+                        android:paddingStart="18dp"
+                        android:paddingVertical="8dp"
+                        android:background="@drawable/input_background"
+                        android:fontFamily="@font/notosansregular"
+                        android:inputType="text"
+                        android:textColor="#000000"
+                        android:textSize="14sp"/>
 
-            <!-- Description Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Description"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:textSize="20sp" />
+                    <ImageButton
+                        android:id="@+id/add_group_btn_emoji"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/input_background"
+                        android:src="@drawable/ic_smiley_face_icon"
+                        android:contentDescription="Emoji Icon"
+                        android:layout_marginStart="8dp"
+                        android:scaleType="centerInside"
+                        android:padding="8dp" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="176dp"
-                android:background="@drawable/search_box_background"
-                android:orientation="vertical"
-                android:padding="16dp">
+                </LinearLayout>
+
+                <!-- Description Section -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Description"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:layout_marginBottom="10dp"
+                    android:textSize="16sp" />
 
                 <EditText
                     android:id="@+id/add_expense_description"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
+                    android:layout_height="176dp"
+                    android:padding="16dp"
+                    android:background="@drawable/search_box_background"
                     android:hint="Write description"
-                    android:background="@drawable/no_background"
                     android:textColor="@android:color/darker_gray"
                     android:gravity="start|top"
-                    android:textSize="20sp" />
-            </LinearLayout>
+                    android:fontFamily="@font/notosansregular"
+                    android:textSize="14sp" />
 
-            <!-- Add members section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Add members"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:textSize="20sp"
-                android:layout_marginTop="16dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginBottom="16dp">
-
-                <EditText
-                    android:id="@+id/add_member_email"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="Enter member's email"
-                    android:padding="12dp"
-                    android:background="@drawable/input_background"
-                    android:inputType="textEmailAddress"
-                    android:textColor="@color/black"
-                    android:textSize="18sp" />
-
-                <Button
-                    android:id="@+id/add_member_button"
+                <!-- Add members section -->
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Add"
-                    android:layout_marginStart="8dp"
-                    android:background="@color/primary"
-                    android:textColor="@color/white"/>
+                    android:text="Add members"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:layout_marginBottom="10dp"
+                    android:textSize="16sp"
+                    android:layout_marginTop="16dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp">
+
+                    <EditText
+                        android:id="@+id/add_member_email"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="Enter member's email"
+                        android:padding="12dp"
+                        android:background="@drawable/input_background"
+                        android:inputType="textEmailAddress"
+                        android:textColor="@color/black"
+                        android:fontFamily="@font/notosansregular"
+                        android:textSize="14sp" />
+
+                    <Button
+                        android:id="@+id/add_member_button"
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:padding="0dp"
+                        android:text="Add"
+                        android:textSize="14sp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/func_add_button"
+                        android:textColor="@color/white"/>
+
+                </LinearLayout>
+
+                <!-- Members List Section -->
+                <TextView
+                    android:id="@+id/members_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/notosansregular"
+                    android:text="Current Members: (Owner)"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:layout_marginBottom="16dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/add_group_btn_add"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="16dp"
+                    android:backgroundTint="@color/primary"
+                    android:text="Submit"
+                    android:textColor="@color/white"
+                    app:cornerRadius="8dp" />
 
             </LinearLayout>
 
-            <!-- Members List Section -->
-            <TextView
-                android:id="@+id/members_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Current Members: (Owner)"
-                android:textSize="16sp"
-                android:textColor="@color/black"
-                android:layout_marginBottom="16dp" />
+    </LinearLayout>
 
-            <Button
-                android:id="@+id/add_expense_btn_add"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Create"
-                android:background="@color/primary"
-                android:textColor="@color/white"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:gravity="center" />
-        </LinearLayout>
-
-    </ScrollView>
 </LinearLayout>

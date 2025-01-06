@@ -47,7 +47,7 @@ public class AddGroupActivity extends AppCompatActivity {
         // Reference UI elements
         titleEditText = findViewById(R.id.add_group_enter_title);
         descriptionEditText = findViewById(R.id.add_expense_description);
-        createButton = findViewById(R.id.add_expense_btn_add);
+        createButton = findViewById(R.id.add_group_btn_add);
         cancelButton = findViewById(R.id.add_group_cancel_button);
         emojiButton = findViewById(R.id.add_group_btn_emoji);
         addMemberButton = findViewById(R.id.add_member_button);

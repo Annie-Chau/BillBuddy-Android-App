@@ -117,7 +117,6 @@
             android:text="@string/sign_in"
             android:textColor="@color/white"
             android:backgroundTint="@color/primary"
-            android:paddingVertical="12dp"
             android:layout_marginBottom="16dp" />
 
         <!-- OR Divider -->
