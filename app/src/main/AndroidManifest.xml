@@ -31,6 +31,9 @@
             android:name=".AddGroupActivity"
             android:exported="false" />
         <activity
+            android:name=".ChatBoxActivity"
+            android:exported="true"/>
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
