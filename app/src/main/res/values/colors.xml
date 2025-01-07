@@ -13,4 +13,6 @@
     <color name="lime">#E4EA8F</color>
     <color name="gray">#E5E4E2</color>
     <color name="bottom_navigation">#ecf5e6</color>
+    <color name="profile_page_gray">#f3f4f6</color>
+    <color name="red">#de3b40</color>
 </resources>
