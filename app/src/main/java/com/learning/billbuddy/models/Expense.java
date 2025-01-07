@@ -6,12 +6,15 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.learning.billbuddy.utils.ExpenseCallback;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Expense {
 
@@ -134,12 +137,27 @@ public class Expense {
         updateParticipantsInFirestore();
     }
 
+    public String getPaidByName(List<User> userList) {
+        for (User user : userList) {
+            if (user.getUserID().equals(payerID)) {
+                return user.getName();
+            }
+        }
+        return "Unknown"; // Or handle the case where the payer is not found
+    }
+
+
     private void updateParticipantsInFirestore() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("expenses").document(this.expenseID)
                 .update("participantIDs", this.participantIDs)
                 .addOnSuccessListener(aVoid -> Log.d("Expense Update", "Participant list successfully updated!"))
                 .addOnFailureListener(e -> Log.e("Expense Update", "Error updating participant list", e));
+    }
+
+    public String getFormattedAmount() {
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.getDefault());
+        return currencyFormat.format(amount);
     }
 
     public static void fetchAllExpenses(final ExpenseCallback callback) {
@@ -204,5 +222,15 @@ public class Expense {
                 .addOnFailureListener(e -> {
                     Log.e("Expense Creation", "Error creating expense: ", e);
                 });
+    }
+
+    public List<String> getParticipantNameList(List<User> userList) {
+        return participantIDs.stream()
+                .map(participantID -> userList.stream()
+                        .filter(user -> user.getUserID().equals(participantID))
+                        .findFirst()
+                        .map(User::getName)
+                        .orElse("Unknown")) // Or handle the case where the user is not found
+                .collect(Collectors.toList());
     }
 }

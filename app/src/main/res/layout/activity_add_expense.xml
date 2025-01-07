@@ -6,17 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".AddExpense">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="30dp"
-        android:paddingHorizontal="30dp"
-        android:fontFamily="@font/kavoon"
-        android:text="BillBuddy"
-        android:textColor="@color/primary"
-        android:textSize="24sp" />
+    android:background="@android:color/transparent"
+    android:backgroundTint="@android:color/transparent"
+    tools:context=".AddExpenseActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,12 +16,12 @@
         android:orientation="vertical"
         android:paddingHorizontal="30dp"
         android:paddingBottom="30dp"
-        android:background="@drawable/round_top_background"
         android:layout_weight="1">
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingVertical="10dp"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
@@ -46,18 +38,19 @@
 
             <Button
                 android:id="@+id/add_expense_cancel_button"
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
                 style="@style/TransparentButtonStyle"
-                android:fontFamily="@font/notosansregular"
-                android:padding="0dp"
-                android:insetBottom="0dp"
-                android:letterSpacing="-0.01"
-                android:text="Cancel"
+                android:layout_width="60dp"
+                android:layout_height="30dp"
                 android:layout_gravity="end"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/notosansregular"
+                android:insetBottom="0dp"
+                android:paddingTop="6dp"
+                android:letterSpacing="-0.01"
+                android:paddingHorizontal="0dp"
+                android:text="Cancel"
                 android:textColor="@color/primary"
-                android:textSize="16sp"
-                android:layout_marginStart="8dp" />
+                android:textSize="16sp" />
 
         </FrameLayout>
 
@@ -214,7 +207,9 @@
                         android:layout_height="wrap_content"
                         android:background="@drawable/dropdown_selection_background"
                         android:drawableEnd="@drawable/ic_dropdown_arrow"
-                        android:paddingHorizontal="12dp"
+                        android:drawablePadding="16dp"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="25dp"
                         android:paddingVertical="10dp"
                         android:spinnerMode="dropdown"
                         android:textSize="14sp" />
@@ -272,7 +267,24 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <com.google.android.material.button.MaterialButton
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Split"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:textSize="16sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/expense_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:scrollbars="vertical" />
+
+            <Button
                 android:id="@+id/add_expense_btn_add"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"

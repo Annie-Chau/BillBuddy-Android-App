@@ -2,6 +2,8 @@ package com.learning.billbuddy;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -12,24 +14,31 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.learning.billbuddy.adapters.SplitAdapter;
+import com.learning.billbuddy.models.Group;
+import com.learning.billbuddy.models.User;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.Calendar;
+import java.util.List;
 
 public class AddExpenseActivity extends AppCompatActivity {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     EditText datePicker, amountEditText, description;
-    Spinner paidBySpinner, splitTypeSpinner, currencySpinner;
-    Button saveButton, cancelButton;
-    RecyclerView peopleRecyclerView;
+    Spinner paidBySpinner, currencySpinner;
+    Button addButton, cancelButton;
+    RecyclerView splitRecyclerView;
 
-    private String selectedCurrency = "VND"; // Default currency
+    private String selectedCurrency = "đ"; // Default currency
     private String splitType;
     private double amount;
     private String date;
+    private Group currentGroup;
+    private String paidBy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +50,22 @@ public class AddExpenseActivity extends AppCompatActivity {
         description = findViewById(R.id.add_expense_description);
         paidBySpinner = findViewById(R.id.add_expense_paid_by_spinner);
         currencySpinner = findViewById(R.id.add_expense_spinner_currency);
-        saveButton = findViewById(R.id.add_expense_btn_add);
+        addButton = findViewById(R.id.add_expense_btn_add);
         cancelButton = findViewById(R.id.add_expense_cancel_button);
+        splitRecyclerView = findViewById(R.id.expense_list); // Initialize the RecyclerView
 
         cancelButton.setOnClickListener(v -> {
             finish();
+        });
+
+        currentGroup = (Group) getIntent().getSerializableExtra("group");
+
+        // Set up the RecyclerView
+        splitRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        User.fetchAllUsers(users -> {
+            SplitAdapter splitAdapter = new SplitAdapter(currentGroup.getMemberList(users), 0, splitRecyclerView);
+            splitRecyclerView.setAdapter(splitAdapter);
         });
 
         datePicker.setOnClickListener(v -> {
@@ -66,7 +86,7 @@ public class AddExpenseActivity extends AppCompatActivity {
             datePickerDialog.show();
         });
 
-        saveButton.setOnClickListener(v -> {
+        addButton.setOnClickListener(v -> {
             try {
                 amount = Double.parseDouble(amountEditText.getText().toString());
                 date = datePicker.getText().toString();
@@ -98,38 +118,52 @@ public class AddExpenseActivity extends AppCompatActivity {
             Log.d("Result", expenseInfo);
         });
 
-        // Set up Paid By spinner
-//        ArrayAdapter<CharSequence> paidByAdapter = ArrayAdapter.createFromResource(this,
-//                R.array.paid_by_options, android.R.layout.simple_spinner_item); // Replace with your actual array resource
-//        paidByAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        paidBySpinner.setAdapter(paidByAdapter);
-//        paidBySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-//                paidBy = parentView.getItemAtPosition(position).toString();
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parentView) {
-//                // Handle nothing selected
-//            }
-//        });
-
-        // Set up Split Type spinner
-        ArrayAdapter<CharSequence> splitTypeAdapter = ArrayAdapter.createFromResource(this,
-                R.array.split_type_options, android.R.layout.simple_spinner_item); // Replace with your actual array resource
-        splitTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        splitTypeSpinner.setAdapter(splitTypeAdapter);
-        splitTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        amountEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                splitType = parentView.getItemAtPosition(position).toString();
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not used
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-                // Handle nothing selected
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                User.fetchAllUsers(users -> {
+                    SplitAdapter splitAdapter = new SplitAdapter(currentGroup.getMemberList(users), Double.parseDouble(amountEditText.getText().toString()), splitRecyclerView);
+                    splitRecyclerView.setAdapter(splitAdapter);
+                });
             }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try {
+                    amount = Double.parseDouble(s.toString());
+                } catch (NumberFormatException e) {
+                    // Handle invalid format
+                    amount = 0;
+                }
+            }
+        });
+
+        User.fetchAllUsers(users -> {
+            List<String> memberNames = currentGroup.getMemberNameList(users);
+
+            ArrayAdapter<String> paidByAdapter = new ArrayAdapter<>(
+                    this, android.R.layout.simple_spinner_item, memberNames);
+
+            paidByAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+            paidBySpinner.setAdapter(paidByAdapter);
+
+            paidBySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                    paidBy = parentView.getItemAtPosition(position).toString();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parentView) {
+                    // Handle nothing selected
+                }
+            });
         });
 
         // Set up Currency spinner

@@ -19,6 +19,7 @@ import com.learning.billbuddy.views.profile.Profile;
 public class MainActivity extends AppCompatActivity {
 
     FirebaseUser currentUser;
+    User currentUserData;
     FirebaseAuth firebaseAuth;
 
     private final NavigationBarView.OnItemSelectedListener navListener =
@@ -33,9 +34,9 @@ public class MainActivity extends AppCompatActivity {
 //                    selectedFragment.setArguments(bundle);
                 } else if (itemId == R.id.bottom_navigation_profile) {
                     selectedFragment = new Profile();
-//                    Bundle bundle = new Bundle();
-//                    bundle.putSerializable("user", currentUser);
-//                    selectedFragment.setArguments(bundle);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("user", currentUserData);
+                    selectedFragment.setArguments(bundle);
                 } else { // default
                     selectedFragment = new HomePage();
 //                    Bundle bundle = new Bundle();
@@ -68,6 +69,13 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // User is logged in, proceed with fetching user data or other initialization
             setContentView(R.layout.activity_main);
+            User.fetchAllUsers(users -> {
+                for (User user: users){
+                    if (user.getUserID().equals(currentUser.getUid())){
+                        currentUserData = user;
+                    }
+                }
+            });
             BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
             bottomNav.setSelectedItemId(R.id.bottom_navigation_home);
             bottomNav.setOnItemSelectedListener(navListener);

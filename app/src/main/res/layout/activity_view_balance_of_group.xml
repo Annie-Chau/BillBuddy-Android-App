@@ -101,112 +101,170 @@
                 android:layout_marginStart="3dp" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-        <!-- ScrollView for remaining content -->
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            >
+
+            <RadioGroup
+                android:id="@+id/segment_button_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/segment_button_background"
+                android:padding="2dp"
+                android:layout_gravity="center_horizontal">
+
+                <RadioButton
+                    android:id="@+id/rb_expense"
+                    android:layout_width="130dp"
+                    android:layout_height="30dp"
+                    android:text="Expense"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:background="@drawable/segment_button_left"
+                    android:button="@null"
+                     />
+
+                <RadioButton
+                    android:id="@+id/rb_balance"
+                    android:layout_width="130dp"
+                    android:layout_height="30dp"
+                    android:text="Balance"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:background="@drawable/segment_button_right"
+                    android:button="@null"
+                    />
+            </RadioGroup>
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:id="@+id/expense_content"
+            android:paddingHorizontal="16dp"
+            >
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/expense_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:layout_marginTop="6dp"
+                android:scrollbars="vertical" />
+
+            <LinearLayout
+                android:id="@+id/floating_button_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginBottom="20dp"
+                android:layout_gravity="center|bottom">
+
+                <!-- Circular Button -->
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/to_add_expense_btn"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/ic_plus"
+                    android:contentDescription="Add Group Button"
+                    app:backgroundTint="@color/primary"
+                    android:scaleType="center"
+                    android:layout_gravity="center"
+                    app:tint="@color/white"
+                    />
+
+                <!-- Text Below the Button -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add Expense"
+                    android:fontFamily="@font/notosansregular"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:id="@+id/balance_content"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:orientation="horizontal"
+                android:background="@drawable/rounded_green_background"
                 android:padding="16dp"
-                >
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="6dp"
+                android:gravity="center">
 
-                <RadioGroup
-                    android:id="@+id/segment_button_group"
+                <!-- Thumbs-up Icon -->
+                <ImageView
+                    android:id="@+id/thumb_icon"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/ic_thump_up_icon"
+                    android:contentDescription="Thumb Icon"
+                    android:layout_marginEnd="16dp" />
+
+                <!-- Text Section -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:background="@drawable/segment_button_background"
-                    android:padding="2dp"
-                    android:layout_gravity="center_horizontal">
+                    android:orientation="vertical">
 
-                    <RadioButton
-                        android:id="@+id/rb_expense"
-                        android:layout_width="130dp"
-                        android:layout_height="30dp"
-                        android:text="Expense"
-                        android:gravity="center"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"
-                        android:background="@drawable/segment_button_left"
-                        android:button="@null"
-                         />
-
-                    <RadioButton
-                        android:id="@+id/rb_balance"
-                        android:layout_width="130dp"
-                        android:layout_height="30dp"
-                        android:text="Balance"
-                        android:gravity="center"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"
-                        android:background="@drawable/segment_button_right"
-                        android:button="@null"
-                        />
-                </RadioGroup>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:background="@drawable/rounded_green_background"
-                    android:padding="16dp"
-                    android:layout_marginTop="20dp"
-                    android:gravity="center">
-
-                    <!-- Thumbs-up Icon -->
-                    <ImageView
-                        android:id="@+id/thumb_icon"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:src="@drawable/ic_thump_up_icon"
-                        android:contentDescription="Thumb Icon"
-                        android:layout_marginEnd="16dp" />
-
-                    <!-- Text Section -->
-                    <LinearLayout
+                    <!-- Upper Text -->
+                    <TextView
+                        android:id="@+id/owed_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:text="You are owed"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
 
-                        <!-- Upper Text -->
-                        <TextView
-                            android:id="@+id/owed_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="You are owed"
-                            android:textSize="16sp"
-                            android:textColor="@android:color/black"
-                            android:textStyle="bold" />
-
-                        <!-- Amount Text -->
-                        <TextView
-                            android:id="@+id/amount_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="₫ 1,000,320.00"
-                            android:textSize="24sp"
-                            android:textColor="@android:color/black"
-                            android:textStyle="bold" />
-                    </LinearLayout>
+                    <!-- Amount Text -->
+                    <TextView
+                        android:id="@+id/amount_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="₫ 1,000,320.00"
+                        android:textSize="24sp"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
-                <!-- Add a clickable textview -->
-                <TextView
-                    android:id="@+id/view_all_suggested_reimbursements"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/blue"
-                    android:text="View All Suggested Reimbursements"
-                    android:textSize="14sp"
-                    android:fontFamily="@font/notosansregular"
-                    android:layout_marginTop="15dp"
-                    android:gravity="center_horizontal" />
             </LinearLayout>
-        </ScrollView>
+
+            <TextView
+                android:id="@+id/view_all_suggested_reimbursements"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/blue"
+                android:text="View All Suggested Reimbursements"
+                android:textSize="14sp"
+                android:fontFamily="@font/notosansregular"
+                android:layout_marginTop="15dp"
+                android:gravity="center_horizontal" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
     <!-- Floating Chat Button -->

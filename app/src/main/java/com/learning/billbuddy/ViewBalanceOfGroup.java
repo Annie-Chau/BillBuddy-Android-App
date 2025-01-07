@@ -3,6 +3,7 @@ package com.learning.billbuddy;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -15,21 +16,18 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.learning.billbuddy.models.Group;
 
 import java.util.ArrayList;
 
 public class ViewBalanceOfGroup extends AppCompatActivity {
 
     private RadioGroup segmentGroup;
-    private RadioButton rbExpense;
-    private RadioButton rbBalance;
+    private RadioButton rbExpense, rbBalance;
     private TextView groupNameTextView;
     private ImageView groupImageView;
     private FloatingActionButton chatButton;
-
-    private String groupID;
-    private ArrayList<String> memberIDs;
-    private String groupName;
+    private Group currentGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,33 +43,38 @@ public class ViewBalanceOfGroup extends AppCompatActivity {
         chatButton = findViewById(R.id.chat_button);
 
         // Retrieve data from Intent
-        groupID = getIntent().getStringExtra("groupID");
-        groupName = getIntent().getStringExtra("groupName");
-        String groupDescription = getIntent().getStringExtra("groupDescription");
-        String groupAvatarURL = getIntent().getStringExtra("groupAvatarURL");
-        memberIDs = getIntent().getStringArrayListExtra("memberIDs");
+        currentGroup = (Group) getIntent().getSerializableExtra("group");
+
+        rbExpense.setChecked(true);
+        findViewById(R.id.expense_content).setVisibility(View.VISIBLE);
+        findViewById(R.id.balance_content).setVisibility(View.GONE);
 
         // Set data to views
-        groupNameTextView.setText(groupName);
+        groupNameTextView.setText(currentGroup.getName());
 
-        if (groupAvatarURL != null && !groupAvatarURL.isEmpty()) {
-            Glide.with(this).load(groupAvatarURL).into(groupImageView);
+        if (currentGroup.getAvatarURL() != null && !currentGroup.getAvatarURL().isEmpty()) {
+            Glide.with(this).load(currentGroup.getAvatarURL()).into(groupImageView);
         }
 
         segmentGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.rb_expense) {
-                Toast.makeText(this, "Expense Selected", Toast.LENGTH_SHORT).show();
+                findViewById(R.id.expense_content).setVisibility(View.VISIBLE);
+                findViewById(R.id.balance_content).setVisibility(View.GONE);
             } else if (checkedId == R.id.rb_balance) {
-                Toast.makeText(this, "Balance Selected", Toast.LENGTH_SHORT).show();
+                findViewById(R.id.expense_content).setVisibility(View.GONE);
+                findViewById(R.id.balance_content).setVisibility(View.VISIBLE);
             }
         });
 
         // Set up chat button click listener
-        chatButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                navigateToChatBox();
-            }
+        chatButton.setOnClickListener(v -> navigateToChatBox());
+
+        findViewById(R.id.return_button).setOnClickListener(v -> finish());
+
+        findViewById(R.id.to_add_expense_btn).setOnClickListener(v -> {
+            Intent intent = new Intent(ViewBalanceOfGroup.this, AddExpenseActivity.class);
+            intent.putExtra("group", currentGroup);
+            startActivity(intent);
         });
     }
 
@@ -80,10 +83,8 @@ public class ViewBalanceOfGroup extends AppCompatActivity {
         if (currentUser != null) {
             String userID = currentUser.getUid();
             Intent intent = new Intent(ViewBalanceOfGroup.this, ChatBoxActivity.class);
-            intent.putExtra("GROUP_ID", groupID);
-            intent.putStringArrayListExtra("MEMBER_IDS", memberIDs);
+            intent.putExtra("group", currentGroup);
             intent.putExtra("USER_ID", userID);
-            intent.putExtra("GROUP_NAME", groupName); // Pass the group name
             startActivity(intent);
         } else {
             Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();

@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -20,7 +19,9 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.learning.billbuddy.adapters.ChatAdapter;
 import com.learning.billbuddy.models.Chat;
+import com.learning.billbuddy.models.Group;
 import com.learning.billbuddy.models.Message;
 import com.learning.billbuddy.models.User;
 import java.util.ArrayList;
@@ -42,12 +43,10 @@ public class ChatBoxActivity extends AppCompatActivity {
     private ImageButton sendButton;
     private ImageButton backButton;
     private TextView groupNameTextView;
-    private String groupID;
-    private ArrayList<String> memberIDs;
     private String chatID;
     private String userID;
-    private String groupName;
     private Map<String, String> userNames;
+    private Group currentGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +61,12 @@ public class ChatBoxActivity extends AppCompatActivity {
         backButton = findViewById(R.id.backButton);
         groupNameTextView = findViewById(R.id.groupName);
 
-        groupID = getIntent().getStringExtra("GROUP_ID");
-        memberIDs = getIntent().getStringArrayListExtra("MEMBER_IDS");
+        currentGroup = (Group) getIntent().getSerializableExtra("group");
+
         userID = getIntent().getStringExtra("USER_ID");
-        groupName = getIntent().getStringExtra("GROUP_NAME");
 
         // Set the group name
-        groupNameTextView.setText(groupName);
+        groupNameTextView.setText(currentGroup.getName());
 
         // Setup RecyclerView
         messageList = new ArrayList<>();
@@ -81,19 +79,9 @@ public class ChatBoxActivity extends AppCompatActivity {
 
         checkOrCreateChat();
 
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendMessage();
-            }
-        });
+        sendButton.setOnClickListener(v -> sendMessage());
 
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); // Return to the previous page
-            }
-        });
+        backButton.setOnClickListener(v -> finish());
     }
 
     private void fetchUserNames() {
@@ -112,7 +100,7 @@ public class ChatBoxActivity extends AppCompatActivity {
 
     private void checkOrCreateChat() {
         db.collection("chats")
-                .whereEqualTo("groupID", groupID)
+                .whereEqualTo("groupID", currentGroup.getGroupID())
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && !task.getResult().isEmpty()) {
@@ -131,7 +119,7 @@ public class ChatBoxActivity extends AppCompatActivity {
 
     private void createNewChat() {
         chatID = db.collection("chats").document().getId();
-        Chat newChat = new Chat(chatID, groupID, new ArrayList<>());
+        Chat newChat = new Chat(chatID, currentGroup.getGroupID(), new ArrayList<>());
         db.collection("chats").document(chatID).set(newChat)
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "New chat created with ID: " + chatID);
@@ -141,19 +129,16 @@ public class ChatBoxActivity extends AppCompatActivity {
 
     private void listenForMessages() {
         db.collection("chats").document(chatID)
-                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.e(TAG, "Error listening for messages", e);
-                            return;
-                        }
-                        if (snapshot != null && snapshot.exists()) {
-                            Chat chat = snapshot.toObject(Chat.class);
-                            if (chat != null) {
-                                Log.d(TAG, "Message IDs: " + chat.getMessageIds());
-                                loadMessages(chat.getMessageIds());
-                            }
+                .addSnapshotListener((snapshot, e) -> {
+                    if (e != null) {
+                        Log.e(TAG, "Error listening for messages", e);
+                        return;
+                    }
+                    if (snapshot != null && snapshot.exists()) {
+                        Chat chat = snapshot.toObject(Chat.class);
+                        if (chat != null) {
+                            Log.d(TAG, "Message IDs: " + chat.getMessageIds());
+                            loadMessages(chat.getMessageIds());
                         }
                     }
                 });
@@ -165,22 +150,20 @@ public class ChatBoxActivity extends AppCompatActivity {
             db.collection("messages")
                     .whereIn("messageID", messageIds)
                     .orderBy("timestamp")
-                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                        @Override
-                        public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
-                            if (e != null) {
-                                Log.e(TAG, "Error loading messages", e);
-                                return;
-                            }
-                            messageList.clear();
-                            for (QueryDocumentSnapshot document : snapshots) {
-                                Message message = document.toObject(Message.class);
-                                Log.d(TAG, "Loaded message: " + message.getContent());
-                                messageList.add(message);
-                            }
-                            chatAdapter.notifyDataSetChanged();
-                            chatRecyclerView.scrollToPosition(messageList.size() - 1);
+                    .addSnapshotListener((snapshots, e) -> {
+                        if (e != null) {
+                            Log.e(TAG, "Error loading messages", e);
+                            return;
                         }
+                        messageList.clear();
+                        for (QueryDocumentSnapshot document : snapshots) {
+                            Message message = document.toObject(Message.class);
+                            Log.d(TAG, "Loaded message: " + message.getContent());
+                            messageList.add(message);
+                        }
+                        chatAdapter.messageList = messageList;
+                        chatAdapter.notifyDataSetChanged();
+                        chatRecyclerView.scrollToPosition(messageList.size() - 1);
                     });
         } else {
             Log.d(TAG, "No messages to load");

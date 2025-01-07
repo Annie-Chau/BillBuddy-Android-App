@@ -111,16 +111,17 @@
             app:backgroundTint="@color/primary"
             android:scaleType="center"
             android:layout_gravity="center"
-            app:tint="@color/white" />
+            app:tint="@color/white"
+            />
 
         <!-- Text Below the Button -->
         <TextView
-            android:id="@+id/add_group_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add Group"
+            android:fontFamily="@font/notosansregular"
             android:textColor="@color/black"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:layout_marginTop="8dp"
             android:gravity="center" />
     </LinearLayout>

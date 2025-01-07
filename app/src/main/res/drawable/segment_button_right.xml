@@ -2,13 +2,13 @@
     <item android:state_checked="true">
         <shape>
             <solid android:color="@android:color/white" /> <!-- Selected color -->
-            <corners android:topRightRadius="16dp" android:bottomRightRadius="16dp" />
+            <corners android:topRightRadius="5dp" android:bottomRightRadius="5dp" />
         </shape>
     </item>
     <item>
         <shape>
             <solid android:color="#D3D3D3" /> <!-- Unselected color -->
-            <corners android:topRightRadius="16dp" android:bottomRightRadius="16dp" />
+            <corners android:topRightRadius="5dp" android:bottomRightRadius="5dp" />
         </shape>
     </item>
 </selector>
