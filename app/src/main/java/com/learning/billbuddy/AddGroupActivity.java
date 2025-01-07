@@ -65,8 +65,16 @@ public class AddGroupActivity extends AppCompatActivity {
 
         // Add the owner to the group members list
         memberIDs.add(ownerID);
-        // Update the members list in the UI
-        updateMembersList();
+        db.collection("users").document(ownerID).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    String ownerName = documentSnapshot.getString("name");
+                    if (!TextUtils.isEmpty(ownerName)) {
+                        memberNames.add(ownerName);
+                    } else {
+                        memberNames.add("Owner"); // Fallback if name is not available
+                    }
+                    updateMembersList();
+                });
 
 
         createButton.setOnClickListener(v -> createGroup());
@@ -76,8 +84,9 @@ public class AddGroupActivity extends AppCompatActivity {
     }
 
     // Method to add a new member
+    private List<String> memberNames = new ArrayList<>();
     private void addMember(){
-        String email = memberEmailEditText.getText().toString().trim();
+        String email = memberEmailEditText.getText().toString().trim().toLowerCase();
         // Validate email
         if (TextUtils.isEmpty(email)){
             memberEmailEditText.setError("Email is required");
@@ -94,15 +103,18 @@ public class AddGroupActivity extends AppCompatActivity {
                         // Get the user's ID from the doc
                         DocumentSnapshot document = querySnapshot.getDocuments().get(0);
                         String userID = document.getString("userID");
+                        String userName = document.getString("name");
 
                         if (memberIDs.contains(userID)){
                             Toast.makeText(this, "User already added", Toast.LENGTH_LONG).show();
                         } else {
                             memberIDs.add(userID);
+                            memberNames.add(userName);
                             updateMembersList();
                             Toast.makeText(this, "User added successfully", Toast.LENGTH_LONG).show();
                         }
                     } else {
+                        Log.d("AddMember", "No user found with email: " + email); // for debugging
                         Toast.makeText(this, "No user found with this email", Toast.LENGTH_SHORT).show();
                     }
                 }).addOnFailureListener(e -> Toast.makeText(this, "Failed to add member", Toast.LENGTH_SHORT).show());
@@ -115,7 +127,7 @@ public class AddGroupActivity extends AppCompatActivity {
             if(i == 0){
                 membersText.append("\n- Owner");
             }else{
-                membersText.append("\n- Member ").append(i);
+                membersText.append("\n- ").append(memberNames.get(i));
             }
         }
         membersListTextView.setText(membersText.toString());

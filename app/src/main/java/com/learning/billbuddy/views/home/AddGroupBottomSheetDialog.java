@@ -35,11 +35,11 @@ public class AddGroupBottomSheetDialog extends BottomSheetDialogFragment {
     private Button addMemberButton;
     private EditText memberEmailEditText;
     private TextView membersListTextView;
-    private List<String> memberIDs = new ArrayList<>(); // List to store group members
+    private List<String> memberIDs = new ArrayList<>(); // List to store member IDs
+    private List<String> memberNames = new ArrayList<>(); // List to store member names
 
     // Owner ID (current logged-in user)
     private String ownerID;
-
 
     public AddGroupBottomSheetDialog() {
         // Required empty public constructor
@@ -63,23 +63,21 @@ public class AddGroupBottomSheetDialog extends BottomSheetDialogFragment {
         memberEmailEditText = view.findViewById(R.id.add_member_email);
         membersListTextView = view.findViewById(R.id.members_list);
 
-
         // Retrieve the current logged-in user's ID from arguments
-        if (getContext() != null) {
+        if (getArguments() != null) {
             ownerID = getArguments().getString("OWNER_ID");
         }
 
         if (ownerID == null || ownerID.isEmpty()) {
             Log.e("AddGroupFragment", "Owner ID is null");
             Toast.makeText(requireContext(), "Error: User not logged in!", Toast.LENGTH_LONG).show();
-            requireActivity().onBackPressed(); // Navigate back if the owner ID is null
+            dismiss();
             return view;
         }
 
         // Add the owner to the group members list
         memberIDs.add(ownerID);
-        // Update the members list in the UI
-        updateMembersList();
+        fetchOwnerName();
 
         // Set click listeners
         createButton.setOnClickListener(v -> createGroup());
@@ -89,78 +87,96 @@ public class AddGroupBottomSheetDialog extends BottomSheetDialogFragment {
         return view;
     }
 
-    // Method to add a new member
+    private void fetchOwnerName() {
+        db.collection("users").document(ownerID).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    String ownerName = documentSnapshot.getString("name");
+                    if (!TextUtils.isEmpty(ownerName)) {
+                        memberNames.add(ownerName);
+                    } else {
+                        memberNames.add("Owner"); // Fallback if name is not available
+                    }
+                    updateMembersList();
+                })
+                .addOnFailureListener(e -> {
+                    memberNames.add("Owner"); // Default fallback
+                    updateMembersList();
+                });
+    }
+
     private void addMember() {
         String email = memberEmailEditText.getText().toString().trim();
-        // Validate email
         if (TextUtils.isEmpty(email)) {
             memberEmailEditText.setError("Email is required");
             memberEmailEditText.requestFocus();
             return;
         }
 
-        // Check if Firestore has the email
         db.collection("users")
                 .whereEqualTo("email", email)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     if (!querySnapshot.isEmpty()) {
-                        // Get the user's ID from the document
                         DocumentSnapshot document = querySnapshot.getDocuments().get(0);
                         String userID = document.getString("userID");
+                        String userName = document.getString("name");
+
+                        if (TextUtils.isEmpty(userID) || TextUtils.isEmpty(userName)) {
+                            Toast.makeText(requireContext(), "Invalid user data. Please check Firestore.", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
                         if (memberIDs.contains(userID)) {
-                            Toast.makeText(requireContext(), "User already added", Toast.LENGTH_LONG).show();
+                            Toast.makeText(requireContext(), "User already added", Toast.LENGTH_SHORT).show();
                         } else {
                             memberIDs.add(userID);
+                            memberNames.add(userName); // Add the user's name to the list
                             updateMembersList();
-                            Toast.makeText(requireContext(), "User added successfully", Toast.LENGTH_LONG).show();
+                            memberEmailEditText.setText(""); // Clear the EditText
+                            Toast.makeText(requireContext(), "User added successfully", Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         Toast.makeText(requireContext(), "No user found with this email", Toast.LENGTH_SHORT).show();
                     }
-                }).addOnFailureListener(e -> Toast.makeText(requireContext(), "Failed to add member", Toast.LENGTH_SHORT).show());
+                })
+                .addOnFailureListener(e -> Toast.makeText(requireContext(), "Failed to add member", Toast.LENGTH_SHORT).show());
     }
 
-    // Update the list of members
     private void updateMembersList() {
         StringBuilder membersText = new StringBuilder("Current members:");
-        for (int i = 0; i < memberIDs.size(); i++) {
+        for (int i = 0; i < memberNames.size(); i++) {
             if (i == 0) {
-                membersText.append("\n- Owner");
+                membersText.append("\n- Owner (").append(memberNames.get(i)).append(")");
             } else {
-                membersText.append("\n- Member ").append(i);
+                membersText.append("\n- ").append(memberNames.get(i));
             }
         }
         membersListTextView.setText(membersText.toString());
     }
 
-    // Method to create a new group
     private void createGroup() {
         String title = titleEditText.getText().toString().trim();
         String description = descriptionEditText.getText().toString().trim();
 
-        // Validate inputs
         if (TextUtils.isEmpty(title)) {
             titleEditText.setError("Group Title is required");
             titleEditText.requestFocus();
             return;
         }
 
-        if (memberIDs.size() < 2) { // A group must have at least two members
+        if (memberIDs.size() < 2) {
             Toast.makeText(requireContext(), "A group must have at least two members", Toast.LENGTH_LONG).show();
             return;
         }
 
-        // Create the group in Firestore
         Group.createGroup(
                 title,
                 description.isEmpty() ? "No description provided" : description,
-                "", // Avatar URL placeholder
+                "",
                 ownerID,
                 memberIDs,
-                new ArrayList<>(), // Expense IDs
-                new ArrayList<>()  // Debt IDs
+                new ArrayList<>(),
+                new ArrayList<>()
         );
 
         Toast.makeText(requireContext(), "Group created successfully!", Toast.LENGTH_SHORT).show();
