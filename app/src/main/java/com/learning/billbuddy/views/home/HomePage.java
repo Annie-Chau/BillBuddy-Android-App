@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -53,79 +54,77 @@ public class HomePage extends Fragment {
         groupRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         groupRecyclerView.setAdapter(groupAdapter);
 
-        loadUserGroups();
-        logAllUsers(); // Log all user documents
+        setupRealTimeGroupUpdates();
 
         ImageButton addParticipantButton = view.findViewById(R.id.to_add_group_btn);
-        addParticipantButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FirebaseUser currentUser = mAuth.getCurrentUser();
-                if (currentUser != null) {
-                    String firebaseAuthID = currentUser.getUid();
-                    Log.d("HomePage", "Current Firebase Auth ID: " + firebaseAuthID);
-                    db.collection("users").whereEqualTo("userID", firebaseAuthID).get().addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            QuerySnapshot querySnapshot = task.getResult();
-                            if (querySnapshot != null && !querySnapshot.isEmpty()) {
-                                for (QueryDocumentSnapshot document : querySnapshot) {
-                                    User user = document.toObject(User.class);
-                                    if (user != null) {
-                                        Log.d("HomePage", "User found: " + user.getName());
-                                        Intent intent = new Intent(requireActivity(), AddGroupActivity.class);
-                                        intent.putExtra("OWNER_ID", user.getUserID());
-                                        intent.putExtra("OWNER_NAME", user.getName());
-                                        startActivity(intent);
-                                        Log.d("HomePage", "Starting AddGroupActivity");
-                                    }
-                                }
-                            } else {
-                                Log.d("HomePage", "No matching documents found");
-                            }
-                        } else {
-                            Log.d("HomePage", "get failed with ", task.getException());
-                        }
-                    });
-                } else {
-                    Log.d("HomePage", "No authenticated user found");
-                }
-            }
-        });
+        addParticipantButton.setOnClickListener(v -> openAddGroupDialog());
 
         return view;
     }
 
-    private void logAllUsers() {
-        db.collection("users").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    Log.d("HomePage", "User Document: " + document.getData());
+    private void openAddGroupDialog() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            Log.d("HomePage", "No authenticated user found");
+            return;
+        }
+
+        String firebaseAuthID = currentUser.getUid();
+        db.collection("users").whereEqualTo("userID", firebaseAuthID).get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                Log.d("HomePage", "get failed with ", task.getException());
+                return;
+            }
+
+            if (task.getResult() != null && !task.getResult().isEmpty()) {
+                for (DocumentSnapshot document : task.getResult()) {
+                    User user = document.toObject(User.class);
+                    if (user != null) {
+                        AddGroupBottomSheetDialog bottomSheet = new AddGroupBottomSheetDialog();
+                        Bundle args = new Bundle();
+                        args.putString("OWNER_ID", user.getUserID());
+                        args.putString("OWNER_NAME", user.getName());
+                        bottomSheet.setArguments(args);
+                        bottomSheet.show(requireActivity().getSupportFragmentManager(), "AddGroupBottomSheetDialog");
+                    }
                 }
             } else {
-                Log.d("HomePage", "Error getting documents: ", task.getException());
+                Log.d("HomePage", "No matching user documents found");
             }
         });
     }
 
-    private void loadUserGroups() {
+    private void setupRealTimeGroupUpdates() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            String currentUserId = currentUser.getUid();
-            db.collection("groups")
-                    .whereArrayContains("memberIDs", currentUserId)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            groupList.clear();
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Group group = document.toObject(Group.class);
+        if (currentUser == null) {
+            Log.e("HomePage", "No authenticated user found for real-time updates");
+            return;
+        }
+
+        String currentUserId = currentUser.getUid();
+        db.collection("groups")
+                .whereArrayContains("memberIDs", currentUserId)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.e("HomePage", "Error fetching real-time updates for groups: ", error);
+                        return;
+                    }
+
+                    if (value != null) {
+                        groupList.clear();
+                        for (DocumentSnapshot document : value.getDocuments()) {
+                            Group group = document.toObject(Group.class);
+                            if (group != null) {
                                 groupList.add(group);
                             }
-                            groupAdapter.notifyDataSetChanged();
-                        } else {
-                            Log.e("HomePage", "Error loading groups", task.getException());
                         }
-                    });
-        }
+                        groupAdapter.notifyDataSetChanged();
+                        Log.d("HomePage", "Groups updated in real-time. Total groups: " + groupList.size());
+                    } else {
+                        Log.d("HomePage", "No group data available for real-time updates");
+                        groupList.clear();
+                        groupAdapter.notifyDataSetChanged();
+                    }
+                });
     }
 }
