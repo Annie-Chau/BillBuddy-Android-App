@@ -109,7 +109,7 @@
             android:padding="8dp"/>
 
         <!-- Sign In Button -->
-        <com.google.android.material.button.MaterialButton
+        <Button
             android:id="@+id/login_submit_button"
             app:cornerRadius="8dp"
             android:layout_width="match_parent"
@@ -179,8 +179,5 @@
         </LinearLayout>
 
     </LinearLayout>
-
-
-
 
 </LinearLayout>

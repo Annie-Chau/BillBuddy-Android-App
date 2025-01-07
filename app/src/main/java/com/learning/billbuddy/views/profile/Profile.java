@@ -22,6 +22,8 @@ import com.learning.billbuddy.R;
 import com.learning.billbuddy.models.User;
 import com.learning.billbuddy.views.authentication.Login;
 
+import java.util.Objects;
+
 public class Profile extends Fragment {
 
 
@@ -32,7 +34,7 @@ public class Profile extends Fragment {
     private FirebaseFirestore db;
 
     private ImageButton editProfileButton;
-
+    User currentUser;
 
     @Nullable
     @Override
@@ -51,21 +53,15 @@ public class Profile extends Fragment {
 
         userName = view.findViewById(R.id.profile_userName_textField);
         phoneNumber = view.findViewById(R.id.profile_phoneNumber_textField);
+        assert getArguments() != null;
+        currentUser = (User) getArguments().getSerializable("user");
 
-        db.collection("users").document(userAuth.getUid()).get().addOnCompleteListener(task -> {
-            if (!task.isSuccessful()) {
-                return;
-            }
-
-            User user = task.getResult().toObject(User.class);
-            userName.setText(user.getName());
-            phoneNumber.setText(user.getPhoneNumber());
-        });
-
+        userName.setText(Objects.requireNonNull(currentUser).getName());
+        phoneNumber.setText(currentUser.getPhoneNumber());
 
         editProfileButton = view.findViewById(R.id.profile_edit_button);
         editProfileButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), AddUserInfo.class);
+            Intent intent = new Intent(requireActivity(), AddUserInfo.class);
             intent.putExtra("isEdit", true);
             intent.putExtra("name", userName.getText().toString());
             intent.putExtra("phoneNumber", phoneNumber.getText().toString());

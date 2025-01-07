@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -31,7 +32,7 @@ public class AddUserInfo extends AppCompatActivity {
 
     private ImageButton changeAvatarButton;
     private EditText nameInput, phoneInput;
-    private MaterialButton submitButton;
+    private Button submitButton;
     private ImageView userAvatar;
     String userId, email, password, registrationMethod;
 

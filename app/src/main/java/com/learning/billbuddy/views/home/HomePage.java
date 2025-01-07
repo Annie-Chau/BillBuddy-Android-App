@@ -1,14 +1,12 @@
 package com.learning.billbuddy.views.home;
 
-import android.content.Intent;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,16 +18,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.learning.billbuddy.AddGroupActivity;
 import com.learning.billbuddy.R;
-import com.learning.billbuddy.GroupAdapter;
+import com.learning.billbuddy.adapters.GroupAdapter;
 import com.learning.billbuddy.models.Group;
 import com.learning.billbuddy.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class HomePage extends Fragment {
 
@@ -94,6 +90,7 @@ public class HomePage extends Fragment {
         });
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void setupRealTimeGroupUpdates() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
@@ -102,29 +99,14 @@ public class HomePage extends Fragment {
         }
 
         String currentUserId = currentUser.getUid();
-        db.collection("groups")
-                .whereArrayContains("memberIDs", currentUserId)
-                .addSnapshotListener((value, error) -> {
-                    if (error != null) {
-                        Log.e("HomePage", "Error fetching real-time updates for groups: ", error);
-                        return;
-                    }
 
-                    if (value != null) {
-                        groupList.clear();
-                        for (DocumentSnapshot document : value.getDocuments()) {
-                            Group group = document.toObject(Group.class);
-                            if (group != null) {
-                                groupList.add(group);
-                            }
-                        }
-                        groupAdapter.notifyDataSetChanged();
-                        Log.d("HomePage", "Groups updated in real-time. Total groups: " + groupList.size());
-                    } else {
-                        Log.d("HomePage", "No group data available for real-time updates");
-                        groupList.clear();
-                        groupAdapter.notifyDataSetChanged();
-                    }
-                });
+        Group.fetchAllGroups(groups -> {
+            groupList = groups.stream()
+                    .filter(group -> group.getMemberIDs() != null && group.getMemberIDs().contains(currentUserId))
+                    .collect(Collectors.toList());
+            groupAdapter.groupList = groupList;
+            groupAdapter.notifyDataSetChanged();
+            Log.d("HomePage", "Groups updated in real-time. Total groups: " + groupList.size());
+        });
     }
 }

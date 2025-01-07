@@ -136,7 +136,7 @@
             android:padding="8dp"/>
 
         <!-- Sign In Button -->
-        <com.google.android.material.button.MaterialButton
+        <Button
             android:id="@+id/signup_confirm_button"
             app:cornerRadius="8dp"
             android:layout_width="match_parent"

@@ -1,4 +1,4 @@
-package com.learning.billbuddy;
+package com.learning.billbuddy.adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,14 +14,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.learning.billbuddy.R;
+import com.learning.billbuddy.ViewBalanceOfGroup;
 import com.learning.billbuddy.models.Group;
 
 import java.util.List;
 
 public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHolder> {
 
-    private Context context;
-    private List<Group> groupList;
+    private final Context context;
+    public List<Group> groupList;
 
     public GroupAdapter(Context context, List<Group> groupList) {
         this.context = context;
@@ -56,10 +57,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
         holder.arrowButton.setOnClickListener(v -> {
             // Handle navigation or action when the arrow is clicked
             Intent intent = new Intent(context, ViewBalanceOfGroup.class);
-            intent.putExtra("groupID", group.getGroupID());
-            intent.putExtra("groupName", group.getName());
-            intent.putExtra("groupDescription", group.getDescription());
-            intent.putExtra("groupAvatarURL", group.getAvatarURL());
+            intent.putExtra("group", group);
             context.startActivity(intent);
         });
     }

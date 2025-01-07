@@ -8,6 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.learning.billbuddy.utils.UserCallback;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.HashMap;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class User {
+public class User implements Serializable {
 
     private String userID; // Firebase UID
     private String name;

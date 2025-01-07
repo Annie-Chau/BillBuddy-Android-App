@@ -21,7 +21,7 @@
             android:scaleType="centerCrop"
             android:src="@drawable/example_image_1"
             android:contentDescription="Group Image"
-            android:background="@drawable/rounded_border_image_view" />
+            android:background="@drawable/item_icon_round_corners" />
 
         <!-- Group Name -->
         <TextView
