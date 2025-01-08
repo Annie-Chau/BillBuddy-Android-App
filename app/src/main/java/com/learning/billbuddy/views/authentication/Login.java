@@ -3,6 +3,7 @@ package com.learning.billbuddy.views.authentication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -32,7 +33,7 @@ public class Login extends AppCompatActivity {
     private static final int RC_SIGN_IN = 9001;
 
     private EditText emailInput, passwordInput;
-    private MaterialButton signInButton;
+    private Button signInButton;
     private ImageButton googleLoginButton;
     private TextView navigateToSignUp;
 

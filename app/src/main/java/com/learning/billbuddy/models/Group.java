@@ -8,6 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.learning.billbuddy.utils.GroupCallback;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class Group {
+public class Group implements Serializable {
 
     private String groupID; // Firestore Document ID
     private String name;
@@ -26,6 +27,9 @@ public class Group {
     private List<String> expenseIDs;
     private List<String> debtIds;
 
+    public Group() {
+        // Default constructor for Firestore deserialization
+    }
 
     // Constructor
     public Group(String groupID, String name, String description, String avatarURL, String ownerID, List<String> memberIDs, List<String> expenseIDs, List<String> debtIds) {
@@ -204,5 +208,25 @@ public class Group {
                 .set(groupData)
                 .addOnSuccessListener(aVoid -> Log.d("Group Creation", "Group created with ID: " + groupID))
                 .addOnFailureListener(e -> Log.e("Group Creation", "Error creating group: ", e));
+    }
+
+    public List<String> getMemberNameList(List<User> userList) {
+        return memberIDs.stream()
+                .map(memberID -> userList.stream()
+                        .filter(user -> user.getUserID().equals(memberID))
+                        .findFirst()
+                        .map(User::getName)
+                        .orElse("Unknown")) // Or handle the case where the user is not found
+                .collect(Collectors.toList());
+    }
+
+    public List<User> getMemberList(List<User> userList) {
+        return memberIDs.stream()
+                .map(memberID -> userList.stream()
+                        .filter(user -> user.getUserID().equals(memberID))
+                        .findFirst()
+                        .orElse(null)) // Or handle the case where the user is not found
+                .filter(Objects::nonNull) // Remove null elements if any
+                .collect(Collectors.toList());
     }
 }

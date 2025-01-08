@@ -3,6 +3,7 @@ package com.learning.billbuddy.views.authentication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,7 +31,7 @@ import java.util.Objects;
 public class Register extends AppCompatActivity {
 
     private EditText emailInput, passwordInput, confirmPasswordInput;
-    private MaterialButton signupButton;
+    private Button signupButton;
     private TextView navigateToSignIn;
     private FirebaseAuth firebaseAuth;
     private GoogleSignInClient googleSignInClient;
@@ -91,7 +92,7 @@ public class Register extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         Intent intent = new Intent(Register.this, AddUserInfo.class);
-                        intent.putExtra("userId", firebaseAuth.getCurrentUser().getUid());
+                        intent.putExtra("userId", Objects.requireNonNull(firebaseAuth.getCurrentUser()).getUid());
                         intent.putExtra("email", email);
                         intent.putExtra("password", password);
                         intent.putExtra("registrationMethod", "Email");

@@ -5,9 +5,12 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -19,6 +22,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.learning.billbuddy.models.User;
 import com.learning.billbuddy.views.authentication.Login;
@@ -29,9 +34,14 @@ import java.util.Objects;
 
 public class AddUserInfo extends AppCompatActivity {
 
+
+    private TextView userInfoFormHeadingTop;
+
+    private TextView cancelTextView;
+    private TextView userInfoFormHeadingBottom;
     private ImageButton changeAvatarButton;
     private EditText nameInput, phoneInput;
-    private MaterialButton submitButton;
+    private Button submitButton;
     private ImageView userAvatar;
     String userId, email, password, registrationMethod;
 
@@ -44,17 +54,55 @@ public class AddUserInfo extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_user_info);
 
+        cancelTextView = findViewById(R.id.user_form_cancel_btn);
+
+        FirebaseUser userAuth = FirebaseAuth.getInstance().getCurrentUser();
+
+
         userId = getIntent().getStringExtra("userId");
         email = getIntent().getStringExtra("email");
         password = getIntent().getStringExtra("password");
         registrationMethod = getIntent().getStringExtra("registrationMethod");
 
+        // Handle case update
+        Boolean isEdit = getIntent().getBooleanExtra("isEdit", false);
+        String currentName = getIntent().getStringExtra("currentName");
+        String currentPhoneNumber = getIntent().getStringExtra("currentPhoneNumber");
+        String currentPhotoUrl = getIntent().getStringExtra("currentPhotoUrl");
+
+        if (!isEdit){
+            cancelTextView.setVisibility(View.INVISIBLE);
+        }
+
+        //heading
+        userInfoFormHeadingTop = findViewById(R.id.user_info_form_heading_top);
+        userInfoFormHeadingBottom = findViewById(R.id.user_info_form_heading_bottom);
+
         // Get references to UI elements
-        changeAvatarButton = findViewById(R.id.change_avatar_button);
+//        changeAvatarButton = findViewById(R.id.change_avatar_button);
         nameInput = findViewById(R.id.sign_up_name_text_input);
         phoneInput = findViewById(R.id.sign_up_phone_text_input);
         submitButton = findViewById(R.id.signup_confirm_button);
         userAvatar = findViewById(R.id.user_avatar);
+
+        if (isEdit) {
+            userInfoFormHeadingTop.setText("Edit your profile");
+            userInfoFormHeadingBottom.setText("Update your information");
+            submitButton.setText("Update");
+        }
+
+        if (currentName != null && !currentName.isEmpty()) {
+            nameInput.setText(currentName);
+        }
+        if (currentPhoneNumber != null && !currentPhoneNumber.isEmpty()) {
+            phoneInput.setText(currentPhoneNumber);
+        }
+        if (userAuth != null && userAuth.getPhotoUrl() != null) {
+            Glide.with(this)
+                    .load(userAuth.getPhotoUrl())
+                    .circleCrop()
+                    .into(userAvatar);
+        }
 
         // Set up click listener for the submit button
         submitButton.setOnClickListener(v -> submitUserInfo());
@@ -67,7 +115,10 @@ public class AddUserInfo extends AppCompatActivity {
         });
 
         // Change the avatar of the user
-        changeAvatarButton.setOnClickListener(v -> openGalerry());
+//        changeAvatarButton.setOnClickListener(v -> openGalerry());
+        cancelTextView.setOnClickListener(v -> {
+            finish();
+        });
     }
 
     private void openGalerry() {
@@ -104,10 +155,25 @@ public class AddUserInfo extends AppCompatActivity {
             return;
         }
 
-        User.createUser(userId, name, email, phone, "XXX", registrationMethod, new ArrayList<>());
-        Toast.makeText(AddUserInfo.this, "User created successfully!", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(AddUserInfo.this, Objects.equals(registrationMethod, "Google Account") ? MainActivity.class : Login.class);
-        startActivity(intent);
-        finish();
+        Boolean isEdit = getIntent().getBooleanExtra("isEdit", false);
+        if (isEdit) {
+
+            User.updateUser(
+                    userId,
+                    nameInput.getText().toString(),
+                    phoneInput.getText().toString(),
+                    "XXX");
+            Toast.makeText(AddUserInfo.this, "User updated successfully!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(AddUserInfo.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+
+        } else {
+            User.createUser(userId, name, email, phone, "XXX", registrationMethod, new ArrayList<>());
+            Toast.makeText(AddUserInfo.this, "User created successfully!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(AddUserInfo.this, Objects.equals(registrationMethod, "Google Account") ? MainActivity.class : Login.class);
+            startActivity(intent);
+            finish();
+        }
     }
 }

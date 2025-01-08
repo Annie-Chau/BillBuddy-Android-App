@@ -8,14 +8,16 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.learning.billbuddy.utils.UserCallback;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class User {
+public class User implements Serializable {
 
     private String userID; // Firebase UID
     private String name;
@@ -169,6 +171,21 @@ public class User {
                 .set(userData)
                 .addOnSuccessListener(documentReference -> Log.d("User Creation", "User created with ID: " + userID))
                 .addOnFailureListener(e -> Log.e("User Creation", "Error creating user", e));
+    }
+
+    public static void updateUser(String userId, String userName, String phoneNumber, String profilePictureURL) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        Log.d("User Update", "Updating user with ID: " + userId);
+        Log.d("User Update", "Updating user userName: " + userName);
+        Log.d("User Update", "Updating user phoneNumber: " + phoneNumber);
+        db.collection("users")
+                .document(userId)
+                .update("name", userName, "phoneNumber", phoneNumber, "profilePictureURL", profilePictureURL)
+                .addOnSuccessListener(aVoid -> Log.d("User Update", "User updated with ID: " + userId))
+                .addOnFailureListener(e -> Log.e("User Update", "Error updating user", e));
+
+
     }
 
     public List<Notification> getUserNotifications(List<Notification> allNotifications) {
