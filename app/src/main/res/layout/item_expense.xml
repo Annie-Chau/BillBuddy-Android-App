@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
+        android:layout_marginBottom="40dp"
         android:padding="16dp">
 
         <ImageView
@@ -32,21 +33,27 @@
 
         <TextView
             android:id="@+id/expense_name"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:text="Expense Name"
             android:textSize="18sp"
             android:fontFamily="@font/notosansbold"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:ellipsize="end"
+            android:maxLines="1"
+            />
 
         <TextView
             android:id="@+id/paid_by"
-            android:layout_width="wrap_content"
+            android:layout_width="180dp"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:fontFamily="@font/notosansregular"
-            android:text="Paid by: User Name" />
+            android:text="Paid by: User Name shdfuhsdufhusdf"
+            android:ellipsize="end"
+            android:maxLines="1"
+            />
 
     </LinearLayout>
 
@@ -57,7 +64,34 @@
             android:fontFamily="@font/notosansbold"
             android:textColor="@color/black"
             android:text="$100.00"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        android:gravity="center"
+        android:background="@drawable/item_expense_button"
+        android:paddingVertical="6dp"
+        android:paddingHorizontal="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:id="@+id/to_view_expense"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View Expense"
+            android:textColor="@color/white"
+            android:fontFamily="@font/notosansbold"
+            android:textSize="13sp"
+            />
 
     </LinearLayout>
 

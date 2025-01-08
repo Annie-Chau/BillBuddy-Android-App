@@ -56,7 +56,7 @@
             android:id="@+id/group_image"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="20dp"
             android:layout_gravity="center"
             android:background="@drawable/rounded_border_image_view"
             android:src="@drawable/example_image_1"
@@ -82,6 +82,7 @@
                 android:textSize="25sp"
                 android:textStyle="bold"
                 android:textColor="@color/black"
+                android:fontFamily="@font/notosansbold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -99,6 +100,7 @@
                 app:layout_constraintBaseline_toBaselineOf="parent"
                 android:scaleType="centerInside"
                 android:layout_marginStart="3dp" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout

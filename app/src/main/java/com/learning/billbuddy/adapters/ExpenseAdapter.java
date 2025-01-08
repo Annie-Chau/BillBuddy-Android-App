@@ -2,6 +2,7 @@ package com.learning.billbuddy.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.learning.billbuddy.R;
+import com.learning.billbuddy.ViewExpenseDetailActivity;
 import com.learning.billbuddy.models.Expense; // Assuming you have an Expense model
 import com.learning.billbuddy.models.User;
 
@@ -25,6 +27,10 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
 
     public ExpenseAdapter(Context context, List<Expense> expenseList) {
         this.context = context;
+        this.expenseList = expenseList;
+    }
+
+    public void setExpenseList(List<Expense> expenseList) {
         this.expenseList = expenseList;
     }
 
@@ -44,7 +50,16 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
         holder.expenseNameTextView.setText(expense.getTitle()); // Assuming your Expense model has a getName() method
         holder.expenseAmountTextView.setText(expense.getFormattedAmount()); // Assuming you have a getFormattedAmount() method in your Expense model
         User.fetchAllUsers(users -> {
-            holder.paidByTextView.setText("Paid by " + expense.getPaidByName(users));
+            holder.paidByTextView.setText("Paid by: " + expense.getPaidByName(users));
+        });
+
+        holder.itemView.findViewById(R.id.to_view_expense).setOnClickListener(v -> {
+            Intent intent = new Intent(context, ViewExpenseDetailActivity.class);
+
+            // Pass the entire Expense object
+            intent.putExtra("expense", expense);
+
+            context.startActivity(intent);
         });
     }
 
