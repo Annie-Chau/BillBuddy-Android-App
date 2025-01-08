@@ -8,6 +8,7 @@
         <item name="android:navigationBarColor" tools:targetApi="1" tools:ignore="ObsoleteSdkInt">
             @color/bottom_navigation
         </item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <style name="Theme.BillBuddy" parent="Base.Theme.BillBuddy" />
