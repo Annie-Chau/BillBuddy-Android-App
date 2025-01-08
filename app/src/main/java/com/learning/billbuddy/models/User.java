@@ -14,6 +14,7 @@ import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -192,5 +193,29 @@ public class User implements Serializable {
         return allNotifications.stream()
                 .filter(notification -> this.notificationIds.contains(notification.getNotificationID()))
                 .collect(Collectors.toList());
+    }
+
+    public void getNumberOfGroupPossessed(final GroupCountCallback callback) {
+        Group.fetchAllGroups(groups -> {
+            int count = 0;
+            for (Group group : groups) {
+                if (Objects.equals(group.getOwnerID(), this.userID)) {
+                    count++;
+                }
+            }
+            callback.onCallback(count);
+        });
+
+/*
+        USAGE:
+        user.getNumberOfGroupPossessed(count -> {
+            Log.d("User Groups", "Number of groups owned by " + user.getName() + ": " + count);
+            // Do something with the count, e.g., update UI
+        });
+*/
+    }
+
+    public interface GroupCountCallback {
+        void onCallback(int count);
     }
 }
