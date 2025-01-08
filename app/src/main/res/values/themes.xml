@@ -6,7 +6,7 @@
             @color/background
         </item>
         <item name="android:navigationBarColor" tools:targetApi="1" tools:ignore="ObsoleteSdkInt">
-            @color/background
+            @color/bottom_navigation
         </item>
         <item name="android:windowLightStatusBar">true</item>
     </style>

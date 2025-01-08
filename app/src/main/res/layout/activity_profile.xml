@@ -35,8 +35,8 @@
 
             <ImageView
                 android:id="@+id/profile_user_avatar"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="130dp"
+                android:layout_height="130dp"
                 android:layout_centerInParent="true"
                 android:background="@drawable/circle_background"
                 android:scaleType="centerCrop"
@@ -62,6 +62,52 @@
                 app:tint="@color/light_green" />
         </FrameLayout>
     </FrameLayout>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="24dp"
+        app:cardCornerRadius="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/profile_page_gray"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@color/profile_page_gray"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_regular"
+                    android:text="Email"
+                    android:textColor="@color/text_gray"
+                    android:textSize="12dp" />
+
+                <View
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/profile_email_textField"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_regular"
+                    android:text="Email"
+                    android:textColor="@color/black"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -218,12 +264,12 @@
         android:id="@+id/profile_logout_button"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="32dp"
         android:background="@drawable/round_gray"
         android:fontFamily="@font/inter_regular"
         android:text="Logout"
         android:textAllCaps="false"
-        android:textColor="@color/black"
+        android:textColor="@color/red"
         android:textSize="16sp" />
 
 
