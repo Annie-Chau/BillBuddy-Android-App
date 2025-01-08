@@ -1,7 +1,9 @@
 package com.learning.billbuddy;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -11,14 +13,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.learning.billbuddy.adapters.ExpenseAdapter;
+import com.learning.billbuddy.models.Expense;
 import com.learning.billbuddy.models.Group;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ViewBalanceOfGroup extends AppCompatActivity {
 
@@ -28,7 +36,11 @@ public class ViewBalanceOfGroup extends AppCompatActivity {
     private ImageView groupImageView;
     private FloatingActionButton chatButton;
     private Group currentGroup;
+    private RecyclerView expenseRecyclerView;
+    private ExpenseAdapter expenseAdapter;
+    private List<Expense> expenseList = new ArrayList<>();
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +53,10 @@ public class ViewBalanceOfGroup extends AppCompatActivity {
         groupNameTextView = findViewById(R.id.group_name);
         groupImageView = findViewById(R.id.group_image);
         chatButton = findViewById(R.id.chat_button);
+        expenseRecyclerView = findViewById(R.id.expense_list);
+        expenseRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        expenseAdapter = new ExpenseAdapter(this, expenseList);
+        expenseRecyclerView.setAdapter(expenseAdapter);
 
         // Retrieve data from Intent
         currentGroup = (Group) getIntent().getSerializableExtra("group");
@@ -55,6 +71,16 @@ public class ViewBalanceOfGroup extends AppCompatActivity {
         if (currentGroup.getAvatarURL() != null && !currentGroup.getAvatarURL().isEmpty()) {
             Glide.with(this).load(currentGroup.getAvatarURL()).into(groupImageView);
         }
+
+        Expense.fetchAllExpenses(expenses -> {
+            // Filter the expenses list to include only those with IDs in groupExpenseIDs
+            expenseList = expenses.stream()
+                    .filter(expense -> currentGroup.getExpenseIDs().contains(expense.getExpenseID()))
+                    .collect(Collectors.toList());
+
+            expenseAdapter.setExpenseList(expenseList);
+            expenseAdapter.notifyDataSetChanged();
+        });
 
         segmentGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.rb_expense) {

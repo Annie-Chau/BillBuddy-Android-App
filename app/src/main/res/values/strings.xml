@@ -10,9 +10,9 @@
     <string name="name">Name</string>
     <string name="enter_your_name">Enter your name</string>
     <string-array name="currency">
-        <item>đ</item>
-        <item>$</item>
-        <item>€</item>
+        <item>VND</item>
+        <item>USD</item>
+        <item>EUR</item>
     </string-array>
     <string-array name="split_type_options">
         <item>Equally</item>

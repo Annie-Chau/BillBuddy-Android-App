@@ -6,6 +6,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.learning.billbuddy.utils.ExpenseCallback;
 
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,7 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class Expense {
+public class Expense implements Serializable {
 
     private String expenseID; // Firestore Document ID
     private String title;
@@ -26,13 +27,14 @@ public class Expense {
     private String billPictureURL; // URL from Firebase storage
     private String payerID; // Reference to User.userID
     private List<String> participantIDs; // List of User.userIDs
-    private Map<String, Double> splits; // Key: User.userID, Value: Amount
+    private List<Map<String, Double>> splits;
     private Date timestamp;
+    private String currency;
 
     // Constructor
     public Expense(String expenseID, String title, String avatarURL, Double amount, String notes,
                    String billPictureURL, String payerID, List<String> participantIDs,
-                   Map<String, Double> splits, Date timestamp) {
+                   List<Map<String, Double>> splits, Date timestamp, String currency) {
         this.expenseID = expenseID;
         this.title = title;
         this.avatarURL = avatarURL;
@@ -43,6 +45,7 @@ public class Expense {
         this.participantIDs = participantIDs;
         this.splits = splits;
         this.timestamp = timestamp;
+        this.currency = currency;
     }
 
     // Getters and setters
@@ -110,11 +113,11 @@ public class Expense {
         this.participantIDs = participantIDs;
     }
 
-    public Map<String, Double> getSplits() {
+    public List<Map<String, Double>> getSplits() {
         return splits;
     }
 
-    public void setSplits(Map<String, Double> splits) {
+    public void setSplits(List<Map<String, Double>> splits) {
         this.splits = splits;
     }
 
@@ -124,6 +127,14 @@ public class Expense {
 
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 
     // Methods
@@ -157,6 +168,7 @@ public class Expense {
 
     public String getFormattedAmount() {
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.getDefault());
+        currencyFormat.setCurrency(java.util.Currency.getInstance(currency)); // Set the currency
         return currencyFormat.format(amount);
     }
 
@@ -184,9 +196,10 @@ public class Expense {
                                     document.getString("billPictureURL"),
                                     document.getString("payerID"),
                                     (List<String>) document.get("participantIDs"),
-                                    (Map<String, Double>) document.get("splits"),
+                                    (List<Map<String, Double>>) document.get("splits"), // Update to get List<Map>
                                     document.getTimestamp("timestamp") != null ?
-                                            Objects.requireNonNull(document.getTimestamp("timestamp")).toDate() : null
+                                            Objects.requireNonNull(document.getTimestamp("timestamp")).toDate() : null,
+                                    document.getString("currency") // Add currency when fetching
                             ));
                         }
                     }
@@ -196,13 +209,15 @@ public class Expense {
     }
 
     // Method to create a new expense
-    public static void createExpense(String title, String avatarURL, Double amount, String notes,
+    public static void createExpense(String groupID, String title, String avatarURL, Double amount, String notes,
                                      String billPictureURL, String payerID, List<String> participantIDs,
-                                     Map<String, Double> splits, Date timestamp) {
+                                     List<Map<String, Double>> splits, Date timestamp, String currency) { // Updated parameter
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String expenseID = db.collection("expenses").document().getId();
 
         // Create a new Expense object
         Map<String, Object> expenseData = new HashMap<>();
+        expenseData.put("expenseID", expenseID);
         expenseData.put("title", title);
         expenseData.put("avatarURL", avatarURL);
         expenseData.put("amount", amount);
@@ -210,14 +225,40 @@ public class Expense {
         expenseData.put("billPictureURL", billPictureURL);
         expenseData.put("payerID", payerID);
         expenseData.put("participantIDs", participantIDs);
-        expenseData.put("splits", splits);
+        expenseData.put("splits", splits); // Update to put List<Map>
         expenseData.put("timestamp", timestamp);
+        expenseData.put("currency", currency); // Add currency to the expense data
 
         // Add the new expense to the "expenses" collection in Firestore
         db.collection("expenses")
-                .add(expenseData)
+                .document(expenseID)
+                .set(expenseData)
                 .addOnSuccessListener(documentReference -> {
-                    Log.d("Expense Creation", "Expense created with ID: " + documentReference.getId());
+                    Log.d("Expense Creation", "Expense created with ID: " + expenseID);
+
+                    db.collection("groups").document(groupID)
+                            .get()
+                            .addOnSuccessListener(documentSnapshot -> {
+                                if (documentSnapshot.exists()) {
+                                    List<String> expenseIDs = (List<String>) documentSnapshot.get("expenseIDs");
+                                    if (expenseIDs == null) {
+                                        expenseIDs = new ArrayList<>();
+                                    }
+                                    expenseIDs.add(expenseID);
+
+                                    db.collection("groups").document(groupID)
+                                            .update("expenseIDs", expenseIDs)
+                                            .addOnSuccessListener(aVoid -> {
+                                                Log.d("Group Update", "Expense ID added to group successfully");
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                Log.e("Group Update", "Error adding expense ID to group", e);
+                                            });
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("Group Fetch", "Error fetching group", e);
+                            });
                 })
                 .addOnFailureListener(e -> {
                     Log.e("Expense Creation", "Error creating expense: ", e);
@@ -232,5 +273,22 @@ public class Expense {
                         .map(User::getName)
                         .orElse("Unknown")) // Or handle the case where the user is not found
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public String toString() {
+        return "Expense{" +
+                "expenseID='" + expenseID + '\'' +
+                ", title='" + title + '\'' +
+                ", avatarURL='" + avatarURL + '\'' +
+                ", amount=" + amount +
+                ", notes='" + notes + '\'' +
+                ", billPictureURL='" + billPictureURL + '\'' +
+                ", payerID='" + payerID + '\'' +
+                ", participantIDs=" + participantIDs +
+                ", splits=" + splits +
+                ", timestamp=" + timestamp +
+                ", currency='" + currency + '\'' +
+                '}';
     }
 }

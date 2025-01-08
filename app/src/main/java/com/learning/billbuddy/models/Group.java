@@ -229,4 +229,5 @@ public class Group implements Serializable {
                 .filter(Objects::nonNull) // Remove null elements if any
                 .collect(Collectors.toList());
     }
+
 }

@@ -1,5 +1,6 @@
 package com.learning.billbuddy;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.text.Editable;
@@ -15,36 +16,43 @@ import android.widget.Toast;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.learning.billbuddy.adapters.SplitAdapter;
+import com.learning.billbuddy.models.Expense;
 import com.learning.billbuddy.models.Group;
 import com.learning.billbuddy.models.User;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class AddExpenseActivity extends AppCompatActivity {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    EditText datePicker, amountEditText, description;
+    EditText titleEditText, datePicker, amountEditText, description;
     Spinner paidBySpinner, currencySpinner;
     Button addButton, cancelButton;
     RecyclerView splitRecyclerView;
 
-    private String selectedCurrency = "đ"; // Default currency
-    private String splitType;
+    private String selectedCurrency = "VND"; // Default currency
     private double amount;
     private String date;
     private Group currentGroup;
     private String paidBy;
+    private String paidById;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_expense);
 
+        titleEditText = findViewById(R.id.add_expense_enter_title);
         datePicker = findViewById(R.id.add_expense_date);
         amountEditText = findViewById(R.id.add_expense_money_amount);
         description = findViewById(R.id.add_expense_description);
@@ -52,7 +60,12 @@ public class AddExpenseActivity extends AppCompatActivity {
         currencySpinner = findViewById(R.id.add_expense_spinner_currency);
         addButton = findViewById(R.id.add_expense_btn_add);
         cancelButton = findViewById(R.id.add_expense_cancel_button);
-        splitRecyclerView = findViewById(R.id.expense_list); // Initialize the RecyclerView
+        splitRecyclerView = findViewById(R.id.expense_list);
+
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()); // Or your preferred format
+        String today = dateFormat.format(calendar.getTime());
+        datePicker.setText(today);
 
         cancelButton.setOnClickListener(v -> {
             finish();
@@ -78,7 +91,10 @@ public class AddExpenseActivity extends AppCompatActivity {
                     this,
                     R.style.MyDateTimePickerDialogTheme,
                     (view, year1, monthOfYear, dayOfMonth) -> {
-                        String selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year1;
+                        calendar.set(year1, monthOfYear, dayOfMonth);
+
+                        String selectedDate = dateFormat.format(calendar.getTime());
+
                         datePicker.setText(selectedDate);
                     },
                     year, month, day);
@@ -105,17 +121,41 @@ public class AddExpenseActivity extends AppCompatActivity {
                 Toast.makeText(AddExpenseActivity.this, "Please select a date", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (splitType == null || splitType.isEmpty()) {
-                Toast.makeText(AddExpenseActivity.this, "Please select split type", Toast.LENGTH_SHORT).show();
+            if (paidBy == null || paidBy.isEmpty()) {
+                Toast.makeText(AddExpenseActivity.this, "Please select who paid", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            String expenseInfo = "Expense saved:\n" +
-                    "Description: " + description.getText() + "\n" +
-                    "Amount: " + selectedCurrency + " " + amount + "\n" +
-                    "Date: " + date + "\n" +
-                    "Split type: " + splitType;
+            // Get split details from the adapter
+            SplitAdapter splitAdapter = (SplitAdapter) splitRecyclerView.getAdapter();
+            if (splitAdapter == null) {
+                Toast.makeText(AddExpenseActivity.this, "Error getting split details", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String expenseInfo = getExpenseInfo(splitAdapter);
+
             Log.d("Result", expenseInfo);
+
+            try {
+                Expense.createExpense(
+                        currentGroup.getGroupID(),
+                        titleEditText.getText().toString(),
+                        "",
+                        amount,
+                        description.getText().toString(),
+                        "",
+                        paidById,
+                        SplitAdapter.getParticipantIDs(splitAdapter.getSplitItems()),
+                        SplitAdapter.getSplits(splitAdapter.getSplitItems()),
+                        dateFormat.parse(date),
+                        selectedCurrency
+                        );
+
+                Toast.makeText(AddExpenseActivity.this, "Expense added successfully", Toast.LENGTH_SHORT).show();
+                finish();
+            } catch (ParseException e) {
+                Log.d("Error", "Parsing date: " + e.getMessage());
+            }
         });
 
         amountEditText.addTextChangedListener(new TextWatcher() {
@@ -124,11 +164,13 @@ public class AddExpenseActivity extends AppCompatActivity {
                 // Not used
             }
 
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 User.fetchAllUsers(users -> {
                     SplitAdapter splitAdapter = new SplitAdapter(currentGroup.getMemberList(users), Double.parseDouble(amountEditText.getText().toString()), splitRecyclerView);
                     splitRecyclerView.setAdapter(splitAdapter);
+                    splitAdapter.notifyDataSetChanged();
                 });
             }
 
@@ -157,6 +199,12 @@ public class AddExpenseActivity extends AppCompatActivity {
                 @Override
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                     paidBy = parentView.getItemAtPosition(position).toString();
+
+                    // Get the selected User object
+                    User selectedUser = currentGroup.getMemberList(users).get(position);
+
+                    // Get the ID of the selected user
+                    paidById = selectedUser.getUserID();
                 }
 
                 @Override
@@ -172,9 +220,20 @@ public class AddExpenseActivity extends AppCompatActivity {
         currencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         currencySpinner.setAdapter(currencyAdapter);
         currencySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 selectedCurrency = parentView.getItemAtPosition(position).toString();
+
+                User.fetchAllUsers(users -> {
+                    SplitAdapter splitAdapter = new SplitAdapter(
+                            currentGroup.getMemberList(users),
+                            !amountEditText.getText().toString().isEmpty() ? Double.parseDouble(amountEditText.getText().toString()) : 0.00,
+                            splitRecyclerView);
+                    splitRecyclerView.setAdapter(splitAdapter);
+                    splitAdapter.setCurrencySymbol(selectedCurrency);
+                    splitAdapter.notifyDataSetChanged();
+                });
             }
 
             @Override
@@ -184,4 +243,20 @@ public class AddExpenseActivity extends AppCompatActivity {
         });
     }
 
+    private @NonNull String getExpenseInfo(SplitAdapter splitAdapter) {
+        List<SplitAdapter.SplitItem> splitItems = splitAdapter.getSplitItems();
+
+        // Log the expense details (replace with your actual saving logic)
+        StringBuilder expenseInfo = new StringBuilder("Expense saved:\n" +
+                "Description: " + description.getText() + "\n" +
+                "Amount: " + selectedCurrency + " " + amount + "\n" +
+                "Date: " + date + "\n" +
+                "Paid by: " + paidBy + "\n" +
+                "Paid by ID: " + paidById + "\n");
+
+        for (SplitAdapter.SplitItem item : splitItems) {
+            expenseInfo.append(item.getUser().getName()).append(": ").append(selectedCurrency).append(" ").append(item.getAmount()).append("\n");
+        }
+        return expenseInfo.toString();
+    }
 }
