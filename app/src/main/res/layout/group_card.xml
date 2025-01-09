@@ -20,6 +20,7 @@
         android:layout_marginBottom="8dp"/>
 
     <LinearLayout
+        android:id="@+id/group_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/round_border">

@@ -31,9 +31,6 @@
             android:name=".views.authentication.Login"
             android:exported="false" />
         <activity
-            android:name=".AddGroupActivity"
-            android:exported="false" />
-        <activity
             android:name=".ChatBoxActivity"
             android:exported="true" />
         <activity
@@ -49,7 +46,7 @@
             android:name=".AddExpenseActivity"
             android:exported="false" />
         <activity
-            android:name=".ViewBalanceOfGroup"
+            android:name=".views.expense.ViewBalanceOfGroup"
             android:exported="false" />
     </application>
 
