@@ -17,12 +17,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.learning.billbuddy.R;
-import com.learning.billbuddy.ViewBalanceOfGroup;
+import com.learning.billbuddy.views.expense.ViewBalanceOfGroup;
 import com.learning.billbuddy.interfaces.IResponseCallback;
 import com.learning.billbuddy.models.Group;
 
@@ -71,7 +70,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
             }
             holder.createdDate.setText(groupList.get(position).getCreatedStringFormat());
             holder.createdDate.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             holder.createdDate.setVisibility(View.GONE);
         }
 
@@ -126,9 +125,6 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
                     @Override
                     public void onSuccess() {
                         Toast.makeText(context, "Group deleted successfully", Toast.LENGTH_SHORT).show();
-                        int index = groupList.indexOf(group);
-                        groupList.remove(group);
-                        notifyItemRemoved(index);
                     }
 
                     @Override
