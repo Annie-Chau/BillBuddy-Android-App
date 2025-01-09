@@ -176,7 +176,8 @@ public class AddGroupBottomSheetDialog extends BottomSheetDialogFragment {
                 ownerID,
                 memberIDs,
                 new ArrayList<>(),
-                new ArrayList<>()
+                new ArrayList<>(),
+                System.currentTimeMillis()
         );
 
         Toast.makeText(requireContext(), "Group created successfully!", Toast.LENGTH_SHORT).show();
