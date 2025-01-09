@@ -16,14 +16,18 @@ import java.util.Objects;
 public class Notification {
 
     private String notificationID; // Firestore Document ID
+    private String messageID; // ID of the message
     private String type; // Enum{"JoinGroup", "AddExpense", "DeptResolved", "NewMessage"}
     private String message;
     private Date timestamp;
     private boolean isRead;
 
+    public Notification() {}
+
     // Constructor
-    public Notification(String notificationID, String type, String message, Date timestamp, boolean isRead) {
+    public Notification(String notificationID, String messageID, String type, String message, Date timestamp, boolean isRead) {
         this.notificationID = notificationID;
+        this.messageID = messageID;
         this.type = type;
         this.message = message;
         this.timestamp = timestamp;
@@ -37,6 +41,14 @@ public class Notification {
 
     public void setNotificationID(String notificationID) {
         this.notificationID = notificationID;
+    }
+
+    public String getMessageID() {
+        return messageID;
+    }
+
+    public void setMessageID(String messageID) {
+        this.messageID = messageID;
     }
 
     public String getType() {
@@ -89,6 +101,7 @@ public class Notification {
                         for (DocumentSnapshot document : value.getDocuments()) {
                             result.add(new Notification(
                                     document.getId(),
+                                    document.getString("messageID"),
                                     document.getString("type"),
                                     document.getString("message"),
                                     document.getTimestamp("timestamp") != null ?
@@ -104,11 +117,12 @@ public class Notification {
     }
 
     // Method to create a new notification
-    public static void createNotification(String type, String message, Date timestamp, boolean isRead) {
+    public static void createNotification(String messageID, String type, String message, Date timestamp, boolean isRead) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Create a new Notification object
         Map<String, Object> notificationData = new HashMap<>();
+        notificationData.put("messageID", messageID);
         notificationData.put("type", type);
         notificationData.put("message", message);
         notificationData.put("timestamp", timestamp);

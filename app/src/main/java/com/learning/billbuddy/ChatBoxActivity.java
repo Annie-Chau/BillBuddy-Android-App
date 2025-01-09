@@ -23,6 +23,7 @@ import com.learning.billbuddy.adapters.ChatAdapter;
 import com.learning.billbuddy.models.Chat;
 import com.learning.billbuddy.models.Group;
 import com.learning.billbuddy.models.Message;
+import com.learning.billbuddy.models.Notification;
 import com.learning.billbuddy.models.User;
 import java.util.ArrayList;
 import java.util.Date;
@@ -183,9 +184,24 @@ public class ChatBoxActivity extends AppCompatActivity {
                                 .update("messageIds", FieldValue.arrayUnion(messageID))
                                 .addOnSuccessListener(aVoid1 -> {
                                     messageInput.setText("");
-                                    // No need to add the message to the list here, as it will be handled by the listener
+                                    createNotificationForGroupMembers(messageID);
                                 });
                     });
+        }
+    }
+
+    private void createNotificationForGroupMembers(String messageID) {
+        for (String memberID : currentGroup.getMemberIDs()) {
+            if (!memberID.equals(userID)) {
+                String notificationID = db.collection("notifications").document().getId();
+                Notification notification = new Notification(notificationID, messageID, "NewMessage", "New message in group " + currentGroup.getName(), new Date(), false);
+
+                db.collection("notifications").document(notificationID).set(notification)
+                        .addOnSuccessListener(aVoid -> {
+                            db.collection("users").document(memberID)
+                                    .update("notificationIds", FieldValue.arrayUnion(notificationID));
+                        });
+            }
         }
     }
 }
