@@ -204,7 +204,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/participant_list"
                 android:layout_width="match_parent"
-                android:layout_height="120dp"
+                android:layout_height="200dp"
                 android:clipToPadding="false"
                 android:layout_marginTop="6dp"
                 android:scrollbars="vertical" />

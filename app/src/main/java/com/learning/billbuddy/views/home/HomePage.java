@@ -30,6 +30,7 @@ import com.learning.billbuddy.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class HomePage extends Fragment {
@@ -147,10 +148,9 @@ public class HomePage extends Fragment {
         Group.fetchAllGroups(groups -> {
             groupList = groups.stream()
                     .filter(group -> group.getMemberIDs() != null && group.getMemberIDs().contains(currentUserId))
-                    .sorted((group1, group2) -> group2.getCreatedDateLongFormat().compareTo(group1.getCreatedDateLongFormat()))
+                    .sorted((group1, group2) -> Objects.requireNonNull(group2.getCreatedDateLongFormat()).compareTo(group1.getCreatedDateLongFormat()))
                     .collect(Collectors.toList());
-            groupAdapter.groupList.clear();
-            groupAdapter.notifyDataSetChanged();
+
             groupAdapter.groupList = new ArrayList<>(groupList);
             groupAdapter.notifyDataSetChanged();
             Log.d("HomePage", "Groups updated in real-time. Total groups: " + groupList.size());

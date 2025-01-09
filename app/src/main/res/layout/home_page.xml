@@ -55,7 +55,7 @@
             android:padding="8dp"
             android:textSize="14sp"
             android:textStyle="bold" />
-        <include layout="@layout/layout_filter_selection_spiner" />
+        <include layout="@layout/layout_filter_selection_spinner" />
         <!-- Group List Container -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/group_list"

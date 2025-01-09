@@ -54,13 +54,13 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
             holder.groupImage.setImageResource(R.drawable.example_image_1); // Default image
         }
 
-        if (position == 0 || !groupList.get(position - 1).getCreatedStringFormat().equals(groupList.get(position).getCreatedStringFormat())) {
-            Log.d("GroupAdapter", "onBindViewHolder: " + groupList.get(position).getCreatedStringFormat());
+        if (position == 0 || !groupList.get(position - 1).getCreatedDateStringFormat().equals(groupList.get(position).getCreatedDateStringFormat())) {
+            Log.d("GroupAdapter", "onBindViewHolder: " + groupList.get(position).getCreatedDateStringFormat());
             Group currentGroup = groupList.get(position);
-            if (currentGroup.getCreatedStringFormat().isEmpty()) {
+            if (currentGroup.getCreatedDateStringFormat().isEmpty()) {
                 return;
             }
-            holder.createdDate.setText(groupList.get(position).getCreatedStringFormat());
+            holder.createdDate.setText(groupList.get(position).getCreatedDateStringFormat());
             holder.createdDate.setVisibility(View.VISIBLE);
         }else{
             holder.createdDate.setVisibility(View.GONE);

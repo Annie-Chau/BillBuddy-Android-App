@@ -207,6 +207,7 @@
             >
 
             <LinearLayout
+                android:id="@+id/balance_total_background"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -218,7 +219,7 @@
 
                 <!-- Thumbs-up Icon -->
                 <ImageView
-                    android:id="@+id/thumb_icon"
+                    android:id="@+id/balance_total_thumb_icon"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:src="@drawable/ic_thump_up_icon"
@@ -233,7 +234,7 @@
 
                     <!-- Upper Text -->
                     <TextView
-                        android:id="@+id/owed_text"
+                        android:id="@+id/balance_total_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="You are owed"
@@ -243,7 +244,7 @@
 
                     <!-- Amount Text -->
                     <TextView
-                        android:id="@+id/amount_text"
+                        android:id="@+id/balance_total_amount_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="₫ 1,000,320.00"
