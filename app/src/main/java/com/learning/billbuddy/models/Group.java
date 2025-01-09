@@ -9,12 +9,16 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.learning.billbuddy.utils.GroupCallback;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
 
 public class Group implements Serializable {
 
@@ -27,12 +31,15 @@ public class Group implements Serializable {
     private List<String> expenseIDs;
     private List<String> debtIds;
 
+    @Nullable
+    private Long createdDate;
+
     public Group() {
         // Default constructor for Firestore deserialization
     }
 
     // Constructor
-    public Group(String groupID, String name, String description, String avatarURL, String ownerID, List<String> memberIDs, List<String> expenseIDs, List<String> debtIds) {
+    public Group(String groupID, String name, String description, String avatarURL, String ownerID, List<String> memberIDs, List<String> expenseIDs, List<String> debtIds, @Nullable Long createdDate) {
         this.groupID = groupID;
         this.name = name;
         this.description = description;
@@ -41,6 +48,7 @@ public class Group implements Serializable {
         this.memberIDs = memberIDs;
         this.expenseIDs = expenseIDs;
         this.debtIds = debtIds;
+        this.createdDate = createdDate;
     }
 
     // Getters and setters
@@ -106,6 +114,26 @@ public class Group implements Serializable {
 
     public void setDebtIds(List<String> debtIds) {
         this.debtIds = debtIds;
+    }
+
+    public Long getCreatedDateLongFormat() {
+        return createdDate;
+    }
+
+    public String getCreatedStringFormat() {
+        //to this format December 12 2024
+        if (this.createdDate == null) {
+            return "";
+        }
+
+        if (new SimpleDateFormat("MMMM dd, yyyy").format(new Date(this.createdDate)).equals(new SimpleDateFormat("MMMM dd, yyyy").format(new Date(System.currentTimeMillis())))) {
+            return "Today";
+        }
+        if (new SimpleDateFormat("MMMM dd, yyyy").format(new Date(this.createdDate)).equals(new SimpleDateFormat("MMMM dd, yyyy").format(new Date(System.currentTimeMillis() - 86400000)))) {
+            return "Yesterday";
+        }
+
+        return new SimpleDateFormat("MMMM dd, yyyy").format(new Date(this.createdDate));
     }
 
     // Methods
@@ -177,7 +205,8 @@ public class Group implements Serializable {
                                     document.getString("ownerID"),
                                     (List<String>) document.get("memberIDs"),
                                     (List<String>) document.get("expenseIDs"),
-                                    (List<String>) document.get("debtIds")
+                                    (List<String>) document.get("debtIds"),
+                                    document.getLong("createdDate")
                             ));
                         }
                     }
@@ -187,7 +216,7 @@ public class Group implements Serializable {
     }
 
     // Method to create a new group in Firestore
-    public static void createGroup(String name, String description, String avatarURL, String ownerID, List<String> memberIDs, List<String> expenseIDs, List<String> debtIds) {
+    public static void createGroup(String name, String description, String avatarURL, String ownerID, List<String> memberIDs, List<String> expenseIDs, List<String> debtIds, Long createdDate) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String groupID = db.collection("groups").document().getId();
 
@@ -201,6 +230,7 @@ public class Group implements Serializable {
         groupData.put("memberIDs", memberIDs);
         groupData.put("expenseIDs", expenseIDs);
         groupData.put("debtIds", debtIds);
+        groupData.put("createdDate", createdDate);
 
         // Add the new group to the "groups" collection in Firestore
         db.collection("groups")
@@ -228,6 +258,14 @@ public class Group implements Serializable {
                         .orElse(null)) // Or handle the case where the user is not found
                 .filter(Objects::nonNull) // Remove null elements if any
                 .collect(Collectors.toList());
+    }
+
+    public boolean isQualifyForSearch(String query) {
+        return name.toLowerCase().contains(query.toLowerCase());
+    }
+
+    public Group deepClone() {
+        return new Group(this.groupID, this.name, this.description, this.avatarURL, this.ownerID, new ArrayList<>(this.memberIDs), new ArrayList<>(this.expenseIDs), new ArrayList<>(this.debtIds), this.createdDate);
     }
 
 }

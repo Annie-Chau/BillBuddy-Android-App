@@ -2,11 +2,16 @@ package com.learning.billbuddy.views.home;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,11 +34,32 @@ import java.util.stream.Collectors;
 
 public class HomePage extends Fragment {
 
+    private enum FilterOption {
+        FILTER("Filter"),
+        DATE_ASCENDING("Date Ascending"),
+        DATE_DESCENDING("Date Descending"),
+        REIMBURSEMENT_AVAILABLE("Reimbursement Available");
+
+        private final String filterOption;
+
+        FilterOption(String filterOption) {
+            this.filterOption = filterOption;
+        }
+
+        public String getFilterOption() {
+            return filterOption;
+        }
+    }
+
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private RecyclerView groupRecyclerView;
     private GroupAdapter groupAdapter;
     private List<Group> groupList;
+
+    private EditText searchGroupEditText;
+
+    private Spinner filterSelection;
 
     @Nullable
     @Override
@@ -43,6 +69,8 @@ public class HomePage extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         groupRecyclerView = view.findViewById(R.id.group_list);
+        searchGroupEditText = view.findViewById(R.id.home_view_search_text_field);
+        filterSelection = view.findViewById(R.id.home_spinner_filter_selection);
 
         // Setup RecyclerView
         groupList = new ArrayList<>();
@@ -50,10 +78,26 @@ public class HomePage extends Fragment {
         groupRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         groupRecyclerView.setAdapter(groupAdapter);
 
+
         setupRealTimeGroupUpdates();
 
         ImageButton addParticipantButton = view.findViewById(R.id.to_add_group_btn);
         addParticipantButton.setOnClickListener(v -> openAddGroupDialog());
+        this.handleSearchGroupEditText();
+
+        filterSelection.setDropDownVerticalOffset(150);
+        filterSelection.setAdapter(new FilterSelectionAdapter(requireContext()));
+        filterSelection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                onSearch();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Not needed
+            }
+        });
 
         return view;
     }
@@ -103,10 +147,69 @@ public class HomePage extends Fragment {
         Group.fetchAllGroups(groups -> {
             groupList = groups.stream()
                     .filter(group -> group.getMemberIDs() != null && group.getMemberIDs().contains(currentUserId))
+                    .sorted((group1, group2) -> group2.getCreatedDateLongFormat().compareTo(group1.getCreatedDateLongFormat()))
                     .collect(Collectors.toList());
-            groupAdapter.groupList = groupList;
+            groupAdapter.groupList.clear();
+            groupAdapter.notifyDataSetChanged();
+            groupAdapter.groupList = new ArrayList<>(groupList);
             groupAdapter.notifyDataSetChanged();
             Log.d("HomePage", "Groups updated in real-time. Total groups: " + groupList.size());
         });
+    }
+
+    private void handleSearchGroupEditText() {
+        searchGroupEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not needed
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Not needed
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                onSearch();
+            }
+        });
+    }
+
+
+    private void onFilter() {
+        String filterOption = filterSelection.getSelectedItem().toString();
+        Log.d("HomePage", "Filter option selected: " + filterOption);
+        // Filter the groupList based on the filter option
+        switch (filterOption) {
+            case "Date Ascending":
+                groupAdapter.groupList.sort((group1, group2) -> group1.getCreatedDateLongFormat().compareTo(group2.getCreatedDateLongFormat()));
+                break;
+            case "Date Descending":
+                groupAdapter.groupList.sort((group1, group2) -> group2.getCreatedDateLongFormat().compareTo(group1.getCreatedDateLongFormat()));
+                break;
+            case "Reimbursement Available":
+                //TODO: Implement this
+                groupAdapter.groupList = groupList;
+                break;
+            default:
+                break;
+        }
+        groupAdapter.notifyDataSetChanged();
+    }
+
+
+    private void onSearch() {
+        String searchQuery = searchGroupEditText.getText().toString().toLowerCase();
+        Log.d("HomePage", "before serach y: " + groupList.size());
+
+        if (searchQuery.trim().isEmpty()) {
+            groupAdapter.groupList = new ArrayList<>(groupList);
+        } else {
+            groupAdapter.groupList = new ArrayList<>(groupList).stream()
+                    .filter(group -> group.isQualifyForSearch(searchQuery))
+                    .collect(Collectors.toList());
+        }
+        onFilter();
     }
 }

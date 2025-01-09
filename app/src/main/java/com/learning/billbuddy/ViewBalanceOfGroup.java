@@ -116,4 +116,6 @@ public class ViewBalanceOfGroup extends AppCompatActivity {
             Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
         }
     }
+
+
 }

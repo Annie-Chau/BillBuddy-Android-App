@@ -1,52 +1,77 @@
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="12dp"
-    android:layout_marginBottom="16dp">
+    android:orientation="vertical"
+    android:paddingVertical="8dp">
+
+    <TextView
+        android:id="@+id/created_date_group"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="December 20 2024"
+        android:paddingStart="8dp"
+        android:textSize="22dp"
+        android:fontFamily="@font/archivo_variable"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="8dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@drawable/small_round_white"
-        android:padding="16dp">
-
-        <!-- Group Image -->
-        <ImageView
-            android:id="@+id/group_image"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="center"
-            android:scaleType="centerCrop"
-            android:src="@drawable/example_image_1"
-            android:contentDescription="Group Image"
-            android:background="@drawable/item_icon_round_corners" />
-
-        <!-- Group Name -->
-        <TextView
-            android:id="@+id/group_name"
-            android:layout_width="0dp"
+        android:background="@drawable/round_border">
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:fontFamily="@font/inter_regular"
-            android:text="Group Name"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@color/black" />
+            android:background="@drawable/round_image"
+            android:orientation="horizontal"
+            android:padding="16dp">
 
-        <!-- Arrow Icon -->
-        <ImageButton
-            android:id="@+id/group_card_action_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:src="@drawable/chevron_right_icon"
-            android:contentDescription="Arrow Icon"
-            app:tint="@color/text_gray"
-            android:layout_gravity="center_vertical" />
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/round_image"
+                android:clipToOutline="true">
+
+                <ImageView
+                    android:id="@+id/group_image"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="Group Image"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/example_image_1" />
+            </FrameLayout>
+
+            <!-- Group Name -->
+            <TextView
+                android:id="@+id/group_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/inter_regular"
+                android:text="Group Name"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!-- Arrow Icon -->
+            <ImageButton
+                android:id="@+id/group_card_action_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:background="@android:color/transparent"
+                android:contentDescription="Arrow Icon"
+                android:src="@drawable/chevron_right_icon"
+                app:tint="@color/text_gray" />
+        </LinearLayout>
+
     </LinearLayout>
+</LinearLayout>
 
-</androidx.cardview.widget.CardView>
