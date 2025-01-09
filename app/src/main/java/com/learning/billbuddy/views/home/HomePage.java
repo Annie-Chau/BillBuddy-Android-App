@@ -147,14 +147,56 @@ public class HomePage extends Fragment {
         Group.fetchAllGroups(groups -> {
             groupList = groups.stream()
                     .filter(group -> group.getMemberIDs() != null && group.getMemberIDs().contains(currentUserId))
-                    .sorted((group1, group2) ->
-                            Objects.requireNonNull(group2.getCreatedDateLongFormat())
-                                    .compareTo(Objects.requireNonNull(group1.getCreatedDateLongFormat())))
+                    .sorted((group1, group2) -> Objects.requireNonNull(group2.getCreatedDateLongFormat()).compareTo(group1.getCreatedDateLongFormat()))
                     .collect(Collectors.toList());
 
+            if (prevGroupList.isEmpty()) {
+                groupAdapter.groupList = currentGroupList;
+                groupAdapter.notifyDataSetChanged();
+            } else {
+                if (prevGroupList.size() < currentGroupList.size()) {
+                    //perform added
+                    groupAdapter.groupList.add(0, currentGroupList.get(0));
+                    groupAdapter.notifyItemInserted(0);
+                    if (currentGroupList.size() > 1) {
+                        groupAdapter.notifyItemChanged(1);
+                    }
+
+                } else if (prevGroupList.size() > currentGroupList.size()) {
+                    //perform delete
+                    //find the group exist in groupList but not in currentGroupList
+
+                    List<Group> groupsToRemove = new ArrayList<>();
+
+                    groupAdapter.groupList.forEach(group -> {
+                        boolean existsInCurrentGroupList = currentGroupList.stream()
+                                .anyMatch(item -> item.getGroupID().equals(group.getGroupID()));
+
+                        if (!existsInCurrentGroupList) {
+                            Log.d("HomePage", "Found item being removed " + group.getName());
+                            groupsToRemove.add(group); // Mark group for removal
+                        }
+                    });
+
+                    groupsToRemove.forEach(group -> {
+                        int index = groupAdapter.groupList.indexOf(group);
+                        if (index != -1) {
+                            groupAdapter.groupList.remove(index);
+                            groupAdapter.notifyItemRemoved(index);
+                        }
+                        if (index < groupAdapter.groupList.size() - 2) { //case delete top and net want need to show date
+                            groupAdapter.notifyItemChanged(index + 1);
+                        }
+                    });
+
+                } else {
+                    return;
+                }
+            }
+            prevGroupList = currentGroupList;
+            Log.d("HomePage", "Groups updated in real-time. Total groups: " + currentGroupList.size());
             groupAdapter.groupList = new ArrayList<>(groupList);
             groupAdapter.notifyDataSetChanged();
-            Log.d("HomePage", "Groups updated in real-time. Total groups: " + groupList.size());
         });
     }
 

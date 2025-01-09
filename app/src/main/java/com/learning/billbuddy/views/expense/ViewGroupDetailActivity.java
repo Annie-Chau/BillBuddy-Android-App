@@ -143,6 +143,11 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
             // This code will be executed when the results are available
             Log.d("Test", reimbursements.toString());
         });
+
+        currentGroup.getReimbursements(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid(), reimbursements -> {
+            // This code will be executed when the results are available
+            Log.d("Test", reimbursements.toString());
+        });
     }
 
     private void navigateToChatBox() {
