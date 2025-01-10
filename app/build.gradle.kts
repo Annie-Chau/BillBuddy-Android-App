@@ -51,7 +51,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth:22.0.0")
 
     // Google Sign-In
-    implementation("com.google.android.gms:play-services-auth:20.5.0")
+    implementation(libs.play.services.auth.v2050)
 
     // Add the Glide dependency so that the uploaded images can be displayed as the wanted shape
     implementation("com.github.bumptech.glide:glide:4.15.1")
