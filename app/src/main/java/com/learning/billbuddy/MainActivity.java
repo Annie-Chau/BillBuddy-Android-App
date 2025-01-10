@@ -144,10 +144,33 @@ public class MainActivity extends AppCompatActivity {
 
     private void displayNotification(Notification notification) {
         String messageID = notification.getMessageID();
-        if (messageID == null) {
-            Log.e(TAG, "Message ID is null for notification: " + notification.getNotificationID());
+        if (messageID == null || messageID.isEmpty()) {
+            // Handle notifications without a messageID directly
+            Log.d(TAG, "Displaying notification without message ID");
+
+            // Create the notification
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            String channelId = "default_channel_id";
+            String channelName = "Default Channel";
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
+                notificationManager.createNotificationChannel(channel);
+            }
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
+                    .setSmallIcon(R.drawable.ic_notification)
+                    .setContentTitle("Group Notification")
+                    .setContentText(notification.getMessage())
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setDefaults(NotificationCompat.DEFAULT_ALL)
+                    .setAutoCancel(true);
+
+            notificationManager.notify(notification.getNotificationID().hashCode(), builder.build());
             return;
         }
+
+        Log.d(TAG, "Fetching message with ID: " + messageID);
 
         // Fetch the message details using the messageID from the notification
         db.collection("messages").document(messageID)
