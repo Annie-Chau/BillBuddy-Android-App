@@ -43,10 +43,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AddExpenseActivity"
-            android:exported="false" />
-        <activity
-            android:name=".views.expense.ViewBalanceOfGroup"
+            android:name=".views.expense.ViewGroupDetail"
             android:exported="false" />
     </application>
 

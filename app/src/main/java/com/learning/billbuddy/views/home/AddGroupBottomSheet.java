@@ -24,7 +24,7 @@ import com.learning.billbuddy.models.Group;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddGroupBottomSheetDialog extends BottomSheetDialogFragment {
+public class AddGroupBottomSheet extends BottomSheetDialogFragment {
 
     private FirebaseFirestore db;
     private EditText titleEditText;
@@ -41,7 +41,7 @@ public class AddGroupBottomSheetDialog extends BottomSheetDialogFragment {
     // Owner ID (current logged-in user)
     private String ownerID;
 
-    public AddGroupBottomSheetDialog() {
+    public AddGroupBottomSheet() {
         // Required empty public constructor
     }
 

@@ -23,7 +23,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.learning.billbuddy.AddExpenseActivity;
 import com.learning.billbuddy.R;
 import com.learning.billbuddy.adapters.SplitAdapter;
 import com.learning.billbuddy.models.Expense;
