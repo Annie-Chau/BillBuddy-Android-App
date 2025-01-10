@@ -57,4 +57,6 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.15.1")
     annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation ("com.android.support:cardview-v7:26.0.0")
+
 }

@@ -85,10 +85,11 @@ public class AddGroupActivity extends AppCompatActivity {
 
     // Method to add a new member
     private List<String> memberNames = new ArrayList<>();
-    private void addMember(){
+
+    private void addMember() {
         String email = memberEmailEditText.getText().toString().trim().toLowerCase();
         // Validate email
-        if (TextUtils.isEmpty(email)){
+        if (TextUtils.isEmpty(email)) {
             memberEmailEditText.setError("Email is required");
             memberEmailEditText.requestFocus();
             return;
@@ -99,13 +100,13 @@ public class AddGroupActivity extends AppCompatActivity {
                 .whereEqualTo("email", email)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
-                    if (!querySnapshot.isEmpty()){
+                    if (!querySnapshot.isEmpty()) {
                         // Get the user's ID from the doc
                         DocumentSnapshot document = querySnapshot.getDocuments().get(0);
                         String userID = document.getString("userID");
                         String userName = document.getString("name");
 
-                        if (memberIDs.contains(userID)){
+                        if (memberIDs.contains(userID)) {
                             Toast.makeText(this, "User already added", Toast.LENGTH_LONG).show();
                         } else {
                             memberIDs.add(userID);
@@ -121,12 +122,12 @@ public class AddGroupActivity extends AppCompatActivity {
     }
 
     // Update the list of members
-    private void updateMembersList(){
+    private void updateMembersList() {
         StringBuilder membersText = new StringBuilder("Current members:");
-        for(int i = 0; i < memberIDs.size(); i++){
-            if(i == 0){
+        for (int i = 0; i < memberIDs.size(); i++) {
+            if (i == 0) {
                 membersText.append("\n- Owner");
-            }else{
+            } else {
                 membersText.append("\n- ").append(memberNames.get(i));
             }
         }
@@ -134,12 +135,12 @@ public class AddGroupActivity extends AppCompatActivity {
     }
 
     // Method to create a new group
-    private void createGroup(){
+    private void createGroup() {
         String title = titleEditText.getText().toString().trim();
         String description = descriptionEditText.getText().toString().trim();
 
         // Validate inputs
-        if (TextUtils.isEmpty(title)){
+        if (TextUtils.isEmpty(title)) {
             titleEditText.setError("Group Title is required");
             titleEditText.requestFocus();
             return;
@@ -158,7 +159,8 @@ public class AddGroupActivity extends AppCompatActivity {
                 ownerID,
                 memberIDs,
                 new ArrayList<>(), // Expense IDs
-                new ArrayList<>()  // Debt IDs
+                new ArrayList<>(), // Debt IDs
+                System.currentTimeMillis()
         );
 
         Toast.makeText(this, "Group created successfully!", Toast.LENGTH_SHORT).show();

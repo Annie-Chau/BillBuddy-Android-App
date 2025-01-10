@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -26,18 +27,20 @@ import com.learning.billbuddy.models.Group;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ViewBalanceOfGroup extends AppCompatActivity {
 
     private RadioGroup segmentGroup;
     private RadioButton rbExpense, rbBalance;
-    private TextView groupNameTextView;
-    private ImageView groupImageView;
+    private TextView groupNameTextView, balanceTextView, balanceAmountTextView;
+    private ImageView groupImageView, balanceThumbIcon;
     private FloatingActionButton chatButton;
     private Group currentGroup;
     private RecyclerView expenseRecyclerView;
     private ExpenseAdapter expenseAdapter;
+    private LinearLayout balanceTotalBackground;
     private List<Expense> expenseList = new ArrayList<>();
 
     @SuppressLint("NotifyDataSetChanged")
@@ -57,6 +60,10 @@ public class ViewBalanceOfGroup extends AppCompatActivity {
         expenseRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         expenseAdapter = new ExpenseAdapter(this, expenseList);
         expenseRecyclerView.setAdapter(expenseAdapter);
+        balanceTextView = findViewById(R.id.balance_total_text);
+        balanceAmountTextView = findViewById(R.id.balance_total_amount_text);
+        balanceThumbIcon = findViewById(R.id.balance_total_thumb_icon);
+        balanceTotalBackground = findViewById(R.id.balance_total_background);
 
         // Retrieve data from Intent
         currentGroup = (Group) getIntent().getSerializableExtra("group");
@@ -102,6 +109,11 @@ public class ViewBalanceOfGroup extends AppCompatActivity {
             intent.putExtra("group", currentGroup);
             startActivity(intent);
         });
+
+        currentGroup.getReimbursements(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid(), reimbursements -> {
+            // This code will be executed when the results are available
+            Log.d("Test", reimbursements.toString());
+        });
     }
 
     private void navigateToChatBox() {
@@ -116,4 +128,6 @@ public class ViewBalanceOfGroup extends AppCompatActivity {
             Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
         }
     }
+
+
 }

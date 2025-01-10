@@ -1,20 +1,26 @@
 package com.learning.billbuddy.models;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.learning.billbuddy.utils.GroupCallback;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
 
 public class Group implements Serializable {
 
@@ -27,12 +33,15 @@ public class Group implements Serializable {
     private List<String> expenseIDs;
     private List<String> debtIds;
 
+    @Nullable
+    private Long createdDate;
+
     public Group() {
         // Default constructor for Firestore deserialization
     }
 
     // Constructor
-    public Group(String groupID, String name, String description, String avatarURL, String ownerID, List<String> memberIDs, List<String> expenseIDs, List<String> debtIds) {
+    public Group(String groupID, String name, String description, String avatarURL, String ownerID, List<String> memberIDs, List<String> expenseIDs, List<String> debtIds, @Nullable Long createdDate) {
         this.groupID = groupID;
         this.name = name;
         this.description = description;
@@ -41,6 +50,7 @@ public class Group implements Serializable {
         this.memberIDs = memberIDs;
         this.expenseIDs = expenseIDs;
         this.debtIds = debtIds;
+        this.createdDate = createdDate;
     }
 
     // Getters and setters
@@ -106,6 +116,27 @@ public class Group implements Serializable {
 
     public void setDebtIds(List<String> debtIds) {
         this.debtIds = debtIds;
+    }
+
+    public Long getCreatedDateLongFormat() {
+        return createdDate;
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    public String getCreatedDateStringFormat() {
+        //to this format December 12 2024
+        if (this.createdDate == null) {
+            return "";
+        }
+
+        if (new SimpleDateFormat("MMMM dd, yyyy").format(new Date(this.createdDate)).equals(new SimpleDateFormat("MMMM dd, yyyy").format(new Date(System.currentTimeMillis())))) {
+            return "Today";
+        }
+        if (new SimpleDateFormat("MMMM dd, yyyy").format(new Date(this.createdDate)).equals(new SimpleDateFormat("MMMM dd, yyyy").format(new Date(System.currentTimeMillis() - 86400000)))) {
+            return "Yesterday";
+        }
+
+        return new SimpleDateFormat("MMMM dd, yyyy").format(new Date(this.createdDate));
     }
 
     // Methods
@@ -177,7 +208,8 @@ public class Group implements Serializable {
                                     document.getString("ownerID"),
                                     (List<String>) document.get("memberIDs"),
                                     (List<String>) document.get("expenseIDs"),
-                                    (List<String>) document.get("debtIds")
+                                    (List<String>) document.get("debtIds"),
+                                    document.getLong("createdDate")
                             ));
                         }
                     }
@@ -187,7 +219,7 @@ public class Group implements Serializable {
     }
 
     // Method to create a new group in Firestore
-    public static void createGroup(String name, String description, String avatarURL, String ownerID, List<String> memberIDs, List<String> expenseIDs, List<String> debtIds) {
+    public static void createGroup(String name, String description, String avatarURL, String ownerID, List<String> memberIDs, List<String> expenseIDs, List<String> debtIds, Long createdDate) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String groupID = db.collection("groups").document().getId();
 
@@ -201,6 +233,7 @@ public class Group implements Serializable {
         groupData.put("memberIDs", memberIDs);
         groupData.put("expenseIDs", expenseIDs);
         groupData.put("debtIds", debtIds);
+        groupData.put("createdDate", createdDate);
 
         // Add the new group to the "groups" collection in Firestore
         db.collection("groups")
@@ -228,6 +261,155 @@ public class Group implements Serializable {
                         .orElse(null)) // Or handle the case where the user is not found
                 .filter(Objects::nonNull) // Remove null elements if any
                 .collect(Collectors.toList());
+    }
+
+    public boolean isQualifyForSearch(String query) {
+        return name.toLowerCase().contains(query.toLowerCase());
+    }
+
+    public class Reimbursement{
+        public String payerId;
+        public String payeeId;
+        public Double amount = 0.0;
+
+        public Reimbursement(String payerId, String payeeId, Double amount) {
+            this.payerId = payerId;
+            this.payeeId = payeeId;
+            this.amount = amount;
+        }
+
+        public String getPayerId() {
+            return payerId;
+        }
+
+        public void setPayerId(String payerId) {
+            this.payerId = payerId;
+        }
+
+        public String getPayeeId() {
+            return payeeId;
+        }
+
+        public void setPayeeId(String payeeId) {
+            this.payeeId = payeeId;
+        }
+
+        public Double getAmount() {
+            return amount;
+        }
+
+        public void setAmount(Double amount) {
+            this.amount = amount;
+        }
+
+        @Override
+        public String toString() {
+            return "Reimbursement{" +
+                    "payerId='" + payerId + '\'' +
+                    ", payeeId='" + payeeId + '\'' +
+                    ", amount=" + amount +
+                    "}\n";
+        }
+    }
+
+    public interface ReimbursementsCallback<T> {
+        void onResult(T result);
+    }
+
+    public void getReimbursements(String currentUserId, ReimbursementsCallback<List<Reimbursement>> callback) {
+        List<Reimbursement> reimbursements = memberIDs.stream()
+                .flatMap(memberId1 -> memberIDs.stream()
+                        .filter(memberId2 -> !Objects.equals(memberId1, memberId2))
+                        .map(memberId2 -> new Reimbursement(memberId1, memberId2, 0.0)))
+                .collect(Collectors.toList());
+
+        Expense.fetchAllExpenses(expenses -> {
+            List<Expense> groupExpense = getGroupExpenses(expenses);
+
+            groupExpense.forEach(expense -> {
+                List<Map<String, Double>> splits = expense.getSplits();
+                splits.forEach(split -> reimbursements.forEach(reimbursement -> {
+                    if (reimbursement.getPayerId().equals(expense.getPayerID()) &&
+                            expense.getParticipantIDs().contains(reimbursement.getPayeeId()) &&
+                            split.get(reimbursement.getPayeeId()) != null){
+                        reimbursement.amount += split.get(reimbursement.getPayeeId());
+                    }
+                }));
+            });
+
+            processReimbursements(reimbursements);
+
+            callback.onResult(reimbursements); // Return the result in the callback
+        });
+    }
+
+    public static void processReimbursements(List<Reimbursement> reimbursements) {
+        // Extract unique participant IDs
+        Set<String> participants = new HashSet<>();
+        for (Reimbursement r : reimbursements) {
+            participants.add(r.getPayerId());
+            participants.add(r.getPayeeId());
+        }
+
+        List<String> ids = new ArrayList<>(participants);
+
+        // Map participant IDs to indices
+        Map<String, Integer> idToIndex = new HashMap<>();
+        for (int i = 0; i < ids.size(); i++) {
+            idToIndex.put(ids.get(i), i);
+        }
+
+        // Initialize total debt and credit arrays
+        int n = ids.size();
+        double[] totalDebt = new double[n];
+        double[] totalCredit = new double[n];
+
+        for (Reimbursement r : reimbursements) {
+            int payerIndex = idToIndex.get(r.getPayerId());
+            int payeeIndex = idToIndex.get(r.getPayeeId());
+            totalDebt[payerIndex] += r.getAmount();
+            totalCredit[payeeIndex] += r.getAmount();
+        }
+
+        // Calculate net amounts
+        double[] netAmounts = new double[n];
+        for (int i = 0; i < n; i++) {
+            netAmounts[i] = totalDebt[i] - totalCredit[i];
+        }
+
+        System.out.println("Participant IDs:");
+        for (String id : ids) {
+            System.out.println(id);
+        }
+
+        System.out.println("\nNet Amounts:");
+        System.out.println(Arrays.toString(netAmounts));
+
+        System.out.println("\nDebt Settlements:");
+        Log.d("Test", Arrays.toString(netAmounts) + ids);
+        settleDebts(netAmounts, ids);
+    }
+
+    private static void settleDebts(double[] amounts, List<String> ids) {
+        int maxDebtorIndex = 0;
+        int maxCreditorIndex = 0;
+
+        for (int i = 0; i < amounts.length; i++) {
+            if (amounts[i] > amounts[maxDebtorIndex]) maxDebtorIndex = i;
+            if (amounts[i] < amounts[maxCreditorIndex]) maxCreditorIndex = i;
+        }
+
+        if (amounts[maxDebtorIndex] == 0 && amounts[maxCreditorIndex] == 0) return;
+
+        double settlement = Math.min(amounts[maxDebtorIndex], -amounts[maxCreditorIndex]);
+
+        if (settlement == 0) return;
+        amounts[maxDebtorIndex] -= settlement;
+        amounts[maxCreditorIndex] += settlement;
+
+        System.out.println(ids.get(maxDebtorIndex) + " owes " + ids.get(maxCreditorIndex) + " " + settlement);
+
+        settleDebts(amounts, ids);
     }
 
 }

@@ -2,6 +2,7 @@ package com.learning.billbuddy.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,6 +54,18 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
             holder.groupImage.setImageResource(R.drawable.example_image_1); // Default image
         }
 
+        if (position == 0 || !groupList.get(position - 1).getCreatedDateStringFormat().equals(groupList.get(position).getCreatedDateStringFormat())) {
+            Log.d("GroupAdapter", "onBindViewHolder: " + groupList.get(position).getCreatedDateStringFormat());
+            Group currentGroup = groupList.get(position);
+            if (currentGroup.getCreatedDateStringFormat().isEmpty()) {
+                return;
+            }
+            holder.createdDate.setText(groupList.get(position).getCreatedDateStringFormat());
+            holder.createdDate.setVisibility(View.VISIBLE);
+        }else{
+            holder.createdDate.setVisibility(View.GONE);
+        }
+
         // Set click listener for the arrow button (if needed)
         holder.arrowButton.setOnClickListener(v -> {
             // Handle navigation or action when the arrow is clicked
@@ -73,11 +86,14 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
         ImageView groupImage;
         ImageButton arrowButton;
 
+        TextView createdDate;
+
         public GroupViewHolder(@NonNull View itemView) {
             super(itemView);
             groupName = itemView.findViewById(R.id.group_name);
             groupImage = itemView.findViewById(R.id.group_image);
             arrowButton = itemView.findViewById(R.id.group_card_action_button);
+            createdDate = itemView.findViewById(R.id.created_date_group);
 
         }
     }

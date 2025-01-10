@@ -63,10 +63,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().setNavigationBarColor(getColor(R.color.bottom_navigation));
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            View decor = getWindow().getDecorView();
-            decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        }
         super.onCreate(savedInstanceState);
 
         // Initialize Firebase Auth
