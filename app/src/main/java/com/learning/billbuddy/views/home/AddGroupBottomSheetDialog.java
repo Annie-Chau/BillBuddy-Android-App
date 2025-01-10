@@ -17,12 +17,16 @@ import androidx.annotation.Nullable;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.learning.billbuddy.R;
 import com.learning.billbuddy.models.Group;
+import com.learning.billbuddy.models.Notification;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 public class AddGroupBottomSheetDialog extends BottomSheetDialogFragment {
 
@@ -180,7 +184,42 @@ public class AddGroupBottomSheetDialog extends BottomSheetDialogFragment {
                 System.currentTimeMillis()
         );
 
+        // Create notifications for all members except the owner
+        Log.d("AddGroupFragment", "Member IDs: " + memberIDs.toString());
+        for (String memberID : memberIDs) {
+            if (!memberID.equals(ownerID)) {
+                Log.d("AddGroupFragment", "Creating notification for member: " + memberID);
+                createNotificationForMember(memberID, title);
+            } else {
+                Log.d("AddGroupFragment", "Skipping notification for owner: " + memberID);
+            }
+        }
+
         Toast.makeText(requireContext(), "Group created successfully!", Toast.LENGTH_SHORT).show();
         dismiss();
+    }
+
+    // Method to create a notification for a member
+    private void createNotificationForMember(String memberID, String groupName) {
+        String notificationID = UUID.randomUUID().toString();
+        String messageID = ""; // Assuming you have a message ID
+        String type = "Group";
+        String message = "You have been added to the group: " + groupName;
+        Date timestamp = new Date();
+        boolean isRead = false;
+
+        Notification notification = new Notification(notificationID, messageID, type, message, timestamp, isRead);
+
+        Log.d("AddGroupFragment", "Creating notification for member: " + memberID);
+        db.collection("notifications").document(notificationID).set(notification)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("AddGroupFragment", "Notification created successfully for member: " + memberID);
+                    // Add the notification ID to the user's document
+                    db.collection("users").document(memberID)
+                            .update("notificationIds", FieldValue.arrayUnion(notificationID))
+                            .addOnSuccessListener(aVoid2 -> Log.d("AddGroupFragment", "Notification ID added to user: " + memberID))
+                            .addOnFailureListener(e -> Log.e("AddGroupFragment", "Error adding notification ID to user", e));
+                })
+                .addOnFailureListener(e -> Log.e("AddGroupFragment", "Error creating notification", e));
     }
 }
