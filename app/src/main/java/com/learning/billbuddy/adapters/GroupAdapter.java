@@ -1,8 +1,11 @@
 package com.learning.billbuddy.adapters;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
@@ -20,12 +23,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseAuth;
 import com.learning.billbuddy.R;
-import com.learning.billbuddy.views.expense.ViewBalanceOfGroup;
+import com.learning.billbuddy.views.expense.ViewGroupDetail;
 import com.learning.billbuddy.interfaces.IResponseCallback;
 import com.learning.billbuddy.models.Group;
 
 import java.util.List;
+import java.util.Objects;
 
 
 public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHolder> implements RecyclerView.OnItemTouchListener {
@@ -45,6 +50,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
         return new GroupViewHolder(view);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onBindViewHolder(@NonNull GroupViewHolder holder, int position) {
         Group group = groupList.get(position);
@@ -112,6 +118,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
     private void showConfirmDeleteDialog(Group group) {
         // Show a dialog to confirm deletion
         Dialog dialog = new Dialog(context);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.setContentView(R.layout.modal_dialog);
 
         Button cancelButton = dialog.findViewById(R.id.modal_dialog_cancel_button);
@@ -119,33 +126,34 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
 
         cancelButton.setOnClickListener(v -> dialog.dismiss());
         confirmButton.setOnClickListener(v -> {
+            String currentUserID = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+            if (currentUserID.equals(group.getOwnerID())) { // Assuming `getOwnerID()` returns ownerID
+                try {
+                    Group.deleteGroup(group, new IResponseCallback() {
+                        @Override
+                        public void onSuccess() {
+                            Toast.makeText(context, "Group deleted successfully", Toast.LENGTH_SHORT).show();
+                        }
 
-            try {
-                Group.deleteGroup(group, new IResponseCallback() {
-                    @Override
-                    public void onSuccess() {
-                        Toast.makeText(context, "Group deleted successfully", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onFailure(Exception e) {
-                        Toast.makeText(context, "Error deleting group: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-            } catch (Exception e) {
-                Log.d("GroupAdapter", "Error deleting group: " + e.getMessage());
+                        @Override
+                        public void onFailure(Exception e) {
+                            Toast.makeText(context, "Error deleting group: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.d("GroupAdapter", "Error deleting group: " + e.getMessage());
+                }
+            } else {
+                Toast.makeText(context, "You are not authorized to delete this group.", Toast.LENGTH_SHORT).show();
             }
             dialog.dismiss();
         });
 
-
         dialog.show();
-
-
     }
 
     private void navigateItemGroupDetail(Group group) {
-        Intent intent = new Intent(context, ViewBalanceOfGroup.class);
+        Intent intent = new Intent(context, ViewGroupDetail.class);
         intent.putExtra("group", group);
         context.startActivity(intent);
     }

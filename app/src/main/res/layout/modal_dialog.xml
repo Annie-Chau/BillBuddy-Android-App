@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="320dp"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/small_round_white"
     app:cardCornerRadius="10dp">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:background="@android:color/transparent"
+        android:backgroundTint="@android:color/transparent"
+        android:padding="32dp">
 
         <TextView
             android:id="@+id/modal_dialog_title"
@@ -26,7 +28,7 @@
             android:textStyle="bold" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="250dp"
             android:layout_height="wrap_content">
 
             <Button
@@ -48,6 +50,7 @@
                 android:layout_width="120dp"
                 android:layout_height="35dp"
                 android:background="@drawable/round_square_primary"
+                android:textColor="@color/white"
                 android:text="Confirm"
                 android:textSize="12sp" />
         </LinearLayout>

@@ -3,6 +3,7 @@ package com.learning.billbuddy.views.expense;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -19,20 +20,18 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.learning.billbuddy.AddExpenseActivity;
 import com.learning.billbuddy.ChatBoxActivity;
 import com.learning.billbuddy.R;
 import com.learning.billbuddy.adapters.ExpenseAdapter;
 import com.learning.billbuddy.models.Expense;
 import com.learning.billbuddy.models.Group;
-import com.learning.billbuddy.views.home.AddGroupBottomSheetDialog;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ViewBalanceOfGroup extends AppCompatActivity {
+public class ViewGroupDetail extends AppCompatActivity {
 
     private RadioGroup segmentGroup;
     private RadioButton rbExpense, rbBalance;
@@ -111,7 +110,7 @@ public class ViewBalanceOfGroup extends AppCompatActivity {
             Bundle args = new Bundle();
             args.putSerializable("group", currentGroup);
             bottomSheet.setArguments(args);
-            bottomSheet.show(ViewBalanceOfGroup.this.getSupportFragmentManager(), "AddGroupBottomSheetDialog");
+            bottomSheet.show(ViewGroupDetail.this.getSupportFragmentManager(), "AddGroupBottomSheetDialog");
         });
 
         currentGroup.getReimbursements(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid(), reimbursements -> {
@@ -124,7 +123,7 @@ public class ViewBalanceOfGroup extends AppCompatActivity {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
             String userID = currentUser.getUid();
-            Intent intent = new Intent(ViewBalanceOfGroup.this, ChatBoxActivity.class);
+            Intent intent = new Intent(ViewGroupDetail.this, ChatBoxActivity.class);
             intent.putExtra("group", currentGroup);
             intent.putExtra("USER_ID", userID);
             startActivity(intent);

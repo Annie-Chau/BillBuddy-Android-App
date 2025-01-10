@@ -121,7 +121,7 @@ public class HomePage extends Fragment {
                 for (DocumentSnapshot document : task.getResult()) {
                     User user = document.toObject(User.class);
                     if (user != null) {
-                        AddGroupBottomSheetDialog bottomSheet = new AddGroupBottomSheetDialog();
+                        AddGroupBottomSheet bottomSheet = new AddGroupBottomSheet();
                         Bundle args = new Bundle();
                         args.putString("OWNER_ID", user.getUserID());
                         args.putString("OWNER_NAME", user.getName());
@@ -148,7 +148,9 @@ public class HomePage extends Fragment {
         Group.fetchAllGroups(groups -> {
             groupList = groups.stream()
                     .filter(group -> group.getMemberIDs() != null && group.getMemberIDs().contains(currentUserId))
-                    .sorted((group1, group2) -> Objects.requireNonNull(group2.getCreatedDateLongFormat()).compareTo(group1.getCreatedDateLongFormat()))
+                    .sorted((group1, group2) ->
+                            Objects.requireNonNull(group2.getCreatedDateLongFormat())
+                                    .compareTo(Objects.requireNonNull(group1.getCreatedDateLongFormat())))
                     .collect(Collectors.toList());
 
             groupAdapter.groupList = new ArrayList<>(groupList);
@@ -177,6 +179,7 @@ public class HomePage extends Fragment {
     }
 
 
+    @SuppressLint("NotifyDataSetChanged")
     private void onFilter() {
         String filterOption = filterSelection.getSelectedItem().toString();
         Log.d("HomePage", "Filter option selected: " + filterOption);
