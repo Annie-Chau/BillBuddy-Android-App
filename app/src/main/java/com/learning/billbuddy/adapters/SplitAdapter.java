@@ -47,18 +47,11 @@ public class SplitAdapter extends RecyclerView.Adapter<SplitAdapter.ViewHolder> 
         }
     }
 
-    public SplitAdapter(List<User> personList, double totalAmount, RecyclerView splitRecyclerView) {
+    public SplitAdapter(List<User> personList, double totalAmount, RecyclerView splitRecyclerView, String currencySymbol) {
         this.personList = personList;
         this.totalAmount = totalAmount;
-        this.checked = 0;
+        this.checked = personList.size();
         this.splitRecyclerView = splitRecyclerView;
-    }
-
-    public void setTotalAmount(double totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public void setCurrencySymbol(String currencySymbol) {
         this.currencySymbol = currencySymbol;
     }
 
@@ -74,29 +67,16 @@ public class SplitAdapter extends RecyclerView.Adapter<SplitAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         User person = personList.get(position);
         holder.personNameTextView.setText(person.getName());
+        holder.personAmountTextView.setText(currencySymbol + " " + String.format("%.2f", calculateSplitAmount()));
+        holder.checkBox.setChecked(true);
 
-        // Initialize amount to 0
-        holder.personAmountTextView.setText(currencySymbol + " 0.00"); // Use currencySymbol
-
-        // Handle CheckBox clicks
         holder.checkBox.setOnClickListener(v -> {
             if (holder.checkBox.isChecked()) {
                 checked++;
             } else {
                 checked--;
             }
-
-            // Update the amount for all checked items
-            for (int i = 0; i < getItemCount(); i++) {
-                ViewHolder itemHolder = (ViewHolder) splitRecyclerView.findViewHolderForAdapterPosition(i);
-                if (itemHolder != null) {
-                    if (itemHolder.checkBox.isChecked()) {
-                        itemHolder.personAmountTextView.setText(currencySymbol + " " + String.format("%.2f", calculateSplitAmount()));
-                    } else {
-                        itemHolder.personAmountTextView.setText(currencySymbol + " " + String.format("%.2f", 0.0));
-                    }
-                }
-            }
+            updateSplitAmounts();
         });
     }
 
@@ -107,6 +87,26 @@ public class SplitAdapter extends RecyclerView.Adapter<SplitAdapter.ViewHolder> 
     private static double calculateSplitAmount() {
         if (checked == 0) return 0; // Prevent division by zero
         return totalAmount / checked;
+    }
+
+    // Method to update the total amount and recalculate the split amounts
+    public void updateTotalAmount(double newTotalAmount) {
+        totalAmount = newTotalAmount;
+        updateSplitAmounts();
+    }
+
+    // Method to update the split amounts for all checked items
+    private void updateSplitAmounts() {
+        for (int i = 0; i < getItemCount(); i++) {
+            ViewHolder itemHolder = (ViewHolder) splitRecyclerView.findViewHolderForAdapterPosition(i);
+            if (itemHolder != null) {
+                if (itemHolder.checkBox.isChecked()) {
+                    itemHolder.personAmountTextView.setText(currencySymbol + " " + String.format("%.2f", calculateSplitAmount()));
+                } else {
+                    itemHolder.personAmountTextView.setText(currencySymbol + " " + String.format("%.2f", 0.0));
+                }
+            }
+        }
     }
 
     // Implement getSplitItems()

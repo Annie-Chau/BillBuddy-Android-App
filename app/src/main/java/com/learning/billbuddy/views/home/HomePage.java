@@ -79,8 +79,7 @@ public class HomePage extends Fragment {
         groupRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         groupRecyclerView.setAdapter(groupAdapter);
 
-
-        setupRealTimeGroupUpdates();
+        setUpRealTimeGroupUpdates();
 
         ImageButton addParticipantButton = view.findViewById(R.id.to_add_group_btn);
         addParticipantButton.setOnClickListener(v -> openAddGroupDialog());
@@ -136,7 +135,7 @@ public class HomePage extends Fragment {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private void setupRealTimeGroupUpdates() {
+    private void setUpRealTimeGroupUpdates() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
             Log.e("HomePage", "No authenticated user found for real-time updates");

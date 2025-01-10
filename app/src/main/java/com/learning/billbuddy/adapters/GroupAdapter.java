@@ -27,7 +27,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.learning.billbuddy.R;
-import com.learning.billbuddy.views.expense.ViewGroupDetail;
+import com.learning.billbuddy.views.expense.ViewGroupDetailActivity;
 import com.learning.billbuddy.interfaces.IResponseCallback;
 import com.learning.billbuddy.models.Group;
 import com.learning.billbuddy.models.Notification;
@@ -57,7 +57,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
         return new GroupViewHolder(view);
     }
 
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint({"ClickableViewAccessibility", "UseCompatLoadingForDrawables"})
     @Override
     public void onBindViewHolder(@NonNull GroupViewHolder holder, int position) {
         Group group = groupList.get(position);
@@ -195,7 +195,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
     }
 
     private void navigateItemGroupDetail(Group group) {
-        Intent intent = new Intent(context, ViewGroupDetail.class);
+        Intent intent = new Intent(context, ViewGroupDetailActivity.class);
         intent.putExtra("group", group);
         context.startActivity(intent);
     }

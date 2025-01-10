@@ -88,7 +88,7 @@ public class AddExpenseBottomSheet extends BottomSheetDialogFragment {
         splitRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         User.fetchAllUsers(users -> {
-            SplitAdapter splitAdapter = new SplitAdapter(currentGroup.getMemberList(users), 0, splitRecyclerView);
+            SplitAdapter splitAdapter = new SplitAdapter(currentGroup.getMemberList(users), 0, splitRecyclerView, selectedCurrency);
             splitRecyclerView.setAdapter(splitAdapter);
         });
 
@@ -179,7 +179,20 @@ public class AddExpenseBottomSheet extends BottomSheetDialogFragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 User.fetchAllUsers(users -> {
-                    SplitAdapter splitAdapter = new SplitAdapter(currentGroup.getMemberList(users), Double.parseDouble(amountEditText.getText().toString()), splitRecyclerView);
+                    SplitAdapter splitAdapter;
+                    String amountString = amountEditText.getText().toString();
+
+                    if (!amountString.trim().isEmpty()) {
+                        try {
+                            double amount = Double.parseDouble(amountString);
+                            splitAdapter = new SplitAdapter(currentGroup.getMemberList(users), amount, splitRecyclerView, selectedCurrency);
+                        } catch (NumberFormatException e) {
+                            splitAdapter = new SplitAdapter(currentGroup.getMemberList(users), 0.00, splitRecyclerView, selectedCurrency);
+                        }
+                    } else {
+                        splitAdapter = new SplitAdapter(currentGroup.getMemberList(users), 0.00, splitRecyclerView, selectedCurrency);
+                    }
+
                     splitRecyclerView.setAdapter(splitAdapter);
                     splitAdapter.notifyDataSetChanged();
                 });
@@ -240,9 +253,9 @@ public class AddExpenseBottomSheet extends BottomSheetDialogFragment {
                     SplitAdapter splitAdapter = new SplitAdapter(
                             currentGroup.getMemberList(users),
                             !amountEditText.getText().toString().isEmpty() ? Double.parseDouble(amountEditText.getText().toString()) : 0.00,
-                            splitRecyclerView);
+                            splitRecyclerView,
+                            selectedCurrency);
                     splitRecyclerView.setAdapter(splitAdapter);
-                    splitAdapter.setCurrencySymbol(selectedCurrency);
                     splitAdapter.notifyDataSetChanged();
                 });
             }
