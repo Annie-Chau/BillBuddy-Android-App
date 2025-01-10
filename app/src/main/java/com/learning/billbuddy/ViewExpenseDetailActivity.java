@@ -75,7 +75,7 @@ public class ViewExpenseDetailActivity extends AppCompatActivity {
         User.fetchAllUsers(users -> {
             ViewExpenseParticipantAdapter adapter = new ViewExpenseParticipantAdapter(currentExpense, users);
             Log.d("Test", currentExpense.toString() + users);
-            participantList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+            participantList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
             participantList.setAdapter(adapter);
             adapter.notifyDataSetChanged();
         });

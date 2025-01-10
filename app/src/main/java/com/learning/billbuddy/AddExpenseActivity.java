@@ -169,6 +169,7 @@ public class AddExpenseActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 User.fetchAllUsers(users -> {
                     SplitAdapter splitAdapter = new SplitAdapter(currentGroup.getMemberList(users), Double.parseDouble(amountEditText.getText().toString()), splitRecyclerView);
+                    splitAdapter.setCurrencySymbol(selectedCurrency);
                     splitRecyclerView.setAdapter(splitAdapter);
                     splitAdapter.notifyDataSetChanged();
                 });
