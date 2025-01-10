@@ -24,23 +24,30 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.learning.billbuddy.R;
 import com.learning.billbuddy.views.expense.ViewGroupDetail;
 import com.learning.billbuddy.interfaces.IResponseCallback;
 import com.learning.billbuddy.models.Group;
+import com.learning.billbuddy.models.Notification;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-
+import java.util.UUID;
 
 public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHolder> implements RecyclerView.OnItemTouchListener {
 
     private final Context context;
     public List<Group> groupList;
+    private FirebaseFirestore db;
 
     public GroupAdapter(Context context, List<Group> groupList) {
         this.context = context;
         this.groupList = groupList;
+        this.db = FirebaseFirestore.getInstance();
     }
 
     @NonNull
@@ -107,7 +114,6 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
             return true;
         });
 
-
         holder.linearLayout.setOnClickListener(v -> {
             // Handle click on the card
             Log.d("GroupAdapter", "Clicked on group: " + group.getName());
@@ -132,6 +138,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
                     Group.deleteGroup(group, new IResponseCallback() {
                         @Override
                         public void onSuccess() {
+                            notifyGroupMembers(group);
                             Toast.makeText(context, "Group deleted successfully", Toast.LENGTH_SHORT).show();
                         }
 
@@ -152,12 +159,46 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
         dialog.show();
     }
 
+    private void notifyGroupMembers(Group group) {
+        String ownerID = group.getOwnerID();
+        String groupName = group.getName();
+        List<String> memberIDs = group.getMemberIDs();
+
+        for (String memberID : memberIDs) {
+            if (!memberID.equals(ownerID)) {
+                createNotificationForMember(memberID, groupName);
+            }
+        }
+    }
+
+    private void createNotificationForMember(String memberID, String groupName) {
+        String notificationID = UUID.randomUUID().toString();
+        String messageID = ""; // Assuming you have a message ID
+        String type = "Group";
+        String message = "The group \"" + groupName + "\" has been deleted.";
+        Date timestamp = new Date();
+        boolean isRead = false;
+
+        Notification notification = new Notification(notificationID, messageID, type, message, timestamp, isRead);
+
+        Log.d("GroupAdapter", "Creating notification for member: " + memberID);
+        db.collection("notifications").document(notificationID).set(notification)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("GroupAdapter", "Notification created successfully for member: " + memberID);
+                    // Add the notification ID to the user's document
+                    db.collection("users").document(memberID)
+                            .update("notificationIds", FieldValue.arrayUnion(notificationID))
+                            .addOnSuccessListener(aVoid2 -> Log.d("GroupAdapter", "Notification ID added to user: " + memberID))
+                            .addOnFailureListener(e -> Log.e("GroupAdapter", "Error adding notification ID to user", e));
+                })
+                .addOnFailureListener(e -> Log.e("GroupAdapter", "Error creating notification", e));
+    }
+
     private void navigateItemGroupDetail(Group group) {
         Intent intent = new Intent(context, ViewGroupDetail.class);
         intent.putExtra("group", group);
         context.startActivity(intent);
     }
-
 
     @Override
     public int getItemCount() {
@@ -179,7 +220,6 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
                 rv.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY_RELEASE);
                 break;
         }
-
     }
 
     @Override
@@ -192,7 +232,6 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
         TextView groupName;
         ImageView groupImage;
         ImageButton arrowButton;
-
         TextView createdDate;
         LinearLayout linearLayout;
 
@@ -202,7 +241,6 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
             groupImage = itemView.findViewById(R.id.group_image);
             arrowButton = itemView.findViewById(R.id.group_card_action_button);
             createdDate = itemView.findViewById(R.id.created_date_group);
-
             linearLayout = itemView.findViewById(R.id.group_card);
         }
     }
