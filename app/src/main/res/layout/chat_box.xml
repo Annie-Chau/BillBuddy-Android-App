@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- Top Bar with Back Button and Group Name -->
     <RelativeLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/light_green"
+        android:background="@color/primary"
         android:padding="16dp">
 
         <ImageButton
@@ -26,6 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Group Name"
+            android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_centerInParent="true" />
@@ -46,7 +48,7 @@
         android:id="@+id/messageInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/background"
+        android:background="@color/bottom_navigation"
         android:padding="16dp"
         android:layout_alignParentBottom="true">
 
@@ -76,10 +78,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_send"
+                app:tint="@color/primary"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="8dp"
                 android:layout_marginStart="8dp" />
         </LinearLayout>
+
     </RelativeLayout>
 
 </RelativeLayout>

@@ -210,32 +210,34 @@ public class AddExpenseBottomSheet extends BottomSheetDialogFragment {
         });
 
         User.fetchAllUsers(users -> {
-            List<String> memberNames = currentGroup.getMemberNameList(users);
+            if (isAdded()){
+                List<String> memberNames = currentGroup.getMemberNameList(users);
 
-            ArrayAdapter<String> paidByAdapter = new ArrayAdapter<>(
-                    requireContext(), android.R.layout.simple_spinner_item, memberNames);
+                ArrayAdapter<String> paidByAdapter = new ArrayAdapter<>(
+                        requireContext(), android.R.layout.simple_spinner_item, memberNames);
 
-            paidByAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                paidByAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-            paidBySpinner.setAdapter(paidByAdapter);
+                paidBySpinner.setAdapter(paidByAdapter);
 
-            paidBySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                    paidBy = parentView.getItemAtPosition(position).toString();
+                paidBySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                        paidBy = parentView.getItemAtPosition(position).toString();
 
-                    // Get the selected User object
-                    User selectedUser = currentGroup.getMemberList(users).get(position);
+                        // Get the selected User object
+                        User selectedUser = currentGroup.getMemberList(users).get(position);
 
-                    // Get the ID of the selected user
-                    paidById = selectedUser.getUserID();
-                }
+                        // Get the ID of the selected user
+                        paidById = selectedUser.getUserID();
+                    }
 
-                @Override
-                public void onNothingSelected(AdapterView<?> parentView) {
-                    // Handle nothing selected
-                }
-            });
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parentView) {
+                        // Handle nothing selected
+                    }
+                });
+            }
         });
 
         // Set up Currency spinner
