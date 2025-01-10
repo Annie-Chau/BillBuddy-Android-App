@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="8dp">
 
     <LinearLayout
@@ -19,11 +20,13 @@
             android:layout_gravity="bottom"
             android:layout_marginRight="8dp"
             android:background="@drawable/circle_background"
+            android:padding="5dp"
             android:scaleType="centerCrop"
+            app:tint="@color/white"
             android:src="@drawable/person_icon" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
@@ -31,16 +34,17 @@
                 android:id="@+id/left_chat_receiver_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8sp"
+                android:layout_marginLeft="5sp"
                 android:layout_marginBottom="4dp"
-                android:fontFamily="@font/inter_regular"
+                android:fontFamily="@font/notosansregular"
                 android:text="Dinh Gia Huu Phuoc"
                 android:textColor="@color/text_gray"
-                android:textSize="10sp" />
+                android:textSize="11sp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minWidth="175dp"
                 android:layout_marginEnd="80dp"
                 android:background="@drawable/edit_text_rounded_corner"
                 android:backgroundTint="@color/gray"
@@ -51,7 +55,7 @@
                     android:id="@+id/left_chat_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/inter_regular"
+                    android:fontFamily="@font/notosansregular"
                     android:text="Hello How are you?"
                     android:textSize="16sp"
                     android:textColor="@color/black" />
@@ -62,6 +66,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:layout_marginTop="4dp"
+                    android:layout_marginEnd="3dp"
                     android:fontFamily="@font/inter_regular"
                     android:text="08:30"
                     android:textColor="@color/text_gray"
@@ -74,10 +79,11 @@
         android:id="@+id/right_chat_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:minWidth="175dp"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="80dp"
         android:background="@drawable/edit_text_rounded_corner"
-        android:backgroundTint="@color/light_green"
+        android:backgroundTint="@color/primary"
         android:orientation="vertical"
         android:padding="8dp">
 
@@ -85,10 +91,10 @@
             android:id="@+id/right_chat_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/inter_regular"
+            android:fontFamily="@font/notosansregular"
             android:text="Hello How are you?"
             android:textSize="16sp"
-            android:textColor="@color/black" />
+            android:textColor="@color/white" />
 
         <TextView
             android:id="@+id/right_chat_time"
@@ -96,9 +102,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginTop="4dp"
+            android:layout_marginEnd="3dp"
             android:fontFamily="@font/inter_regular"
             android:text="08:30"
-            android:textColor="@color/text_gray"
+            android:textColor="@color/white"
             android:textSize="10sp" />
     </LinearLayout>
 

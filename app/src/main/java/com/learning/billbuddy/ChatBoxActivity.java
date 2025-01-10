@@ -51,7 +51,7 @@ public class ChatBoxActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        getWindow().setStatusBarColor(getColor(R.color.light_green));
+        getWindow().setStatusBarColor(getColor(R.color.primary));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat_box);
 

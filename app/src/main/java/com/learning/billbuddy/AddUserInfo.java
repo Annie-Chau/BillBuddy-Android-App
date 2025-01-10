@@ -169,7 +169,7 @@ public class AddUserInfo extends AppCompatActivity {
             finish();
 
         } else {
-            User.createUser(userId, name, email, phone, "XXX", registrationMethod, new ArrayList<>());
+            User.createUser(userId, name, email, phone, "", registrationMethod, new ArrayList<>());
             Toast.makeText(AddUserInfo.this, "User created successfully!", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(AddUserInfo.this, Objects.equals(registrationMethod, "Google Account") ? MainActivity.class : Login.class);
             startActivity(intent);

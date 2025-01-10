@@ -22,9 +22,11 @@ import com.learning.billbuddy.models.Message;
 import com.learning.billbuddy.models.User;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder> {
 
@@ -55,21 +57,46 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
         Message message = messageList.get(position);
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        String currentUserId = currentUser.getUid();
+        String currentUserId = Objects.requireNonNull(currentUser).getUid();
+        Calendar today = Calendar.getInstance();
 
         if (message.getSenderID().equals(currentUserId)) {
             holder.leftChatLayout.setVisibility(View.GONE);
             holder.rightChatLayout.setVisibility(View.VISIBLE);
             holder.rightChatText.setText(message.getContent());
-            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-            holder.rightChatTime.setText(sdf.format(message.getTimestamp()));
+
+            Calendar messageDate = Calendar.getInstance();
+            messageDate.setTime(message.getTimestamp());
+
+            if (today.get(Calendar.YEAR) == messageDate.get(Calendar.YEAR) &&
+                    today.get(Calendar.DAY_OF_YEAR) == messageDate.get(Calendar.DAY_OF_YEAR)) {
+                // Today: Display only time
+                SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+                holder.rightChatTime.setText(sdf.format(message.getTimestamp()));
+            } else {
+                // Not today: Display date and time
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault());
+                holder.rightChatTime.setText(sdf.format(message.getTimestamp()));
+            }
+
         } else {
             holder.rightChatLayout.setVisibility(View.GONE);
             holder.leftChatLayout.setVisibility(View.VISIBLE);
             holder.leftChatReceiverName.setText(userNames.get(message.getSenderID()));
             holder.leftChatText.setText(message.getContent());
-            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-            holder.leftChatTime.setText(sdf.format(message.getTimestamp()));
+            Calendar messageDate = Calendar.getInstance();
+            messageDate.setTime(message.getTimestamp());
+
+            if (today.get(Calendar.YEAR) == messageDate.get(Calendar.YEAR) &&
+                    today.get(Calendar.DAY_OF_YEAR) == messageDate.get(Calendar.DAY_OF_YEAR)) {
+                // Today: Display only time
+                SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+                holder.leftChatTime.setText(sdf.format(message.getTimestamp()));
+            } else {
+                // Not today: Display date and time
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault());
+                holder.leftChatTime.setText(sdf.format(message.getTimestamp()));
+            }
 
             db.collection("users").document(message.getSenderID()).get().addOnCompleteListener(task -> {
 
@@ -82,7 +109,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                         return;
                     }
 
-                    if (user.getProfilePictureURL() != null) {
+                    if (!Objects.equals(user.getProfilePictureURL(), "")) {
                         try {
                             Glide.with(context).load(Uri.parse(user.getProfilePictureURL())).circleCrop().into(holder.leftChatAvatar);
                         } catch (Exception e) {
