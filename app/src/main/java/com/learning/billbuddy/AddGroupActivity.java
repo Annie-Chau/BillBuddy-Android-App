@@ -15,10 +15,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.learning.billbuddy.models.Group;
+import com.learning.billbuddy.models.Notification;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -76,11 +79,9 @@ public class AddGroupActivity extends AppCompatActivity {
                     updateMembersList();
                 });
 
-
         createButton.setOnClickListener(v -> createGroup());
         cancelButton.setOnClickListener(v -> finish());
         addMemberButton.setOnClickListener(v -> addMember());
-
     }
 
     // Method to add a new member
@@ -161,7 +162,42 @@ public class AddGroupActivity extends AppCompatActivity {
                 new ArrayList<>()  // Debt IDs
         );
 
+        // Create notifications for all members except the owner
+        Log.d("AddGroupActivity", "Member IDs: " + memberIDs.toString());
+        for (String memberID : memberIDs) {
+            if (!memberID.equals(ownerID)) {
+                Log.d("AddGroupActivity", "Creating notification for member: " + memberID);
+                createNotificationForMember(memberID, title);
+            } else {
+                Log.d("AddGroupActivity", "Skipping notification for owner: " + memberID);
+            }
+        }
+
         Toast.makeText(this, "Group created successfully!", Toast.LENGTH_SHORT).show();
         finish();
+    }
+
+    // Method to create a notification for a member
+    private void createNotificationForMember(String memberID, String groupName) {
+        String notificationID = UUID.randomUUID().toString();
+        String messageID = ""; // Assuming you have a message ID
+        String type = "Group";
+        String message = "You have been added to the group: " + groupName;
+        Date timestamp = new Date();
+        boolean isRead = false;
+
+        Notification notification = new Notification(notificationID, messageID, type, message, timestamp, isRead);
+
+        Log.d("AddGroupActivity", "Creating notification for member: " + memberID);
+        db.collection("notifications").document(notificationID).set(notification)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("AddGroupActivity", "Notification created successfully for member: " + memberID);
+                    // Add the notification ID to the user's document
+                    db.collection("users").document(memberID)
+                            .update("notificationIds", FieldValue.arrayUnion(notificationID))
+                            .addOnSuccessListener(aVoid2 -> Log.d("AddGroupActivity", "Notification ID added to user: " + memberID))
+                            .addOnFailureListener(e -> Log.e("AddGroupActivity", "Error adding notification ID to user", e));
+                })
+                .addOnFailureListener(e -> Log.e("AddGroupActivity", "Error creating notification", e));
     }
 }
