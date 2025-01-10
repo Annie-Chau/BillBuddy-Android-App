@@ -1,6 +1,5 @@
 package com.learning.billbuddy.views.expense;
 
-
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
@@ -22,18 +21,22 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.learning.billbuddy.R;
 import com.learning.billbuddy.adapters.SplitAdapter;
 import com.learning.billbuddy.models.Expense;
 import com.learning.billbuddy.models.Group;
+import com.learning.billbuddy.models.Notification;
 import com.learning.billbuddy.models.User;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 public class AddExpenseBottomSheet extends BottomSheetDialogFragment {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -148,8 +151,8 @@ public class AddExpenseBottomSheet extends BottomSheetDialogFragment {
             Log.d("Result", expenseInfo);
 
             try {
-                Expense.createExpense(
-                        currentGroup.getGroupID(),
+                Expense expense = new Expense(
+                        UUID.randomUUID().toString(),
                         titleEditText.getText().toString(),
                         "",
                         amount,
@@ -161,6 +164,23 @@ public class AddExpenseBottomSheet extends BottomSheetDialogFragment {
                         dateFormat.parse(date),
                         selectedCurrency
                 );
+
+                Expense.createExpense(
+                        currentGroup.getGroupID(),
+                        expense.getTitle(),
+                        expense.getAvatarURL(),
+                        expense.getAmount(),
+                        expense.getNotes(),
+                        expense.getBillPictureURL(),
+                        expense.getPayerID(),
+                        expense.getParticipantIDs(),
+                        expense.getSplits(),
+                        expense.getTimestamp(),
+                        expense.getCurrency()
+                );
+
+                // Notify all users in the group, including the payer
+                notifyGroupMembers(expense);
 
                 Toast.makeText(requireActivity(), "Expense added successfully", Toast.LENGTH_SHORT).show();
                 dismiss();
@@ -210,32 +230,34 @@ public class AddExpenseBottomSheet extends BottomSheetDialogFragment {
         });
 
         User.fetchAllUsers(users -> {
-            List<String> memberNames = currentGroup.getMemberNameList(users);
+            if (isAdded()){
+                List<String> memberNames = currentGroup.getMemberNameList(users);
 
-            ArrayAdapter<String> paidByAdapter = new ArrayAdapter<>(
-                    requireContext(), android.R.layout.simple_spinner_item, memberNames);
+                ArrayAdapter<String> paidByAdapter = new ArrayAdapter<>(
+                        requireContext(), android.R.layout.simple_spinner_item, memberNames);
 
-            paidByAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                paidByAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-            paidBySpinner.setAdapter(paidByAdapter);
+                paidBySpinner.setAdapter(paidByAdapter);
 
-            paidBySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                    paidBy = parentView.getItemAtPosition(position).toString();
+                paidBySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                        paidBy = parentView.getItemAtPosition(position).toString();
 
-                    // Get the selected User object
-                    User selectedUser = currentGroup.getMemberList(users).get(position);
+                        // Get the selected User object
+                        User selectedUser = currentGroup.getMemberList(users).get(position);
 
-                    // Get the ID of the selected user
-                    paidById = selectedUser.getUserID();
-                }
+                        // Get the ID of the selected user
+                        paidById = selectedUser.getUserID();
+                    }
 
-                @Override
-                public void onNothingSelected(AdapterView<?> parentView) {
-                    // Handle nothing selected
-                }
-            });
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parentView) {
+                        // Handle nothing selected
+                    }
+                });
+            }
         });
 
         // Set up Currency spinner
@@ -250,13 +272,15 @@ public class AddExpenseBottomSheet extends BottomSheetDialogFragment {
                 selectedCurrency = parentView.getItemAtPosition(position).toString();
 
                 User.fetchAllUsers(users -> {
-                    SplitAdapter splitAdapter = new SplitAdapter(
-                            currentGroup.getMemberList(users),
-                            !amountEditText.getText().toString().isEmpty() ? Double.parseDouble(amountEditText.getText().toString()) : 0.00,
-                            splitRecyclerView,
-                            selectedCurrency);
-                    splitRecyclerView.setAdapter(splitAdapter);
-                    splitAdapter.notifyDataSetChanged();
+                    if (isAdded()) {
+                        SplitAdapter splitAdapter = new SplitAdapter(
+                                currentGroup.getMemberList(users),
+                                !amountEditText.getText().toString().isEmpty() ? Double.parseDouble(amountEditText.getText().toString()) : 0.00,
+                                splitRecyclerView,
+                                selectedCurrency);
+                        splitRecyclerView.setAdapter(splitAdapter);
+                        splitAdapter.notifyDataSetChanged();
+                    }
                 });
             }
 
@@ -285,4 +309,31 @@ public class AddExpenseBottomSheet extends BottomSheetDialogFragment {
         return expenseInfo.toString();
     }
 
+    private void notifyGroupMembers(Expense expense) {
+        List<String> allUserIDs = expense.getParticipantIDs();
+        allUserIDs.add(expense.getPayerID());
+
+        for (String userID : allUserIDs) {
+            String notificationID = UUID.randomUUID().toString();
+            String messageID = ""; // Assuming you have a message ID
+            String type = "Expense";
+            String message = "A new expense \"" + expense.getTitle() + "\" of " + expense.getCurrency() + " " + expense.getAmount() + " has been added.";
+            Date timestamp = new Date();
+            boolean isRead = false;
+
+            Notification notification = new Notification(notificationID, messageID, type, message, timestamp, isRead);
+
+            Log.d("AddExpenseBottomSheet", "Creating notification for user: " + userID);
+            db.collection("notifications").document(notificationID).set(notification)
+                    .addOnSuccessListener(aVoid -> {
+                        Log.d("AddExpenseBottomSheet", "Notification created successfully for user: " + userID);
+                        // Add the notification ID to the user's document
+                        db.collection("users").document(userID)
+                                .update("notificationIds", FieldValue.arrayUnion(notificationID))
+                                .addOnSuccessListener(aVoid2 -> Log.d("AddExpenseBottomSheet", "Notification ID added to user: " + userID))
+                                .addOnFailureListener(e -> Log.e("AddExpenseBottomSheet", "Error adding notification ID to user", e));
+                    })
+                    .addOnFailureListener(e -> Log.e("AddExpenseBottomSheet", "Error creating notification", e));
+        }
+    }
 }
