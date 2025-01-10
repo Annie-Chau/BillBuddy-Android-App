@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.learning.billbuddy.interfaces.IResponseCallback;
 import com.learning.billbuddy.utils.GroupCallback;
 
 import java.io.Serializable;
@@ -410,6 +411,21 @@ public class Group implements Serializable {
         System.out.println(ids.get(maxDebtorIndex) + " owes " + ids.get(maxCreditorIndex) + " " + settlement);
 
         settleDebts(amounts, ids);
+    }
+
+    public static void deleteGroup(Group group, IResponseCallback deleteGroupCallBack) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("groups").document(group.getGroupID())
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Group Deletion", "Group deleted successfully");
+                    deleteGroupCallBack.onSuccess();
+                })
+                .addOnFailureListener(e -> {
+                            Log.e("Group Deletion", "Error deleting group", e);
+                            deleteGroupCallBack.onFailure(e);
+                        }
+                );
     }
 
 }
