@@ -1,11 +1,9 @@
-package com.learning.billbuddy;
+package com.learning.billbuddy.views.expense;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -21,9 +19,13 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.learning.billbuddy.AddExpenseActivity;
+import com.learning.billbuddy.ChatBoxActivity;
+import com.learning.billbuddy.R;
 import com.learning.billbuddy.adapters.ExpenseAdapter;
 import com.learning.billbuddy.models.Expense;
 import com.learning.billbuddy.models.Group;
+import com.learning.billbuddy.views.home.AddGroupBottomSheetDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,9 +107,11 @@ public class ViewBalanceOfGroup extends AppCompatActivity {
         findViewById(R.id.return_button).setOnClickListener(v -> finish());
 
         findViewById(R.id.to_add_expense_btn).setOnClickListener(v -> {
-            Intent intent = new Intent(ViewBalanceOfGroup.this, AddExpenseActivity.class);
-            intent.putExtra("group", currentGroup);
-            startActivity(intent);
+            AddExpenseBottomSheet bottomSheet = new AddExpenseBottomSheet();
+            Bundle args = new Bundle();
+            args.putSerializable("group", currentGroup);
+            bottomSheet.setArguments(args);
+            bottomSheet.show(ViewBalanceOfGroup.this.getSupportFragmentManager(), "AddGroupBottomSheetDialog");
         });
 
         currentGroup.getReimbursements(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid(), reimbursements -> {
@@ -128,6 +132,4 @@ public class ViewBalanceOfGroup extends AppCompatActivity {
             Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
         }
     }
-
-
 }
