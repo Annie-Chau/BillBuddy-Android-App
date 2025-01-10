@@ -43,7 +43,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".views.expense.ViewGroupDetail"
+            android:name=".views.expense.ViewGroupDetailActivity"
             android:exported="false" />
     </application>
 

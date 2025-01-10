@@ -12,6 +12,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +21,11 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.learning.billbuddy.ChatBoxActivity;
 import com.learning.billbuddy.R;
 import com.learning.billbuddy.adapters.ExpenseAdapter;
@@ -31,7 +37,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ViewGroupDetail extends AppCompatActivity {
+public class ViewGroupDetailActivity extends AppCompatActivity {
 
     private RadioGroup segmentGroup;
     private RadioButton rbExpense, rbBalance;
@@ -81,13 +87,33 @@ public class ViewGroupDetail extends AppCompatActivity {
         }
 
         Expense.fetchAllExpenses(expenses -> {
-            // Filter the expenses list to include only those with IDs in groupExpenseIDs
-            expenseList = expenses.stream()
-                    .filter(expense -> currentGroup.getExpenseIDs().contains(expense.getExpenseID()))
-                    .collect(Collectors.toList());
 
-            expenseAdapter.setExpenseList(expenseList);
-            expenseAdapter.notifyDataSetChanged();
+            FirebaseFirestore.getInstance()
+                    .collection("groups")
+                    .document(currentGroup.getGroupID())
+                    .addSnapshotListener((documentSnapshot, e) -> {
+
+                        if (e != null) {
+                            return;
+                        }
+
+                        if (documentSnapshot != null && documentSnapshot.exists()) {
+                            currentGroup = documentSnapshot.toObject(Group.class);
+                            expenseList = expenses.stream()
+                                    .filter(expense ->
+                                            Objects.requireNonNull(currentGroup)
+                                                    .getExpenseIDs()
+                                                    .contains(expense.getExpenseID()))
+                                    .collect(Collectors.toList());
+
+                            Log.d("Expense", expenses.toString());
+                            Log.d("Expense Change", expenseList.toString());
+
+                            expenseAdapter.setExpenseList(expenseList);
+                            expenseAdapter.notifyDataSetChanged();
+                        }
+            });
+
         });
 
         segmentGroup.setOnCheckedChangeListener((group, checkedId) -> {
@@ -110,7 +136,7 @@ public class ViewGroupDetail extends AppCompatActivity {
             Bundle args = new Bundle();
             args.putSerializable("group", currentGroup);
             bottomSheet.setArguments(args);
-            bottomSheet.show(ViewGroupDetail.this.getSupportFragmentManager(), "AddGroupBottomSheetDialog");
+            bottomSheet.show(ViewGroupDetailActivity.this.getSupportFragmentManager(), "AddGroupBottomSheetDialog");
         });
 
         currentGroup.getReimbursements(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid(), reimbursements -> {
@@ -123,7 +149,7 @@ public class ViewGroupDetail extends AppCompatActivity {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
             String userID = currentUser.getUid();
-            Intent intent = new Intent(ViewGroupDetail.this, ChatBoxActivity.class);
+            Intent intent = new Intent(ViewGroupDetailActivity.this, ChatBoxActivity.class);
             intent.putExtra("group", currentGroup);
             intent.putExtra("USER_ID", userID);
             startActivity(intent);
@@ -131,4 +157,5 @@ public class ViewGroupDetail extends AppCompatActivity {
             Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
         }
     }
+
 }
