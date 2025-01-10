@@ -28,7 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public class AddGroupBottomSheetDialog extends BottomSheetDialogFragment {
+public class AddGroupBottomSheet extends BottomSheetDialogFragment {
 
     private FirebaseFirestore db;
     private EditText titleEditText;
@@ -45,7 +45,7 @@ public class AddGroupBottomSheetDialog extends BottomSheetDialogFragment {
     // Owner ID (current logged-in user)
     private String ownerID;
 
-    public AddGroupBottomSheetDialog() {
+    public AddGroupBottomSheet() {
         // Required empty public constructor
     }
 

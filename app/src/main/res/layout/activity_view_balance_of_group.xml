@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.expense.ViewBalanceOfGroup">
+    tools:context=".views.expense.ViewGroupDetail">
 
     <!-- Main Content Layout -->
     <LinearLayout
