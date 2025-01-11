@@ -9,17 +9,19 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.learning.billbuddy.R;
+import com.learning.billbuddy.adapters.MemberAdapter;
 import com.learning.billbuddy.models.Group;
 import com.learning.billbuddy.models.Notification;
 
@@ -28,7 +30,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public class AddGroupBottomSheet extends BottomSheetDialogFragment {
+public class AddGroupBottomSheet extends BottomSheetDialogFragment implements MemberAdapter.OnRemoveClickListener {
 
     private FirebaseFirestore db;
     private EditText titleEditText;
@@ -38,7 +40,8 @@ public class AddGroupBottomSheet extends BottomSheetDialogFragment {
     private ImageButton emojiButton;
     private Button addMemberButton;
     private EditText memberEmailEditText;
-    private TextView membersListTextView;
+    private RecyclerView membersRecyclerView;
+    private MemberAdapter memberAdapter;
     private List<String> memberIDs = new ArrayList<>(); // List to store member IDs
     private List<String> memberNames = new ArrayList<>(); // List to store member names
 
@@ -51,7 +54,8 @@ public class AddGroupBottomSheet extends BottomSheetDialogFragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         // Inflate the fragment layout
         View view = inflater.inflate(R.layout.activity_add_group, container, false);
 
@@ -59,13 +63,13 @@ public class AddGroupBottomSheet extends BottomSheetDialogFragment {
 
         // Reference UI elements
         titleEditText = view.findViewById(R.id.add_group_enter_title);
-        descriptionEditText = view.findViewById(R.id.add_expense_description);
+        descriptionEditText = view.findViewById(R.id.add_group_description); // Updated ID
         createButton = view.findViewById(R.id.add_group_btn_add);
         cancelButton = view.findViewById(R.id.add_group_cancel_button);
         emojiButton = view.findViewById(R.id.add_group_btn_emoji);
         addMemberButton = view.findViewById(R.id.add_member_button);
         memberEmailEditText = view.findViewById(R.id.add_member_email);
-        membersListTextView = view.findViewById(R.id.members_list);
+        membersRecyclerView = view.findViewById(R.id.members_recycler_view);
 
         // Retrieve the current logged-in user's ID from arguments
         if (getArguments() != null) {
@@ -82,6 +86,12 @@ public class AddGroupBottomSheet extends BottomSheetDialogFragment {
         // Add the owner to the group members list
         memberIDs.add(ownerID);
         fetchOwnerName();
+
+        // Initialize RecyclerView
+        memberAdapter = new MemberAdapter(memberNames, this);
+        membersRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        membersRecyclerView.setAdapter(memberAdapter);
+        membersRecyclerView.setHasFixedSize(true);
 
         // Set click listeners
         createButton.setOnClickListener(v -> createGroup());
@@ -100,11 +110,11 @@ public class AddGroupBottomSheet extends BottomSheetDialogFragment {
                     } else {
                         memberNames.add("Owner"); // Fallback if name is not available
                     }
-                    updateMembersList();
+                    memberAdapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> {
                     memberNames.add("Owner"); // Default fallback
-                    updateMembersList();
+                    memberAdapter.notifyDataSetChanged();
                 });
     }
 
@@ -112,6 +122,13 @@ public class AddGroupBottomSheet extends BottomSheetDialogFragment {
         String email = memberEmailEditText.getText().toString().trim();
         if (TextUtils.isEmpty(email)) {
             memberEmailEditText.setError("Email is required");
+            memberEmailEditText.requestFocus();
+            return;
+        }
+
+        // Optional: Validate email format
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            memberEmailEditText.setError("Invalid email format");
             memberEmailEditText.requestFocus();
             return;
         }
@@ -135,7 +152,7 @@ public class AddGroupBottomSheet extends BottomSheetDialogFragment {
                         } else {
                             memberIDs.add(userID);
                             memberNames.add(userName); // Add the user's name to the list
-                            updateMembersList();
+                            memberAdapter.notifyItemInserted(memberNames.size() - 1);
                             memberEmailEditText.setText(""); // Clear the EditText
                             Toast.makeText(requireContext(), "User added successfully", Toast.LENGTH_SHORT).show();
                         }
@@ -143,19 +160,21 @@ public class AddGroupBottomSheet extends BottomSheetDialogFragment {
                         Toast.makeText(requireContext(), "No user found with this email", Toast.LENGTH_SHORT).show();
                     }
                 })
-                .addOnFailureListener(e -> Toast.makeText(requireContext(), "Failed to add member", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> {
+                    Log.e("AddGroupFragment", "Error fetching user by email", e);
+                    Toast.makeText(requireContext(), "Failed to add member", Toast.LENGTH_SHORT).show();
+                });
     }
 
-    private void updateMembersList() {
-        StringBuilder membersText = new StringBuilder("Current members:");
-        for (int i = 0; i < memberNames.size(); i++) {
-            if (i == 0) {
-                membersText.append("\n- Owner (").append(memberNames.get(i)).append(")");
-            } else {
-                membersText.append("\n- ").append(memberNames.get(i));
-            }
+    @Override
+    public void onRemoveClick(int position) {
+        if (position > 0) { // Ensure the owner cannot be removed
+            String removedMemberID = memberIDs.remove(position);
+            String removedMemberName = memberNames.remove(position);
+            memberAdapter.notifyItemRemoved(position);
+            Toast.makeText(requireContext(), "Removed: " + removedMemberName, Toast.LENGTH_SHORT).show();
+            // Optional: Handle any additional cleanup, such as removing notifications
         }
-        membersListTextView.setText(membersText.toString());
     }
 
     private void createGroup() {
@@ -173,6 +192,7 @@ public class AddGroupBottomSheet extends BottomSheetDialogFragment {
             return;
         }
 
+        // Create the group (Assuming Group.createGroup handles Firestore operations)
         Group.createGroup(
                 title,
                 description.isEmpty() ? "No description provided" : description,

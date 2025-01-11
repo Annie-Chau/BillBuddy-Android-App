@@ -9,7 +9,11 @@
         android:icon="@drawable/ic_person_icon"
         android:title="Profile" />
     <item
-        android:id="@+id/bottom_navigation_information"
+        android:id="@+id/bottom_navigation_faq"
+        android:icon="@drawable/ic_question_icon"
+        android:title="FAQ" />
+    <item
+        android:id="@+id/bottom_navigation_about_us"
         android:icon="@drawable/ic_info"
-        android:title="Information" />
+        android:title="About Us" />
 </menu>
