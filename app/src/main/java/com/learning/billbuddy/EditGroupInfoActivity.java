@@ -32,7 +32,7 @@ public class EditGroupInfoActivity extends AppCompatActivity {
     private List<String> memberIDs;
     private MemberAdapter memberAdapter;
     private EditText editMemberEmail;
-    private Button addMemberButton;
+    private Button addMemberButton, cancelButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +46,10 @@ public class EditGroupInfoActivity extends AppCompatActivity {
         saveChangesButton = findViewById(R.id.save_group_changes_button);
         editMemberEmail = findViewById(R.id.edit_member_email);
         addMemberButton = findViewById(R.id.add_member_button);
+        cancelButton = findViewById(R.id.edit_group_cancel_button);
 
         addMemberButton.setOnClickListener(v -> addMemberByEmail());
+        cancelButton.setOnClickListener(v -> finish());
 
 
         // Retrieve the current group passed through intent
