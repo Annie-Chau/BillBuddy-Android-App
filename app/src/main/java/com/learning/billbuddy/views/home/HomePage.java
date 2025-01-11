@@ -56,11 +56,13 @@ public class HomePage extends Fragment {
     private FirebaseFirestore db;
     private RecyclerView groupRecyclerView;
     private GroupAdapter groupAdapter;
-    private List<Group> groupList;
 
     private EditText searchGroupEditText;
 
     private Spinner filterSelection;
+
+    private ArrayList<Group> prevGroupList;
+    private ArrayList<Group> currentGroupList;
 
     @Nullable
     @Override
@@ -74,12 +76,13 @@ public class HomePage extends Fragment {
         filterSelection = view.findViewById(R.id.home_spinner_filter_selection);
 
         // Setup RecyclerView
-        groupList = new ArrayList<>();
-        groupAdapter = new GroupAdapter(requireContext(), groupList);
+        prevGroupList = new ArrayList<>();
+        currentGroupList = new ArrayList<>();
+        groupAdapter = new GroupAdapter(requireContext(), currentGroupList);
         groupRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         groupRecyclerView.setAdapter(groupAdapter);
 
-        setUpRealTimeGroupUpdates();
+        setupRealTimeGroupUpdates();
 
         ImageButton addParticipantButton = view.findViewById(R.id.to_add_group_btn);
         addParticipantButton.setOnClickListener(v -> openAddGroupDialog());
@@ -135,7 +138,7 @@ public class HomePage extends Fragment {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private void setUpRealTimeGroupUpdates() {
+    private void setupRealTimeGroupUpdates() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
             Log.e("HomePage", "No authenticated user found for real-time updates");
@@ -145,10 +148,10 @@ public class HomePage extends Fragment {
         String currentUserId = currentUser.getUid();
 
         Group.fetchAllGroups(groups -> {
-            groupList = groups.stream()
+            currentGroupList = groups.stream()
                     .filter(group -> group.getMemberIDs() != null && group.getMemberIDs().contains(currentUserId))
-                    .sorted((group1, group2) -> Objects.requireNonNull(group2.getCreatedDateLongFormat()).compareTo(group1.getCreatedDateLongFormat()))
-                    .collect(Collectors.toList());
+                    .sorted((group1, group2) -> group2.getCreatedDateLongFormat().compareTo(group1.getCreatedDateLongFormat()))
+                    .collect(Collectors.toCollection(ArrayList::new));
 
             if (prevGroupList.isEmpty()) {
                 groupAdapter.groupList = currentGroupList;
@@ -161,6 +164,7 @@ public class HomePage extends Fragment {
                     if (currentGroupList.size() > 1) {
                         groupAdapter.notifyItemChanged(1);
                     }
+                    groupRecyclerView.scrollToPosition(0);
 
                 } else if (prevGroupList.size() > currentGroupList.size()) {
                     //perform delete
@@ -195,8 +199,6 @@ public class HomePage extends Fragment {
             }
             prevGroupList = currentGroupList;
             Log.d("HomePage", "Groups updated in real-time. Total groups: " + currentGroupList.size());
-            groupAdapter.groupList = new ArrayList<>(groupList);
-            groupAdapter.notifyDataSetChanged();
         });
     }
 
@@ -219,8 +221,6 @@ public class HomePage extends Fragment {
         });
     }
 
-
-    @SuppressLint("NotifyDataSetChanged")
     private void onFilter() {
         String filterOption = filterSelection.getSelectedItem().toString();
         Log.d("HomePage", "Filter option selected: " + filterOption);
@@ -234,7 +234,7 @@ public class HomePage extends Fragment {
                 break;
             case "Reimbursement Available":
                 //TODO: Implement this
-                groupAdapter.groupList = groupList;
+                groupAdapter.groupList = currentGroupList;
                 break;
             default:
                 break;
@@ -242,15 +242,14 @@ public class HomePage extends Fragment {
         groupAdapter.notifyDataSetChanged();
     }
 
-
     private void onSearch() {
         String searchQuery = searchGroupEditText.getText().toString().toLowerCase();
-        Log.d("HomePage", "before serach y: " + groupList.size());
+        Log.d("HomePage", "before serach y: " + currentGroupList.size());
 
         if (searchQuery.trim().isEmpty()) {
-            groupAdapter.groupList = new ArrayList<>(groupList);
+            groupAdapter.groupList = currentGroupList;
         } else {
-            groupAdapter.groupList = new ArrayList<>(groupList).stream()
+            groupAdapter.groupList = currentGroupList.stream()
                     .filter(group -> group.isQualifyForSearch(searchQuery))
                     .collect(Collectors.toList());
         }

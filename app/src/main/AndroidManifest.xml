@@ -17,7 +17,7 @@
         android:theme="@style/Theme.BillBuddy"
         tools:targetApi="31">
         <activity
-            android:name=".ViewExpenseDetailActivity"
+            android:name=".views.expense.ViewExpenseDetailActivity"
             android:exported="false" />
         <activity
             android:name=".adapters.GroupAdapter"

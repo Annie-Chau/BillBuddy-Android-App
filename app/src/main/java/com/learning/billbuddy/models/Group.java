@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -268,10 +269,10 @@ public class Group implements Serializable {
         return name.toLowerCase().contains(query.toLowerCase());
     }
 
-    public class Reimbursement{
-        public String payerId;
-        public String payeeId;
-        public Double amount = 0.0;
+    public static class Reimbursement {
+        private String payerId;
+        private String payeeId;
+        private Double amount = 0.0;
 
         public Reimbursement(String payerId, String payeeId, Double amount) {
             this.payerId = payerId;
@@ -317,7 +318,7 @@ public class Group implements Serializable {
         void onResult(T result);
     }
 
-    public void getReimbursements(String currentUserId, ReimbursementsCallback<List<Reimbursement>> callback) {
+    public void getReimbursements(ReimbursementsCallback<List<Reimbursement>> callback) {
         List<Reimbursement> reimbursements = memberIDs.stream()
                 .flatMap(memberId1 -> memberIDs.stream()
                         .filter(memberId2 -> !Objects.equals(memberId1, memberId2))
@@ -332,19 +333,19 @@ public class Group implements Serializable {
                 splits.forEach(split -> reimbursements.forEach(reimbursement -> {
                     if (reimbursement.getPayerId().equals(expense.getPayerID()) &&
                             expense.getParticipantIDs().contains(reimbursement.getPayeeId()) &&
-                            split.get(reimbursement.getPayeeId()) != null){
+                            split.get(reimbursement.getPayeeId()) != null) {
                         reimbursement.amount += split.get(reimbursement.getPayeeId());
                     }
                 }));
             });
 
-            processReimbursements(reimbursements);
-
-            callback.onResult(reimbursements); // Return the result in the callback
+            callback.onResult(processReimbursements(reimbursements)); // Return the result in the callback
         });
     }
 
-    public static void processReimbursements(List<Reimbursement> reimbursements) {
+
+    public static List<Reimbursement> processReimbursements(List<Reimbursement> reimbursements) {
+        List<Reimbursement> result = new ArrayList<>();
         // Extract unique participant IDs
         Set<String> participants = new HashSet<>();
         for (Reimbursement r : reimbursements) {
@@ -388,10 +389,11 @@ public class Group implements Serializable {
 
         System.out.println("\nDebt Settlements:");
         Log.d("Test", Arrays.toString(netAmounts) + ids);
-        settleDebts(netAmounts, ids);
+        settleDebts(result, netAmounts, ids);
+        return result;
     }
 
-    private static void settleDebts(double[] amounts, List<String> ids) {
+    private static void settleDebts(List<Reimbursement> result, double[] amounts, List<String> ids) {
         int maxDebtorIndex = 0;
         int maxCreditorIndex = 0;
 
@@ -408,9 +410,10 @@ public class Group implements Serializable {
         amounts[maxDebtorIndex] -= settlement;
         amounts[maxCreditorIndex] += settlement;
 
-        System.out.println(ids.get(maxDebtorIndex) + " owes " + ids.get(maxCreditorIndex) + " " + settlement);
+        Log.d("Test", ids.get(maxDebtorIndex) + " owes " + ids.get(maxCreditorIndex) + " " + settlement);
+        result.add(new Reimbursement(ids.get(maxDebtorIndex), ids.get(maxCreditorIndex), settlement));
 
-        settleDebts(amounts, ids);
+        settleDebts(result, amounts, ids);
     }
 
     public static void deleteGroup(Group group, IResponseCallback deleteGroupCallBack) {
