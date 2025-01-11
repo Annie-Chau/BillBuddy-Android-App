@@ -88,20 +88,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
             holder.createdDate.setVisibility(View.GONE);
         }
 
-        // Handle createdDate visibility and content
-        if (position == 0 || !groupList.get(position - 1).getCreatedDateStringFormat().equals(group.getCreatedDateStringFormat())) {
-            Log.d("GroupAdapter", "onBindViewHolder: " + groupList.get(position).getCreatedDateStringFormat());
-            if (!group.getCreatedDateStringFormat().isEmpty()) {
-                holder.createdDate.setText(group.getCreatedDateStringFormat());
-                holder.createdDate.setVisibility(View.VISIBLE);
-            } else {
-                holder.createdDate.setVisibility(View.GONE);
-            }
-        } else {
-            holder.createdDate.setVisibility(View.GONE);
-        }
-
-        // Set click listener for the arrow button
+        // Set click listener for the arrow button (if needed)
         holder.arrowButton.setOnClickListener(v -> {
             // Handle navigation or action when the arrow is clicked
             navigateItemGroupDetail(group);
