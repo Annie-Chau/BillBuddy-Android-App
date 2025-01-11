@@ -6,11 +6,11 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -33,7 +33,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.learning.billbuddy.ChatBoxActivity;
+import com.learning.billbuddy.EditGroupInfoActivity;
 import com.learning.billbuddy.R;
 import com.learning.billbuddy.adapters.BalanceListAdapter;
 import com.learning.billbuddy.adapters.ExpenseAdapter;
@@ -53,6 +55,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
     private ImageView groupImageView, balanceThumbIcon;
     private FloatingActionButton chatButton;
     private Group currentGroup;
+    private ImageButton updateGroupInfoButton;
     private RecyclerView expenseRecyclerView;
     private ExpenseAdapter expenseAdapter;
     private LinearLayout balanceTotalBackground;
@@ -62,6 +65,8 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
     private EditText searchExpense;
     private LinearLayout viewReimbursement;
     private TextView viewReimbursementTextView;
+    private FirebaseFirestore db;
+    private ListenerRegistration groupListenerRegistration; // if I want to remove in onDestroy(), this one will be used
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
@@ -86,8 +91,10 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         balanceThumbIcon = findViewById(R.id.balance_total_thumb_icon);
         balanceTotalBackground = findViewById(R.id.balance_total_background);
         viewReimbursement = findViewById(R.id.view_all_suggested_reimbursements);
+        updateGroupInfoButton = findViewById(R.id.edit_group_button);
         viewReimbursementTextView = findViewById(R.id.view_all_suggested_reimbursements_text_view);
         searchExpense = findViewById(R.id.search_expense);
+        db = FirebaseFirestore.getInstance();
 
 
         balanceListRecyclerView = findViewById(R.id.balance_list_recycler_view);
@@ -118,11 +125,9 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
             if (checkedId == R.id.rb_expense) {
                 findViewById(R.id.expense_content).setVisibility(View.VISIBLE);
                 findViewById(R.id.balance_content).setVisibility(View.GONE);
-                searchExpense.setVisibility(View.VISIBLE);
             } else if (checkedId == R.id.rb_balance) {
                 findViewById(R.id.expense_content).setVisibility(View.GONE);
                 findViewById(R.id.balance_content).setVisibility(View.VISIBLE);
-                searchExpense.setVisibility(View.GONE);
             }
         });
 
@@ -144,35 +149,31 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
 ////            Log.d("Test", reimbursements.());
 //        });
 
-
-        viewReimbursement.setOnTouchListener((view, motionEvent) -> {
-            switch (motionEvent.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    // Handle touch (press)
-                    viewReimbursementTextView.setBackgroundColor(getColor(R.color.profile_page_gray));
-                    viewReimbursement.setBackgroundColor(getColor(R.color.profile_page_gray));
-                    break;
-
-                case MotionEvent.ACTION_UP:
-                case MotionEvent.ACTION_CANCEL:
-                    // Handle release
-                    viewReimbursementTextView.setBackgroundColor(getColor(R.color.white));
-                    viewReimbursement.setBackgroundColor(getColor(R.color.white)); // Reset color or set a new one
-                    break;
-            }
-            return false;
+        currentGroup.getReimbursements(reimbursements -> {
+            // This code will be executed when the results are available
+            Log.d("Test", reimbursements.toString());
+            balanceListAdapter = new BalanceListAdapter(this, currentGroup, reimbursements);
+            balanceListRecyclerView.setAdapter(balanceListAdapter);
         });
 
-
         viewReimbursement.setOnClickListener(v -> {
-            // Handle click on the card
-            Log.d("GroupAdapter", "Clicked on group: " + currentGroup.getName());
             ViewReimbursementDetail bottomSheet = new ViewReimbursementDetail();
             Bundle args = new Bundle();
             args.putSerializable("group", currentGroup);
             bottomSheet.setArguments(args);
             bottomSheet.show(ViewGroupDetailActivity.this.getSupportFragmentManager(), "ViewReimbursementDetail");
         });
+
+        // Handle edit group info button
+        setupGroupListener();
+        updateGroupInfoButton.setOnClickListener(v -> navigateToEditGroupInfo());
+
+    }
+
+    private void navigateToEditGroupInfo() {
+        Intent intent = new Intent(ViewGroupDetailActivity.this, EditGroupInfoActivity.class);
+        intent.putExtra("group", currentGroup);
+        startActivity(intent);
 
         handleSearchGroupEditText();
         handleUpdateExpenseRealTime();
@@ -305,7 +306,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
             balanceAmountTextView.setText("đ" + String.format("%.3f", amount));
             balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_green_background));
             balanceThumbIcon.setImageDrawable(getResources().getDrawable(R.drawable.thumb_up_icon));
-        } else if (Math.round(amount) < 0) {
+        } else if (amount < 0) {
             balanceTextView.setText("You owe others");
             balanceAmountTextView.setText("đ" + String.format("%.3f", amount));
             balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_red_background));
@@ -331,6 +332,68 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
 
         return amount;
         // Logic to calculate the amount owed to currentLogin user
+    }
+
+    private void setupGroupListener() {
+        DocumentReference groupRef = db.collection("groups")
+                .document(currentGroup.getGroupID());
+
+        // Keep the registration so we can remove the listener if needed
+        groupListenerRegistration = groupRef.addSnapshotListener((snapshot, e) -> {
+            if (e != null) {
+                Log.w("ViewGroupDetail", "Listen failed.", e);
+                return;
+            }
+            if (snapshot != null && snapshot.exists()) {
+                Group updatedGroup = snapshot.toObject(Group.class);
+                if (updatedGroup != null) {
+                    currentGroup = updatedGroup;
+                    Log.d("ViewGroupDetail", "Real-time group update: " + currentGroup.getName());
+                    updateUIWithGroupData();
+                }
+            }
+        });
+    }
+
+    private void updateUIWithGroupData() {
+        // Update group name and avatar
+        groupNameTextView.setText(currentGroup.getName());
+        if (currentGroup.getAvatarURL() != null && !currentGroup.getAvatarURL().isEmpty()) {
+            Glide.with(this).load(currentGroup.getAvatarURL()).into(groupImageView);
+        } else {
+            groupImageView.setImageResource(R.drawable.example_image_1);
+        }
+
+        // Refresh reimbursements (Balance)
+        currentGroup.getReimbursements(reimbursements -> {
+            // If first time, create the adapter; otherwise update
+            if (balanceListAdapter == null) {
+                balanceListAdapter = new BalanceListAdapter(this, currentGroup, reimbursements);
+                balanceListRecyclerView.setAdapter(balanceListAdapter);
+            } else {
+                balanceListAdapter.updateReimbursements(reimbursements);
+            }
+
+            // Update the displayed balance
+            handleDisplayBalance(reimbursements);
+        });
+
+        // Refresh the expenses in real time
+        // If you have a small number of total expenses, you can fetch them all, else you can optimize
+        Expense.fetchAllExpenses(allExpenses -> {
+            // Filter only expenses belonging to this group
+            List<Expense> updatedExpenseList = allExpenses.stream()
+                    .filter(expense -> currentGroup.getExpenseIDs().contains(expense.getExpenseID()))
+                    .sorted((o1, o2) -> o2.getTimestamp().compareTo(o1.getTimestamp()))
+                    .collect(Collectors.toList());
+
+            // Clear + add new data
+            expenseList.clear();
+            expenseList.addAll(updatedExpenseList);
+
+            expenseAdapter.notifyDataSetChanged();
+            Log.d("ViewGroupDetail", "Expense list updated in real-time: " + expenseList.size() + " items");
+        });
     }
 
 }
