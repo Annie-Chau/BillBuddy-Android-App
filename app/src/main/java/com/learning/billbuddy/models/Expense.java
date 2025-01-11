@@ -8,6 +8,7 @@ import com.learning.billbuddy.utils.ExpenseCallback;
 
 import java.io.Serializable;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,10 +32,13 @@ public class Expense implements Serializable {
     private Date timestamp;
     private String currency;
 
+    private Boolean isReimbursed = false;
+
     // Constructor
     public Expense(String expenseID, String title, String avatarURL, Double amount, String notes,
                    String billPictureURL, String payerID, List<String> participantIDs,
-                   List<Map<String, Double>> splits, Date timestamp, String currency) {
+                   List<Map<String, Double>> splits, Date timestamp, String currency,
+                   Boolean isReimbursed) {
         this.expenseID = expenseID;
         this.title = title;
         this.avatarURL = avatarURL;
@@ -46,6 +50,14 @@ public class Expense implements Serializable {
         this.splits = splits;
         this.timestamp = timestamp;
         this.currency = currency;
+        this.isReimbursed = isReimbursed;
+    }
+
+    public Expense(String expenseID, String title, String avatarURL, Double amount, String notes,
+                   String billPictureURL, String payerID, List<String> participantIDs,
+                   List<Map<String, Double>> splits, Date timestamp, String currency) {
+        this(expenseID, title, avatarURL, amount, notes, billPictureURL, payerID, participantIDs,
+                splits, timestamp, currency, false); // Default value for isReimbursed
     }
 
     // Getters and setters
@@ -137,6 +149,16 @@ public class Expense implements Serializable {
         this.currency = currency;
     }
 
+    public String getTimeString() {
+        // return Today if it's created today
+        if (new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(timestamp).equals(new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()))) {
+            return "Today";
+        } else if (new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(timestamp).equals(new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date(System.currentTimeMillis() - 86400000)))) {
+            return "Yesterday";
+        }
+        return new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(timestamp);
+    }
+
     // Methods
     public void addParticipant(String participantID) {
         this.participantIDs.add(participantID);
@@ -199,7 +221,8 @@ public class Expense implements Serializable {
                                     (List<Map<String, Double>>) document.get("splits"), // Update to get List<Map>
                                     document.getTimestamp("timestamp") != null ?
                                             Objects.requireNonNull(document.getTimestamp("timestamp")).toDate() : null,
-                                    document.getString("currency") // Add currency when fetching
+                                    document.getString("currency"), // Add currency when fetching
+                                    document.getBoolean("isReimbursed") // Add isReimbursed when fetching
                             ));
                         }
                     }
@@ -208,10 +231,11 @@ public class Expense implements Serializable {
                 });
     }
 
+
     // Method to create a new expense
     public static void createExpense(String groupID, String title, String avatarURL, Double amount, String notes,
                                      String billPictureURL, String payerID, List<String> participantIDs,
-                                     List<Map<String, Double>> splits, Date timestamp, String currency) { // Updated parameter
+                                     List<Map<String, Double>> splits, Date timestamp, String currency, Boolean isReimbursed) { // Updated parameter
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String expenseID = db.collection("expenses").document().getId();
 
@@ -228,6 +252,7 @@ public class Expense implements Serializable {
         expenseData.put("splits", splits); // Update to put List<Map>
         expenseData.put("timestamp", timestamp);
         expenseData.put("currency", currency); // Add currency to the expense data
+        expenseData.put("isReimbursed", isReimbursed); // Add isReimbursed to the expense data
 
         // Add the new expense to the "expenses" collection in Firestore
         db.collection("expenses")
@@ -289,6 +314,7 @@ public class Expense implements Serializable {
                 ", splits=" + splits +
                 ", timestamp=" + timestamp +
                 ", currency='" + currency + '\'' +
+                ", isReimbursed=" + isReimbursed +
                 '}';
     }
 }

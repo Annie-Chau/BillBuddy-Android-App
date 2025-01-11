@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -233,7 +234,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
         ImageView groupImage;
         ImageButton arrowButton;
         TextView createdDate;
-        LinearLayout linearLayout;
+        CardView linearLayout;
 
         public GroupViewHolder(@NonNull View itemView) {
             super(itemView);

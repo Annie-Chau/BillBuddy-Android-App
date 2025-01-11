@@ -150,43 +150,41 @@ public class AddExpenseBottomSheet extends BottomSheetDialogFragment {
 
             Log.d("Result", expenseInfo);
 
-            try {
-                Expense expense = new Expense(
-                        UUID.randomUUID().toString(),
-                        titleEditText.getText().toString(),
-                        "",
-                        amount,
-                        description.getText().toString(),
-                        "",
-                        paidById,
-                        SplitAdapter.getParticipantIDs(splitAdapter.getSplitItems()),
-                        SplitAdapter.getSplits(splitAdapter.getSplitItems()),
-                        dateFormat.parse(date),
-                        selectedCurrency
-                );
+            Expense expense = new Expense(
+                    UUID.randomUUID().toString(),
+                    titleEditText.getText().toString(),
+                    "",
+                    amount,
+                    description.getText().toString(),
+                    "",
+                    paidById,
+                    SplitAdapter.getParticipantIDs(splitAdapter.getSplitItems()),
+                    SplitAdapter.getSplits(splitAdapter.getSplitItems()),
+                    new Date(),
+                    selectedCurrency,
+                    false
+            );
 
-                Expense.createExpense(
-                        currentGroup.getGroupID(),
-                        expense.getTitle(),
-                        expense.getAvatarURL(),
-                        expense.getAmount(),
-                        expense.getNotes(),
-                        expense.getBillPictureURL(),
-                        expense.getPayerID(),
-                        expense.getParticipantIDs(),
-                        expense.getSplits(),
-                        expense.getTimestamp(),
-                        expense.getCurrency()
-                );
+            Expense.createExpense(
+                    currentGroup.getGroupID(),
+                    expense.getTitle(),
+                    expense.getAvatarURL(),
+                    expense.getAmount(),
+                    expense.getNotes(),
+                    expense.getBillPictureURL(),
+                    expense.getPayerID(),
+                    expense.getParticipantIDs(),
+                    expense.getSplits(),
+                    expense.getTimestamp(),
+                    expense.getCurrency(),
+                    false
+            );
 
-                // Notify all users in the group, including the payer
-                notifyGroupMembers(expense);
+            // Notify all users in the group, including the payer
+            notifyGroupMembers(expense);
 
-                Toast.makeText(requireActivity(), "Expense added successfully", Toast.LENGTH_SHORT).show();
-                dismiss();
-            } catch (ParseException e) {
-                Log.d("Error", "Parsing date: " + e.getMessage());
-            }
+            Toast.makeText(requireActivity(), "Expense added successfully", Toast.LENGTH_SHORT).show();
+            dismiss();
         });
 
         amountEditText.addTextChangedListener(new TextWatcher() {

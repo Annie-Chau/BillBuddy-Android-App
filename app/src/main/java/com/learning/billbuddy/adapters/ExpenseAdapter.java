@@ -3,18 +3,21 @@ package com.learning.billbuddy.adapters;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.learning.billbuddy.R;
-import com.learning.billbuddy.ViewExpenseDetailActivity;
+import com.learning.billbuddy.views.expense.ViewExpenseDetailActivity;
 import com.learning.billbuddy.models.Expense; // Assuming you have an Expense model
 import com.learning.billbuddy.models.User;
 
@@ -23,7 +26,7 @@ import java.util.List;
 public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder> {
 
     private Context context;
-    private List<Expense> expenseList;
+    public List<Expense> expenseList;
 
     public ExpenseAdapter(Context context, List<Expense> expenseList) {
         this.context = context;
@@ -53,7 +56,34 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
             holder.paidByTextView.setText("Paid by: " + expense.getPaidByName(users));
         });
 
-        holder.itemView.findViewById(R.id.to_view_expense).setOnClickListener(v -> {
+        if (position == 0) {
+            holder.createdDate.setVisibility(View.VISIBLE);
+            holder.createdDate.setText(expense.getTimeString());
+        } else if (position > 0 && !expense.getTimeString().equals(expenseList.get(position - 1).getTimeString())) {
+            holder.createdDate.setVisibility(View.VISIBLE);
+            holder.createdDate.setText(expense.getTimeString());
+        } else {
+            holder.createdDate.setVisibility(View.GONE);
+        }
+
+        holder.linearLayout.setOnTouchListener((view, motionEvent) -> {
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    // Handle touch (press)
+                    holder.linearLayout.setBackgroundColor(context.getColor(R.color.profile_page_gray));
+                    break;
+
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    // Handle release
+                    holder.linearLayout.setBackground(context.getDrawable(R.drawable.small_round_white)); // Reset color or set a new one
+                    break;
+            }
+            return false;
+        });
+
+
+        holder.linearLayout.setOnClickListener(v -> {
             Intent intent = new Intent(context, ViewExpenseDetailActivity.class);
 
             // Pass the entire Expense object
@@ -74,12 +104,18 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
         TextView expenseAmountTextView;
         TextView paidByTextView;
 
+        TextView createdDate;
+
+        LinearLayout linearLayout;
+
         public ExpenseViewHolder(@NonNull View itemView) {
             super(itemView);
             expenseImageView = itemView.findViewById(R.id.expense_image);
             expenseNameTextView = itemView.findViewById(R.id.expense_name);
             expenseAmountTextView = itemView.findViewById(R.id.expense_amount);
             paidByTextView = itemView.findViewById(R.id.paid_by);
+            createdDate = itemView.findViewById(R.id.expense_created_date);
+            linearLayout = itemView.findViewById(R.id.expense_item_linear_layout);
         }
     }
 }

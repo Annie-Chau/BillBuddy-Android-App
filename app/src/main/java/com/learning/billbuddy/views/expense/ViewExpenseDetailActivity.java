@@ -1,4 +1,4 @@
-package com.learning.billbuddy;
+package com.learning.billbuddy.views.expense;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -9,22 +9,28 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.learning.billbuddy.R;
 import com.learning.billbuddy.adapters.ViewExpenseParticipantAdapter;
 import com.learning.billbuddy.models.Expense;
+import com.learning.billbuddy.models.Group;
 import com.learning.billbuddy.models.User;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class ViewExpenseDetailActivity extends AppCompatActivity {
 
-    private TextView expenseName, expenseDate, expenseAmount, paidByName, paidByAmount, expenseDescription;
+    private TextView expenseName, expenseDate, expenseAmount, paidByName, paidByAmount, expenseDescription, balanceTotalText, balanceTotalAmount;
     private RecyclerView participantList;
     private Expense currentExpense;
+
+    private LinearLayout balanceTotalBackground;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +49,7 @@ public class ViewExpenseDetailActivity extends AppCompatActivity {
         ImageButton returnButton = findViewById(R.id.return_button);
         ImageButton renameButton = findViewById(R.id.rename_button);
 
+
         currentExpense = (Expense) getIntent().getSerializableExtra("expense");
 
         // Set up button click listeners
@@ -52,6 +59,7 @@ public class ViewExpenseDetailActivity extends AppCompatActivity {
         });
 
         expenseDescription.setText(currentExpense.getNotes());
+
 
         populateExpenseDetails();
         setupParticipantList();
@@ -80,4 +88,5 @@ public class ViewExpenseDetailActivity extends AppCompatActivity {
             adapter.notifyDataSetChanged();
         });
     }
+
 }

@@ -2,10 +2,13 @@ package com.learning.billbuddy.models;
 
 import android.util.Log;
 
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.learning.billbuddy.interfaces.IResponseCallback;
 import com.learning.billbuddy.utils.UserCallback;
 
 import java.io.Serializable;
@@ -195,6 +198,19 @@ public class User implements Serializable {
                 .collect(Collectors.toList());
     }
 
+    public static void getUsersBydIds(List<String> userIds, IUsersCallBack callback) {
+        fetchAllUsers(users -> {
+            ArrayList<User> result = new ArrayList<>();
+            for (User user : users) {
+                if (userIds.contains(user.getUserID())) {
+                    result.add(user);
+                }
+            }
+            callback.onSuccess(result);
+        });
+
+    }
+
     public void getNumberOfGroupPossessed(final GroupCountCallback callback) {
         Group.fetchAllGroups(groups -> {
             int count = 0;
@@ -217,5 +233,11 @@ public class User implements Serializable {
 
     public interface GroupCountCallback {
         void onCallback(int count);
+    }
+
+    public interface IUsersCallBack {
+        void onSuccess(ArrayList<User> users);
+
+        void onFailure(String error);
     }
 }
