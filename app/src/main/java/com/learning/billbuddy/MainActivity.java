@@ -23,6 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.learning.billbuddy.models.Notification;
 import com.learning.billbuddy.models.User;
 import com.learning.billbuddy.views.authentication.Login;
+import com.learning.billbuddy.views.home.AboutUsActivity;
 import com.learning.billbuddy.views.home.HomePage;
 import com.learning.billbuddy.views.profile.Profile;
 
@@ -48,8 +49,14 @@ public class MainActivity extends AppCompatActivity {
                     Bundle bundle = new Bundle();
                     bundle.putSerializable("user", currentUserData);
                     selectedFragment.setArguments(bundle);
-                } else { // default
-                    selectedFragment = new HomePage();
+                } else if (itemId == R.id.bottom_navigation_about_us) { // go to about us page
+                    Intent intent = new Intent(MainActivity.this, AboutUsActivity.class);
+                    startActivity(intent);
+                    return true;
+                } else if (itemId == R.id.bottom_navigation_faq) { // go to FAQ page
+                    Intent intent = new Intent(MainActivity.this, FAQActivity.class);
+                    startActivity(intent);
+                    return true;
                 }
 
                 getSupportFragmentManager()
