@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -27,9 +26,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.ListenerRegistration;
 import com.learning.billbuddy.ChatBoxActivity;
-import com.learning.billbuddy.EditGroupInfoActivity;
 import com.learning.billbuddy.R;
 import com.learning.billbuddy.adapters.BalanceListAdapter;
 import com.learning.billbuddy.adapters.ExpenseAdapter;
@@ -49,7 +46,6 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
     private ImageView groupImageView, balanceThumbIcon;
     private FloatingActionButton chatButton;
     private Group currentGroup;
-    private ImageButton updateGroupInfoButton;
     private RecyclerView expenseRecyclerView;
     private ExpenseAdapter expenseAdapter;
     private LinearLayout balanceTotalBackground;
@@ -57,8 +53,6 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
 
     private RecyclerView balanceListRecyclerView;
     private BalanceListAdapter balanceListAdapter;
-    private FirebaseFirestore db;
-    private ListenerRegistration groupListenerRegistration; // if I want to remove in onDestroy(), this one will be used
 
 
     private TextView viewReimbursement;
@@ -85,12 +79,11 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         balanceThumbIcon = findViewById(R.id.balance_total_thumb_icon);
         balanceTotalBackground = findViewById(R.id.balance_total_background);
         viewReimbursement = findViewById(R.id.view_all_suggested_reimbursements);
-        updateGroupInfoButton = findViewById(R.id.edit_group_button);
+
 
         balanceListRecyclerView = findViewById(R.id.balance_list_recycler_view);
         balanceListRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        db = FirebaseFirestore.getInstance();
 
         // Retrieve data from Intent
         currentGroup = (Group) getIntent().getSerializableExtra("group");
@@ -154,17 +147,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
             bottomSheet.setArguments(args);
             bottomSheet.show(ViewGroupDetailActivity.this.getSupportFragmentManager(), "ViewReimbursementDetail");
         });
-
-        // Handle edit group info button
-        setupGroupListener();
-        updateGroupInfoButton.setOnClickListener(v -> navigateToEditGroupInfo());
-
-    }
-
-    private void navigateToEditGroupInfo() {
-        Intent intent = new Intent(ViewGroupDetailActivity.this, EditGroupInfoActivity.class);
-        intent.putExtra("group", currentGroup);
-        startActivity(intent);
+        handleUpdateExpenseRealTime();
     }
 
     private void handleUpdateExpenseRealTime() {
@@ -256,68 +239,6 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
 
         return amount;
         // Logic to calculate the amount owed to currentLogin user
-    }
-
-    private void setupGroupListener() {
-        DocumentReference groupRef = db.collection("groups")
-                .document(currentGroup.getGroupID());
-
-        // Keep the registration so we can remove the listener if needed
-        groupListenerRegistration = groupRef.addSnapshotListener((snapshot, e) -> {
-            if (e != null) {
-                Log.w("ViewGroupDetail", "Listen failed.", e);
-                return;
-            }
-            if (snapshot != null && snapshot.exists()) {
-                Group updatedGroup = snapshot.toObject(Group.class);
-                if (updatedGroup != null) {
-                    currentGroup = updatedGroup;
-                    Log.d("ViewGroupDetail", "Real-time group update: " + currentGroup.getName());
-                    updateUIWithGroupData();
-                }
-            }
-        });
-    }
-
-    private void updateUIWithGroupData() {
-        // Update group name and avatar
-        groupNameTextView.setText(currentGroup.getName());
-        if (currentGroup.getAvatarURL() != null && !currentGroup.getAvatarURL().isEmpty()) {
-            Glide.with(this).load(currentGroup.getAvatarURL()).into(groupImageView);
-        } else {
-            groupImageView.setImageResource(R.drawable.example_image_1);
-        }
-
-        // Refresh reimbursements (Balance)
-        currentGroup.getReimbursements(reimbursements -> {
-            // If first time, create the adapter; otherwise update
-            if (balanceListAdapter == null) {
-                balanceListAdapter = new BalanceListAdapter(this, currentGroup, reimbursements);
-                balanceListRecyclerView.setAdapter(balanceListAdapter);
-            } else {
-                balanceListAdapter.updateReimbursements(reimbursements);
-            }
-
-            // Update the displayed balance
-            handleDisplayBalance(reimbursements);
-        });
-
-        // Refresh the expenses in real time
-        // If you have a small number of total expenses, you can fetch them all, else you can optimize
-        Expense.fetchAllExpenses(allExpenses -> {
-            // Filter only expenses belonging to this group
-            List<Expense> updatedExpenseList = allExpenses.stream()
-                    .filter(expense -> currentGroup.getExpenseIDs().contains(expense.getExpenseID()))
-                    .sorted((o1, o2) -> o2.getTimestamp().compareTo(o1.getTimestamp()))
-                    .collect(Collectors.toList());
-
-            // Clear + add new data
-            expenseList.clear();
-            expenseList.addAll(updatedExpenseList);
-
-            expenseAdapter.notifyDataSetChanged();
-            Log.d("ViewGroupDetail", "Expense list updated in real-time: " + expenseList.size() + " items");
-        });
     }
 
 }
