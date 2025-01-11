@@ -1,8 +1,8 @@
 package com.learning.billbuddy.adapters;
 
 
-
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,11 +40,6 @@ public class BalanceListAdapter extends RecyclerView.Adapter<BalanceListAdapter.
         this.currentUser = FirebaseAuth.getInstance().getCurrentUser();
         this.group = group;
 
-        User.fetchAllUsers(users -> {
-            //map id with its reference
-            this.userNameMap = users.stream().collect(Collectors.toMap(User::getUserID, user -> user));
-        });
-
     }
 
 
@@ -60,29 +55,38 @@ public class BalanceListAdapter extends RecyclerView.Adapter<BalanceListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull AccountBalanceViewHolder holder, int position) {
-        String memberId = this.group.getMemberIDs().get(position);
-        User user = this.userNameMap.get(memberId);
+        User.fetchAllUsers(users -> {
+            //map id with its reference
+            this.userNameMap = users.stream().collect(Collectors.toMap(User::getUserID, user -> user));
 
-        if (user.getProfilePictureURL() == "XXX" || user.getProfilePictureURL().isEmpty()) {
-            holder.accountBalanceImage.setVisibility(View.GONE);
-            holder.accountBalanceProfileTextView.setText(user.getName().substring(0, 1));
-            holder.accountBalanceProfileTextView.setVisibility(View.VISIBLE);
-        } else {
-            holder.accountBalanceProfileTextView.setVisibility(View.GONE);
-            holder.accountBalanceImage.setVisibility(View.VISIBLE);
-            Glide.with(context).load(user.getProfilePictureURL()).circleCrop().into(holder.accountBalanceImage);
-        }
 
-        holder.accountBalanceMemberName.setText(user.getName() + this.returnStringMeIfMatched(memberId));
-        holder.accountBalanceAmount.setText("đ" + String.format("%.3f", getBalanceAmount(reimbursementList, memberId)));
+            String memberId = this.group.getMemberIDs().get(position);
+            User user = this.userNameMap.get(memberId);
 
-        if (getBalanceAmount(reimbursementList, memberId) > 0) {
-            holder.accountBalanceAmount.setTextColor(context.getResources().getColor(R.color.light_green));
-        } else if (getBalanceAmount(reimbursementList, memberId) < 0) {
-            holder.accountBalanceAmount.setTextColor(context.getResources().getColor(R.color.red));
-        } else {
-            holder.accountBalanceAmount.setTextColor(context.getResources().getColor(R.color.text_gray));
-        }
+            if (user.getProfilePictureURL().equals("XXX") || user.getProfilePictureURL().isEmpty()) {
+                Log.d("Profile Picture", "No profile picture found");
+                holder.accountBalanceImage.setVisibility(View.GONE);
+                holder.accountBalanceProfileTextView.setText(user.getName().substring(0, 1));
+                holder.accountBalanceProfileTextView.setVisibility(View.VISIBLE);
+            } else {
+                holder.accountBalanceProfileTextView.setVisibility(View.GONE);
+                holder.accountBalanceImage.setVisibility(View.VISIBLE);
+                Glide.with(context).load(user.getProfilePictureURL()).circleCrop().into(holder.accountBalanceImage);
+            }
+
+            holder.accountBalanceMemberName.setText(user.getName() + this.returnStringMeIfMatched(memberId));
+            holder.accountBalanceAmount.setText("đ" + String.format("%.3f", Math.abs(getBalanceAmount(reimbursementList, memberId))));
+
+            if (getBalanceAmount(reimbursementList, memberId) > 0) {
+                holder.accountBalanceAmount.setTextColor(context.getResources().getColor(R.color.light_green));
+            } else if (Math.round(getBalanceAmount(reimbursementList, memberId)) < 0) {
+                holder.accountBalanceAmount.setTextColor(context.getResources().getColor(R.color.red));
+            } else {
+                holder.accountBalanceAmount.setTextColor(context.getResources().getColor(R.color.text_gray));
+            }
+        });
+
+
     }
 
     private String returnStringMeIfMatched(String memberId) {

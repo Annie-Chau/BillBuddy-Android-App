@@ -11,7 +11,7 @@
     android:paddingHorizontal="16dp"
     android:paddingTop="32dp"
     android:paddingBottom="16dp"
-    tools:context=".AddUserInfo">
+    tools:context=".views.authentication.AddUserInfo">
 
     <FrameLayout
         android:layout_marginBottom="24dp"
@@ -66,31 +66,37 @@
         android:textStyle="bold" />
 
     <!-- Avatar Section -->
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp">
+
+    <FrameLayout
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:background="@drawable/layout_circle_image_profile"
+        android:clipToOutline="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_person_icon">
 
         <ImageView
-            android:id="@+id/user_avatar"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:background="@drawable/circle_background"
+            android:id="@+id/user_form_avatar"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:contentDescription="Group Image"
             android:scaleType="centerCrop"
-            android:src="@drawable/person_icon" />
+            android:src="@drawable/ic_person_icon"
+            android:visibility="gone" />
 
-<!--        <ImageButton-->
-<!--            android:id="@+id/change_avatar_button"-->
-<!--            android:layout_width="32dp"-->
-<!--            android:layout_height="32dp"-->
-<!--            android:layout_alignTop="@id/user_avatar"-->
-<!--            android:layout_alignEnd="@id/user_avatar"-->
-<!--            android:background="@android:color/transparent"-->
-<!--            android:contentDescription="Change Avatar"-->
-<!--            android:src="@drawable/camera_icon"-->
-<!--            app:tint="@color/primary" />-->
+        <TextView
+            android:id="@+id/user_form_avatar_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="C"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="36sp"
+            android:textStyle="bold" />
+    </FrameLayout>
 
-    </RelativeLayout>
 
     <TextView
         android:layout_width="match_parent"

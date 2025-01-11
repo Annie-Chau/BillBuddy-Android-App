@@ -8,6 +8,7 @@
     tools:context=".views.expense.ViewGroupDetailActivity">
 
     <!-- Main Content Layout -->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -28,7 +29,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-
                 android:background="@android:color/transparent"
                 android:contentDescription="Return Button"
                 android:scaleType="centerInside"
@@ -51,17 +51,42 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
+        <EditText
+            android:id="@+id/search_expense"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="16dp"
+            android:height="40dp"
+            android:background="@drawable/round_primary_border"
+            android:drawableStart="@drawable/search_icon"
+            android:drawablePadding="8dp"
+            android:drawableTint="@color/black"
+            android:fontFamily="@font/archivo_variable"
+            android:hint="Search"
+            android:padding="8dp"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
         <!-- Add an ImageView for the group -->
-        <ImageView
-            android:id="@+id/group_image"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="20dp"
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:background="@drawable/rounded_border_image_view"
-            android:contentDescription="Group Image"
-            android:scaleType="centerCrop"
-            android:src="@drawable/example_image_1" />
+            android:clipToOutline="true">
+
+            <ImageView
+                android:id="@+id/group_image"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+
+                android:contentDescription="Group Image"
+                android:scaleType="centerCrop"
+                android:src="@drawable/example_image_1" />
+        </FrameLayout>
+
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -141,6 +166,7 @@
 
         </LinearLayout>
 
+
         <FrameLayout
             android:id="@+id/expense_content"
             android:layout_width="match_parent"
@@ -156,39 +182,6 @@
                 android:clipToPadding="false"
                 android:scrollbars="vertical" />
 
-            <LinearLayout
-                android:id="@+id/floating_button_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center|bottom"
-                android:layout_marginBottom="20dp"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <!-- Circular Button -->
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/to_add_expense_btn"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_gravity="center"
-                    android:contentDescription="Add Group Button"
-                    android:scaleType="center"
-                    android:src="@drawable/ic_plus"
-                    app:backgroundTint="@color/primary"
-                    app:tint="@color/white" />
-
-                <!-- Text Below the Button -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:fontFamily="@font/notosansregular"
-                    android:gravity="center"
-                    android:text="Add Expense"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
-
-            </LinearLayout>
 
         </FrameLayout>
 
@@ -202,7 +195,7 @@
                 android:id="@+id/balance_total_background"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginHorizontal="24dp"
                 android:layout_marginTop="6dp"
                 android:background="@drawable/rounded_green_background"
                 android:gravity="center"
@@ -230,6 +223,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="You are owed"
+                        android:textAlignment="textStart"
                         android:textColor="@android:color/black"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -240,6 +234,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="₫ 1,000,320.00"
+                        android:textAlignment="center"
                         android:textColor="@android:color/black"
                         android:textSize="24sp"
                         android:textStyle="bold" />
@@ -247,29 +242,82 @@
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/view_all_suggested_reimbursements"
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:fontFamily="@font/inter_regular"
-                android:gravity="center_horizontal"
-                android:text="View All Suggested Reimbursements"
-                android:textColor="@color/blue"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:id="@+id/view_all_suggested_reimbursements"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/view_all_suggested_reimbursements_text_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/small_round_white"
+                        android:fontFamily="@font/inter_regular"
+                        android:gravity="center_horizontal"
+                        android:text="View All Suggested Reimbursements"
+                        android:textColor="@color/blue"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/balance_list_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingHorizontal="24dp"/>
+                android:paddingHorizontal="16dp" />
 
 
         </LinearLayout>
-
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/floating_button_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <!-- Circular Button -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/to_add_expense_btn"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            android:contentDescription="Add Group Button"
+            android:scaleType="center"
+            android:src="@drawable/ic_plus"
+            app:backgroundTint="@color/primary"
+            app:tint="@color/white" />
+
+        <!-- Text Below the Button -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/inter_regular"
+            android:gravity="center"
+            android:text="Add Expense"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
     <!-- Floating Chat Button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/chat_button"

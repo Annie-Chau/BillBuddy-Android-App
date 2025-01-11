@@ -3,8 +3,15 @@ package com.learning.billbuddy.views.expense;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -50,17 +57,17 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
     private ExpenseAdapter expenseAdapter;
     private LinearLayout balanceTotalBackground;
     private List<Expense> expenseList = new ArrayList<>();
-
     private RecyclerView balanceListRecyclerView;
     private BalanceListAdapter balanceListAdapter;
-
-
-    private TextView viewReimbursement;
+    private EditText searchExpense;
+    private LinearLayout viewReimbursement;
+    private TextView viewReimbursementTextView;
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setNavigationBarColor(getResources().getColor(R.color.background));
         setContentView(R.layout.activity_view_balance_of_group);
 
         // Initialize UI elements
@@ -79,6 +86,8 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         balanceThumbIcon = findViewById(R.id.balance_total_thumb_icon);
         balanceTotalBackground = findViewById(R.id.balance_total_background);
         viewReimbursement = findViewById(R.id.view_all_suggested_reimbursements);
+        viewReimbursementTextView = findViewById(R.id.view_all_suggested_reimbursements_text_view);
+        searchExpense = findViewById(R.id.search_expense);
 
 
         balanceListRecyclerView = findViewById(R.id.balance_list_recycler_view);
@@ -109,9 +118,11 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
             if (checkedId == R.id.rb_expense) {
                 findViewById(R.id.expense_content).setVisibility(View.VISIBLE);
                 findViewById(R.id.balance_content).setVisibility(View.GONE);
+                searchExpense.setVisibility(View.VISIBLE);
             } else if (checkedId == R.id.rb_balance) {
                 findViewById(R.id.expense_content).setVisibility(View.GONE);
                 findViewById(R.id.balance_content).setVisibility(View.VISIBLE);
+                searchExpense.setVisibility(View.GONE);
             }
         });
 
@@ -133,21 +144,81 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
 ////            Log.d("Test", reimbursements.());
 //        });
 
-        currentGroup.getReimbursements(reimbursements -> {
-            // This code will be executed when the results are available
-            Log.d("Test", reimbursements.toString());
-            balanceListAdapter = new BalanceListAdapter(this, currentGroup, reimbursements);
-            balanceListRecyclerView.setAdapter(balanceListAdapter);
+
+        viewReimbursement.setOnTouchListener((view, motionEvent) -> {
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    // Handle touch (press)
+                    viewReimbursementTextView.setBackgroundColor(getColor(R.color.profile_page_gray));
+                    viewReimbursement.setBackgroundColor(getColor(R.color.profile_page_gray));
+                    break;
+
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    // Handle release
+                    viewReimbursementTextView.setBackgroundColor(getColor(R.color.white));
+                    viewReimbursement.setBackgroundColor(getColor(R.color.white)); // Reset color or set a new one
+                    break;
+            }
+            return false;
         });
 
+
         viewReimbursement.setOnClickListener(v -> {
+            // Handle click on the card
+            Log.d("GroupAdapter", "Clicked on group: " + currentGroup.getName());
             ViewReimbursementDetail bottomSheet = new ViewReimbursementDetail();
             Bundle args = new Bundle();
             args.putSerializable("group", currentGroup);
             bottomSheet.setArguments(args);
             bottomSheet.show(ViewGroupDetailActivity.this.getSupportFragmentManager(), "ViewReimbursementDetail");
         });
+
+        handleSearchGroupEditText();
         handleUpdateExpenseRealTime();
+        handleUpdateAccountBalanceList();
+    }
+
+    private void handleSearchGroupEditText() {
+        searchExpense.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not needed
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Not needed
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                onSearch();
+            }
+        });
+    }
+
+    private void handleUpdateAccountBalanceList() {
+        currentGroup.getReimbursements(reimbursements -> {
+            // This code will be executed when the results are available
+            Log.d("Test", reimbursements.toString());
+            balanceListAdapter = new BalanceListAdapter(this, currentGroup, reimbursements);
+            balanceListRecyclerView.setAdapter(balanceListAdapter);
+        });
+    }
+
+    private void onSearch() {
+        String searchQuery = searchExpense.getText().toString().toLowerCase();
+        Log.d("HomePage", "before serach y: " + expenseList.size());
+
+        if (searchQuery.trim().isEmpty()) {
+            expenseAdapter.expenseList = expenseList;
+        } else {
+            expenseAdapter.expenseList = expenseList.stream()
+                    .filter(group -> group.isQualifyForSearch(searchQuery))
+                    .collect(Collectors.toList());
+        }
+        expenseAdapter.notifyDataSetChanged();
     }
 
     private void handleUpdateExpenseRealTime() {
@@ -169,7 +240,14 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
                                             Objects.requireNonNull(currentGroup)
                                                     .getExpenseIDs()
                                                     .contains(expense.getExpenseID()))
-                                    .sorted((o1, o2) -> o2.getTimestamp().compareTo(o1.getTimestamp()))
+                                    //sort by timestamp first if equal sort by id in descending order
+                                    .sorted((e1, e2) -> {
+                                        if (e1.getTimestamp().compareTo(e2.getTimestamp()) == 0) {
+                                            return e2.getExpenseID().compareTo(e1.getExpenseID());
+                                        }
+                                        return e2.getTimestamp().compareTo(e1.getTimestamp());
+                                    })
+
                                     .collect(Collectors.toList());
 
                             Log.d("Expense", expenses.toString());
@@ -179,13 +257,27 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
                                 expenseAdapter.expenseList.addAll(expenseList);
                                 expenseAdapter.notifyDataSetChanged();
                             } else if (expenseAdapter.getItemCount() < expenseList.size()) {
-                                expenseAdapter.expenseList.add(0, expenseList.get(0));
-                                expenseAdapter.notifyItemInserted(0);
-                                expenseAdapter.notifyItemChanged(1);
-                                expenseRecyclerView.scrollToPosition(0);
+                                for (int i = 0; i < expenseList.size(); i++) {
+                                    if (i >= expenseAdapter.expenseList.size()) {
+                                        expenseAdapter.expenseList.add(expenseList.get(i));
+                                        expenseRecyclerView.scrollToPosition(i - 1);
+                                        expenseAdapter.notifyItemInserted(i);
+
+                                    } else if (!expenseAdapter.expenseList.get(i).getExpenseID().equals(expenseList.get(i).getExpenseID())) {
+                                        expenseAdapter.expenseList.add(i, expenseList.get(i));
+                                        expenseRecyclerView.scrollToPosition(i);
+                                        expenseAdapter.notifyItemInserted(i);
+                                        if (i + 1 < expenseAdapter.expenseList.size()) {
+                                            expenseAdapter.notifyItemChanged(i + 1);
+                                        }
+                                    }
+                                }
                             } else {
-                                return;
+                                expenseAdapter.expenseList.clear();
+                                expenseAdapter.expenseList.addAll(expenseList);
+                                expenseAdapter.notifyDataSetChanged();
                             }
+                            handleUpdateAccountBalanceList();
                         }
                     });
         });
@@ -213,7 +305,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
             balanceAmountTextView.setText("đ" + String.format("%.3f", amount));
             balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_green_background));
             balanceThumbIcon.setImageDrawable(getResources().getDrawable(R.drawable.thumb_up_icon));
-        } else if (amount < 0) {
+        } else if (Math.round(amount) < 0) {
             balanceTextView.setText("You owe others");
             balanceAmountTextView.setText("đ" + String.format("%.3f", amount));
             balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_red_background));

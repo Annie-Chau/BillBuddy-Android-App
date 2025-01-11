@@ -150,20 +150,25 @@ public class AddExpenseBottomSheet extends BottomSheetDialogFragment {
 
             Log.d("Result", expenseInfo);
 
-            Expense expense = new Expense(
-                    UUID.randomUUID().toString(),
-                    titleEditText.getText().toString(),
-                    "",
-                    amount,
-                    description.getText().toString(),
-                    "",
-                    paidById,
-                    SplitAdapter.getParticipantIDs(splitAdapter.getSplitItems()),
-                    SplitAdapter.getSplits(splitAdapter.getSplitItems()),
-                    new Date(),
-                    selectedCurrency,
-                    false
-            );
+            Expense expense = null;
+            try {
+                expense = new Expense(
+                        UUID.randomUUID().toString(),
+                        titleEditText.getText().toString(),
+                        "",
+                        amount,
+                        description.getText().toString(),
+                        "",
+                        paidById,
+                        SplitAdapter.getParticipantIDs(splitAdapter.getSplitItems()),
+                        SplitAdapter.getSplits(splitAdapter.getSplitItems()),
+                        new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(date),
+                        selectedCurrency,
+                        false
+                );
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
 
             Expense.createExpense(
                     currentGroup.getGroupID(),
