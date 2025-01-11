@@ -5,8 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.expense.ViewExpenseDetailActivity"
-    >
+    tools:context=".views.expense.ViewExpenseDetailActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,10 +15,10 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_marginVertical="30dp"
-            android:paddingHorizontal="10dp"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="10dp">
 
             <!-- Add a return button -->
             <ImageButton
@@ -29,9 +28,9 @@
                 android:layout_marginStart="5dp"
 
                 android:background="@android:color/transparent"
-                android:src="@drawable/ic_return_arrow_icon"
                 android:contentDescription="Return Button"
-                android:scaleType="centerInside" />
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_return_arrow_icon" />
 
             <!-- Spacer to push TextView to the right -->
             <View
@@ -42,62 +41,60 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="BillBuddy"
-                android:textSize="30sp"
-                android:textStyle="bold"
-                android:textColor="@color/primary"
+                android:layout_marginEnd="20dp"
                 android:fontFamily="@font/kavoon"
-                android:layout_marginEnd="20dp" />
+                android:text="BillBuddy"
+                android:textColor="@color/primary"
+                android:textSize="30sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <ImageView
             android:id="@+id/expense_image"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginTop="20dp"
             android:layout_gravity="center"
+            android:layout_marginTop="20dp"
             android:background="@drawable/rounded_border_image_view"
-            android:src="@drawable/example_image_1"
             android:contentDescription="Expense Image"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            android:src="@drawable/example_image_1" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
             android:layout_marginTop="10dp"
-            >
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/expense_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/inter_regular"
                 android:maxWidth="270dp"
                 android:maxLines="1"
-                android:ellipsize="end"
                 android:text="Expense Name"
+                android:textColor="@color/black"
                 android:textSize="25sp"
                 android:textStyle="bold"
-                android:textColor="@color/black"
-                android:fontFamily="@font/notosansbold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
                 android:id="@+id/rename_button"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:layout_marginStart="3dp"
                 android:background="@android:color/transparent"
-                android:src="@drawable/ic_edit_icon"
                 android:contentDescription="Rename Button"
-                app:layout_constraintLeft_toRightOf="@id/expense_name"
-                app:layout_constraintBaseline_toBaselineOf="parent"
                 android:scaleType="centerInside"
-                android:layout_marginStart="3dp" />
+                android:src="@drawable/ic_edit_icon"
+                app:layout_constraintBaseline_toBaselineOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/expense_name" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -105,45 +102,47 @@
             android:id="@+id/expense_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_regular"
             android:gravity="center"
             android:text="Date"
-            android:fontFamily="@font/notosansregular"
+            android:textColor="@color/black"
             android:textSize="15sp"
-            />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/expense_amount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/inter_regular"
             android:gravity="center"
             android:text="Total"
-            android:fontFamily="@font/notosansregular"
-            android:layout_marginTop="5dp"
             android:textColor="@color/primary"
             android:textSize="18sp"
-            />
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="16dp"
             android:orientation="vertical"
-            >
+            android:paddingHorizontal="16dp">
 
             <TextView
+                android:layout_marginTop="16dp"
+                android:id="@+id/expense_detail_top_heading"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/notosansbold"
                 android:text="Paid By"
                 android:textColor="@color/black"
-                android:fontFamily="@font/notosansbold"
-                android:textSize="17sp"
-                />
+                android:textStyle="bold"
+                android:textSize="18sp" />
 
             <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_margin="10dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="4dp">
 
@@ -151,85 +150,83 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:paddingTop="16dp"
-                    android:paddingBottom="12dp"
                     android:paddingHorizontal="16dp"
-                    >
+
+                    android:paddingTop="16dp"
+                    android:layout_gravity="center_vertical"
+                    android:paddingBottom="12dp">
 
                     <TextView
                         android:id="@+id/paid_by_name"
-                        android:layout_width="150dp"
+                        android:layout_width="200dp"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/black"
-                        android:text="Name"
-                        android:textSize="18sp"
-                        android:fontFamily="@font/notosansbold"
-                        android:textStyle="bold"
                         android:ellipsize="end"
+                        android:fontFamily="@font/notosansbold"
                         android:maxLines="1"
-                        />
+                        android:text="Name"
+                        android:layout_gravity="center_vertical"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
 
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
 
                     <TextView
                         android:id="@+id/paid_by_amount"
-                        android:layout_width="180dp"
+                        android:layout_width="wrap_content"
+                        android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/notosansbold"
-                        android:textColor="#bc8a26"
-                        android:text="$100.00"
-                        android:textSize="18sp"
+                        android:layout_gravity="center_vertical"
                         android:ellipsize="end"
-                        android:maxLines="1"
+                        android:fontFamily="@font/notosansbold"
                         android:gravity="end"
-                        />
+                        android:maxLines="1"
+                        android:text="$100.00"
+                        android:textColor="#bc8a26"
+                        android:textSize="16sp" />
 
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 
             <TextView
+                android:id="@+id/expense_detail_bottom_heading"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Participants"
-                android:textColor="@color/black"
                 android:fontFamily="@font/notosansbold"
-                android:textSize="17sp"
-                android:layout_marginTop="20dp"
-                />
+                android:text="Paid By"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp"
+                android:textSize="18sp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/participant_list"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:clipToPadding="false"
+                android:layout_height="300dp"
                 android:layout_marginTop="6dp"
+                android:clipToPadding="false"
+                android:padding="8dp"
                 android:scrollbars="vertical" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/notosansbold"
                 android:text="Note"
                 android:textColor="@color/black"
-                android:fontFamily="@font/notosansbold"
-                android:textSize="17sp"
-                android:layout_marginTop="20dp"
-                />
+                android:textSize="17sp" />
 
             <TextView
                 android:id="@+id/expense_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/notosansregular"
+                android:maxLines="3"
                 android:text="Description"
                 android:textColor="#7C7C7C"
-                android:fontFamily="@font/notosansregular"
-                android:textSize="13sp"
-                android:maxLines="3"
-                android:ellipsize="end"
-                />
+                android:textSize="13sp" />
 
         </LinearLayout>
 

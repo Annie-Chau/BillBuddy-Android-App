@@ -53,7 +53,7 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
         holder.expenseNameTextView.setText(expense.getTitle()); // Assuming your Expense model has a getName() method
         holder.expenseAmountTextView.setText(expense.getFormattedAmount()); // Assuming you have a getFormattedAmount() method in your Expense model
         User.fetchAllUsers(users -> {
-            holder.paidByTextView.setText("Paid by: " + expense.getPaidByName(users));
+            holder.paidByTextView.setText(getPrefix(expense) + expense.getPaidByName(users));
         });
 
         if (position == 0) {
@@ -64,6 +64,11 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
             holder.createdDate.setText(expense.getTimeString());
         } else {
             holder.createdDate.setVisibility(View.GONE);
+        }
+        if (expense.getIsReimbursed()) {
+            holder.expenseImageView.setImageDrawable(context.getDrawable(R.drawable.card));
+        } else {
+            holder.expenseImageView.setImageDrawable(context.getDrawable(R.drawable.money));
         }
 
         holder.linearLayout.setOnTouchListener((view, motionEvent) -> {
@@ -82,7 +87,6 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
             return false;
         });
 
-
         holder.linearLayout.setOnClickListener(v -> {
             Intent intent = new Intent(context, ViewExpenseDetailActivity.class);
 
@@ -92,6 +96,12 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
             context.startActivity(intent);
         });
     }
+
+
+    private String getPrefix(Expense expense) {
+        return expense.getIsReimbursed() ? "Transferred By: " : "Paid By: ";
+    }
+
 
     @Override
     public int getItemCount() {

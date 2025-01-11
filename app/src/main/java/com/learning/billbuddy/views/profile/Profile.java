@@ -1,8 +1,8 @@
 package com.learning.billbuddy.views.profile;
 
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,17 +19,16 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.learning.billbuddy.AddUserInfo;
+import com.learning.billbuddy.views.authentication.AddUserInfo;
 import com.learning.billbuddy.R;
 import com.learning.billbuddy.models.User;
 import com.learning.billbuddy.views.authentication.Login;
-
-import java.util.Objects;
 
 public class Profile extends Fragment {
 
 
     private ImageView profileImage;
+    private TextView profileImageTextView;
 
     private TextView email;
     private TextView userName;
@@ -60,6 +59,7 @@ public class Profile extends Fragment {
         userName = view.findViewById(R.id.profile_userName_textField);
         phoneNumber = view.findViewById(R.id.profile_phoneNumber_textField);
         email = view.findViewById(R.id.profile_email_textField);
+        profileImageTextView = view.findViewById(R.id.profile_user_avatar_text_view);
         assert getArguments() != null;
         currentUser = (User) getArguments().getSerializable("user");
 
@@ -73,12 +73,15 @@ public class Profile extends Fragment {
             phoneNumber.setText(currentUser.getPhoneNumber());
             email.setText(currentUser.getEmail());
         });
-
-
-        if (userAuth.getPhotoUrl() != null) {
+        if (currentUser.getProfilePictureURL().equals("XXX") || currentUser.getProfilePictureURL().isEmpty()) {
+            Log.d("Profile", currentUser.getProfilePictureURL());
+            profileImageTextView.setText(currentUser.getName().substring(0, 1));
+            profileImageTextView.setVisibility(View.VISIBLE);
+        } else {
+            profileImageTextView.setVisibility(View.GONE);
+            profileImage.setVisibility(View.VISIBLE);
             Glide.with(requireActivity()).load(userAuth.getPhotoUrl()).circleCrop().into(profileImage);
         }
-
 
         editProfileButton = view.findViewById(R.id.profile_edit_button);
         editProfileButton.setOnClickListener(v -> {
@@ -88,6 +91,7 @@ public class Profile extends Fragment {
             intent.putExtra("currentName", userName.getText().toString());
             intent.putExtra("currentPhoneNumber", phoneNumber.getText().toString());
             intent.putExtra("currentPhotoUrl", currentUser.getProfilePictureURL());
+            intent.putExtra("currentUser", currentUser);
             startActivity(intent);
         });
 

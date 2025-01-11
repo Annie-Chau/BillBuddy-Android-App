@@ -26,15 +26,14 @@ import java.util.Locale;
 
 public class ViewExpenseDetailActivity extends AppCompatActivity {
 
-    private TextView expenseName, expenseDate, expenseAmount, paidByName, paidByAmount, expenseDescription, balanceTotalText, balanceTotalAmount;
+    private TextView expenseName, expenseDate, expenseAmount, paidByName, paidByAmount, expenseDescription, topheading, bottomHeading;
     private RecyclerView participantList;
     private Expense currentExpense;
-
-    private LinearLayout balanceTotalBackground;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setNavigationBarColor(getResources().getColor(R.color.background));
         setContentView(R.layout.activity_view_expense_detail); // Make sure this matches your XML filename
 
         // Initialize views
@@ -48,6 +47,8 @@ public class ViewExpenseDetailActivity extends AppCompatActivity {
         expenseDescription = findViewById(R.id.expense_description);
         ImageButton returnButton = findViewById(R.id.return_button);
         ImageButton renameButton = findViewById(R.id.rename_button);
+        topheading = findViewById(R.id.expense_detail_top_heading);
+        bottomHeading = findViewById(R.id.expense_detail_bottom_heading);
 
 
         currentExpense = (Expense) getIntent().getSerializableExtra("expense");
@@ -57,6 +58,19 @@ public class ViewExpenseDetailActivity extends AppCompatActivity {
         renameButton.setOnClickListener(v -> {
             // Handle rename button click (e.g., open an edit dialog)
         });
+
+        if (currentExpense.getIsReimbursed()) {
+            topheading.setText("Transferred Form");
+            bottomHeading.setText("To 1 Participant");
+        } else {
+            topheading.setText("Paid By");
+
+            String bottomHeadingText = "For " + currentExpense.getParticipantIDs().size() + " Participants";
+            if (currentExpense.getParticipantIDs().contains(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                bottomHeadingText += ", Including Me";
+            }
+            bottomHeading.setText(bottomHeadingText);
+        }
 
         expenseDescription.setText(currentExpense.getNotes());
 

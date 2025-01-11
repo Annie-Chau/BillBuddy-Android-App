@@ -15,8 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.learning.billbuddy.R;
 import com.learning.billbuddy.adapters.ReimbursementAdapter;
+import com.learning.billbuddy.models.Expense;
 import com.learning.billbuddy.models.Group;
 import com.learning.billbuddy.models.User;
 
@@ -45,6 +47,8 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
         // Required empty public constructor
     }
 
+    private Group currentGroup;
+
     private ArrayList<Group.Reimbursement> reimbursementArrayList = new ArrayList<>();
 
     @Override
@@ -52,7 +56,7 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.activity_view_imbursement, container, false);
-        Group group = (Group) getArguments().getSerializable("group");
+        currentGroup = (Group) getArguments().getSerializable("group");
 
         totalAmountOwed = view.findViewById(R.id.reimbursement_amount);
         headingTextView = view.findViewById(R.id.reimbursement_form_heading_top);
@@ -61,7 +65,7 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
         balanceTotalBackground = view.findViewById(R.id.reimbursement_amount);
 
 
-        User.getUsersBydIds(Objects.requireNonNull(group.getMemberIDs()), new User.IUsersCallBack() {
+        User.getUsersBydIds(Objects.requireNonNull(currentGroup.getMemberIDs()), new User.IUsersCallBack() {
             @Override
             public void onSuccess(ArrayList<User> users) {
                 Map<String, String> userMap = new HashMap<>();
@@ -69,11 +73,11 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
                     userMap.put(user.getUserID(), user.getName());
                 }
 
-                reimbursementAdapter = new ReimbursementAdapter(getContext(), group, reimbursementArrayList, userMap);
+                reimbursementAdapter = new ReimbursementAdapter(getContext(), currentGroup, reimbursementArrayList, userMap);
                 recyclerView = view.findViewById(R.id.reimbursement_recycler_view);
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                 recyclerView.setAdapter(reimbursementAdapter);
-                updateReimbursement(group);
+                updateReimbursement();
                 handleDisplayBalance(reimbursementArrayList);
             }
 
@@ -84,13 +88,12 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
         });
 
         closeButton.setOnClickListener(v -> dismiss());
+        handleUpdateExpenseRealTime();
         return view;
     }
 
-    private void updateReimbursement(Group group) {
-        group.getReimbursements(reimbursements -> {
-            Log.d("ViewReimbursementDetail", "Reimbursements: " + reimbursements.toString());
-            Log.d("ViewReimbursementDetail", "Refetch");
+    private void updateReimbursement() {
+        currentGroup.getReimbursements(reimbursements -> {
             //sort the reimbursement pirotize the one that are relate to current payerId or payeeId is currentuser
             reimbursements = reimbursements.stream().sorted((r1, r2) -> {
                 if (r1.getPayeeId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
@@ -136,4 +139,32 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
         return amount;
         // Logic to calculate the amount owed to currentLogin user
     }
+
+
+    private void handleUpdateExpenseRealTime() {
+        FirebaseFirestore.getInstance()
+                .collection("groups")
+                .document(currentGroup.getGroupID())
+                .addSnapshotListener((documentSnapshot, e) -> {
+
+                    if (e != null) {
+                        return;
+                    }
+
+                    if (documentSnapshot != null && documentSnapshot.exists()) {
+                        Log.d("ViewReimbursementDetail", "addSnapshotListener");
+                        Group group = documentSnapshot.toObject(Group.class);
+
+                        Log.d("ViewReimbursementDetail", "currentGroup().size() " + currentGroup.getExpenseIDs().size());
+                        Log.d("ViewReimbursementDetail", "group.getExpenseIDs().size() " + group.getExpenseIDs().size());
+
+                        if (currentGroup.getExpenseIDs().size() < group.getExpenseIDs().size()) {
+                            Log.d("ViewReimbursementDetail", "New Expense Added");
+                            currentGroup = group;
+                            updateReimbursement();
+                        }
+                    }
+                });
+    }
+
 }

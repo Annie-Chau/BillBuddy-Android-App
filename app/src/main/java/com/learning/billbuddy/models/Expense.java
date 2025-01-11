@@ -60,6 +60,10 @@ public class Expense implements Serializable {
                 splits, timestamp, currency, false); // Default value for isReimbursed
     }
 
+    public  Boolean getIsReimbursed() {
+        return isReimbursed;
+    }
+
     // Getters and setters
     public String getExpenseID() {
         return expenseID;
@@ -298,6 +302,10 @@ public class Expense implements Serializable {
                         .map(User::getName)
                         .orElse("Unknown")) // Or handle the case where the user is not found
                 .collect(Collectors.toList());
+    }
+
+    public Boolean isQualifyForSearch(String searchQuery) {
+        return title.toLowerCase().contains(searchQuery.toLowerCase());
     }
 
     @Override

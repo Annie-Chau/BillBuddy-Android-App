@@ -240,4 +240,17 @@ public class User implements Serializable {
 
         void onFailure(String error);
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userID='" + userID + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", profilePictureURL='" + profilePictureURL + '\'' +
+                ", registrationMethod='" + registrationMethod + '\'' +
+                ", notificationIds=" + notificationIds +
+                '}';
+    }
 }

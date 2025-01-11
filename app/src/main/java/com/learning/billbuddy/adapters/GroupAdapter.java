@@ -104,7 +104,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
                 case MotionEvent.ACTION_UP:
                 case MotionEvent.ACTION_CANCEL:
                     // Handle release
-                    holder.linearLayout.setBackground(context.getDrawable(R.drawable.small_round_white)); // Reset color or set a new one
+                    holder.linearLayout.setBackgroundColor(context.getColor(R.color.white)); // Reset color or set a new one
                     break;
             }
             return false;
@@ -234,7 +234,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
         ImageView groupImage;
         ImageButton arrowButton;
         TextView createdDate;
-        CardView linearLayout;
+        LinearLayout linearLayout;
 
         public GroupViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -242,7 +242,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
             groupImage = itemView.findViewById(R.id.group_image);
             arrowButton = itemView.findViewById(R.id.group_card_action_button);
             createdDate = itemView.findViewById(R.id.created_date_group);
-            linearLayout = itemView.findViewById(R.id.group_card);
+            linearLayout = itemView.findViewById(R.id.expense_item_linear_layout);
         }
     }
 }

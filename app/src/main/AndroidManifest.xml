@@ -23,7 +23,7 @@
             android:name=".adapters.GroupAdapter"
             android:exported="true" />
         <activity
-            android:name=".AddUserInfo"
+            android:name=".views.authentication.AddUserInfo"
             android:exported="false" />
         <activity
             android:name=".views.authentication.Register"

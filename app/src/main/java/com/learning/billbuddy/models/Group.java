@@ -406,7 +406,7 @@ public class Group implements Serializable {
 
         double settlement = Math.min(amounts[maxDebtorIndex], -amounts[maxCreditorIndex]);
 
-        if (settlement == 0) return;
+        if (Math.round(settlement) == 0) return;
         amounts[maxDebtorIndex] -= settlement;
         amounts[maxCreditorIndex] += settlement;
 
@@ -429,6 +429,12 @@ public class Group implements Serializable {
                             deleteGroupCallBack.onFailure(e);
                         }
                 );
+    }
+
+    public Boolean isDifferentByContent(Group group) {
+        //compare by field value
+        if (!Objects.equals(this.name, group.name)) return true;
+        return false;
     }
 
 }

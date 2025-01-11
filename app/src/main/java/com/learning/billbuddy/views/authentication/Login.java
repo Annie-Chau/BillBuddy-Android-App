@@ -21,8 +21,6 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.android.material.button.MaterialButton;
-import com.learning.billbuddy.AddUserInfo;
 import com.learning.billbuddy.MainActivity;
 import com.learning.billbuddy.R;
 

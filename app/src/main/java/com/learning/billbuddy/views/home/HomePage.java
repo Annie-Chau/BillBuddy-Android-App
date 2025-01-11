@@ -34,24 +34,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class HomePage extends Fragment {
-
-    private enum FilterOption {
-        FILTER("Filter"),
-        DATE_ASCENDING("Date Ascending"),
-        DATE_DESCENDING("Date Descending"),
-        REIMBURSEMENT_AVAILABLE("Reimbursement Available");
-
-        private final String filterOption;
-
-        FilterOption(String filterOption) {
-            this.filterOption = filterOption;
-        }
-
-        public String getFilterOption() {
-            return filterOption;
-        }
-    }
-
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private RecyclerView groupRecyclerView;
@@ -194,7 +176,13 @@ public class HomePage extends Fragment {
                     });
 
                 } else {
-                    return;
+                    //perform update
+                    for (int i = 0; i < currentGroupList.size(); i++) {
+                        if (currentGroupList.get(i).isDifferentByContent(groupAdapter.groupList.get(i))) {
+                            groupAdapter.groupList.set(i, currentGroupList.get(i));
+                            groupAdapter.notifyItemChanged(i);
+                        }
+                    }
                 }
             }
             prevGroupList = currentGroupList;
@@ -234,13 +222,25 @@ public class HomePage extends Fragment {
                 break;
             case "Reimbursement Available":
                 //TODO: Implement this
-                groupAdapter.groupList = currentGroupList;
+                // get grroup with reimbursemt.sisze >
+                List<Group> availableReimbursementGroups = new ArrayList<>();
+                List<Group> currentGroupList = groupAdapter.groupList;
+                for (Group group : currentGroupList) {
+                    group.getReimbursements(result -> {
+                        if (result.size() > 0) {
+                            availableReimbursementGroups.add(group);
+                            groupAdapter.groupList = availableReimbursementGroups;
+                            groupAdapter.notifyDataSetChanged();
+                        }
+                    });
+                }
                 break;
             default:
                 break;
         }
         groupAdapter.notifyDataSetChanged();
     }
+
 
     private void onSearch() {
         String searchQuery = searchGroupEditText.getText().toString().toLowerCase();

@@ -3,7 +3,7 @@
     <!--   make a round shape primary border <-->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="@android:color/transparent" />
+            <solid android:color="@color/primary" />
             <corners android:radius="50dp" />
         </shape>
     </item>
