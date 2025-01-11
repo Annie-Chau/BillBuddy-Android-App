@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.learning.billbuddy.R;
 import com.learning.billbuddy.adapters.GroupAdapter;
 import com.learning.billbuddy.models.Group;
@@ -61,8 +62,8 @@ public class HomePage extends Fragment {
 
     private Spinner filterSelection;
 
-    private ArrayList<Group> prevGroupList;
-    private ArrayList<Group> currentGroupList;
+//    private ArrayList<Group> prevGroupList;
+    private ArrayList<Group> currentGroupList; // store the up-to-date list from Firestore
 
     @Nullable
     @Override
@@ -76,7 +77,7 @@ public class HomePage extends Fragment {
         filterSelection = view.findViewById(R.id.home_spinner_filter_selection);
 
         // Setup RecyclerView
-        prevGroupList = new ArrayList<>();
+//        prevGroupList = new ArrayList<>();
         currentGroupList = new ArrayList<>();
         groupAdapter = new GroupAdapter(requireContext(), currentGroupList);
         groupRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -137,6 +138,76 @@ public class HomePage extends Fragment {
         });
     }
 
+//    private void setupRealTimeGroupUpdates() {
+//        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        if (currentUser == null) {
+//            Log.e("HomePage", "No authenticated user found for real-time updates");
+//            return;
+//        }
+//
+//        String currentUserId = currentUser.getUid();
+//
+////        Group.fetchAllGroups(groups -> {
+////            currentGroupList = groups.stream()
+////                    .filter(group -> group.getMemberIDs() != null && group.getMemberIDs().contains(currentUserId))
+////                    .sorted((group1, group2) -> group2.getCreatedDateLongFormat().compareTo(group1.getCreatedDateLongFormat()))
+////                    .collect(Collectors.toCollection(ArrayList::new));
+////
+////            if (prevGroupList.isEmpty()) {
+////                groupAdapter.groupList = currentGroupList;
+////                groupAdapter.notifyDataSetChanged();
+////            } else {
+////                if (prevGroupList.size() < currentGroupList.size()) {
+////                    //perform added
+////                    groupAdapter.groupList.add(0, currentGroupList.get(0));
+////                    groupAdapter.notifyItemInserted(0);
+////                    if (currentGroupList.size() > 1) {
+////                        groupAdapter.notifyItemChanged(1);
+////                    }
+////                    groupRecyclerView.scrollToPosition(0);
+////
+////                } else if (prevGroupList.size() > currentGroupList.size()) {
+////                    //perform delete
+////                    //find the group exist in groupList but not in currentGroupList
+////
+////                    List<Group> groupsToRemove = new ArrayList<>();
+////
+////                    groupAdapter.groupList.forEach(group -> {
+////                        boolean existsInCurrentGroupList = currentGroupList.stream()
+////                                .anyMatch(item -> item.getGroupID().equals(group.getGroupID()));
+////
+////                        if (!existsInCurrentGroupList) {
+////                            Log.d("HomePage", "Found item being removed " + group.getName());
+////                            groupsToRemove.add(group); // Mark group for removal
+////                        }
+////                    });
+////
+////                    groupsToRemove.forEach(group -> {
+////                        int index = groupAdapter.groupList.indexOf(group);
+////                        if (index != -1) {
+////                            groupAdapter.groupList.remove(index);
+////                            groupAdapter.notifyItemRemoved(index);
+////                        }
+////                        if (index < groupAdapter.groupList.size() - 2) { //case delete top and net want need to show date
+////                            groupAdapter.notifyItemChanged(index + 1);
+////                        }
+////                    });
+////
+////                } else {
+////                    return;
+////                }
+////            }
+////            prevGroupList = currentGroupList;
+////            Log.d("HomePage", "Groups updated in real-time. Total groups: " + currentGroupList.size());
+////        });
+//
+//
+//
+//    }
+
+    /**
+     * Replaces the custom "fetchAllGroups" logic with a Firestore real-time listener.
+     */
     @SuppressLint("NotifyDataSetChanged")
     private void setupRealTimeGroupUpdates() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -144,62 +215,30 @@ public class HomePage extends Fragment {
             Log.e("HomePage", "No authenticated user found for real-time updates");
             return;
         }
-
         String currentUserId = currentUser.getUid();
 
-        Group.fetchAllGroups(groups -> {
-            currentGroupList = groups.stream()
-                    .filter(group -> group.getMemberIDs() != null && group.getMemberIDs().contains(currentUserId))
-                    .sorted((group1, group2) -> group2.getCreatedDateLongFormat().compareTo(group1.getCreatedDateLongFormat()))
-                    .collect(Collectors.toCollection(ArrayList::new));
-
-            if (prevGroupList.isEmpty()) {
-                groupAdapter.groupList = currentGroupList;
-                groupAdapter.notifyDataSetChanged();
-            } else {
-                if (prevGroupList.size() < currentGroupList.size()) {
-                    //perform added
-                    groupAdapter.groupList.add(0, currentGroupList.get(0));
-                    groupAdapter.notifyItemInserted(0);
-                    if (currentGroupList.size() > 1) {
-                        groupAdapter.notifyItemChanged(1);
+        // Real-time listener on groups that contain the current user in their memberIDs
+        db.collection("groups")
+                .whereArrayContains("memberIDs", currentUserId)
+                .addSnapshotListener((querySnapshot, e) -> {
+                    if (e != null) {
+                        Log.w("HomePage", "Listen failed.", e);
+                        return;
                     }
-                    groupRecyclerView.scrollToPosition(0);
-
-                } else if (prevGroupList.size() > currentGroupList.size()) {
-                    //perform delete
-                    //find the group exist in groupList but not in currentGroupList
-
-                    List<Group> groupsToRemove = new ArrayList<>();
-
-                    groupAdapter.groupList.forEach(group -> {
-                        boolean existsInCurrentGroupList = currentGroupList.stream()
-                                .anyMatch(item -> item.getGroupID().equals(group.getGroupID()));
-
-                        if (!existsInCurrentGroupList) {
-                            Log.d("HomePage", "Found item being removed " + group.getName());
-                            groupsToRemove.add(group); // Mark group for removal
+                    if (querySnapshot != null) {
+                        List<Group> updatedGroups = new ArrayList<>();
+                        for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                            Group group = doc.toObject(Group.class);
+                            if (group != null) {
+                                updatedGroups.add(group);
+                            }
                         }
-                    });
-
-                    groupsToRemove.forEach(group -> {
-                        int index = groupAdapter.groupList.indexOf(group);
-                        if (index != -1) {
-                            groupAdapter.groupList.remove(index);
-                            groupAdapter.notifyItemRemoved(index);
-                        }
-                        if (index < groupAdapter.groupList.size() - 2) { //case delete top and net want need to show date
-                            groupAdapter.notifyItemChanged(index + 1);
-                        }
-                    });
-
-                } else {
-                    return;
-                }
-            }
-            prevGroupList = currentGroupList;
-            Log.d("HomePage", "Groups updated in real-time. Total groups: " + currentGroupList.size());
-        });
+                        // Update current list and re-apply any search/filter logic
+                        this.currentGroupList = (ArrayList<Group>) updatedGroups;
+                        onSearch();  // Will handle both search filtering and the user’s filter choice
+                        Log.d("HomePage", "Groups updated in real-time. Size: " + updatedGroups.size());
+                    }
+                });
     }
 
     private void handleSearchGroupEditText() {
