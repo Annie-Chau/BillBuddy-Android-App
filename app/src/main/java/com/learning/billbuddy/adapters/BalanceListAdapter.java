@@ -43,6 +43,11 @@ public class BalanceListAdapter extends RecyclerView.Adapter<BalanceListAdapter.
 
     }
 
+    // This allows the adapter to be notified when reimbursements change.
+    public void updateReimbursements(List<Group.Reimbursement> newReimbursements) {
+        this.reimbursementList = newReimbursements;
+        notifyDataSetChanged();
+    }
 
     @NonNull
     @Override
