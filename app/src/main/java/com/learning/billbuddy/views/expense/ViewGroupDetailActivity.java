@@ -165,7 +165,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         });
 
         // Handle edit group info button
-        setupGroupListener();
+//        setupGroupListener();
         updateGroupInfoButton.setOnClickListener(v -> navigateToEditGroupInfo());
 
     }
@@ -334,66 +334,66 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         // Logic to calculate the amount owed to currentLogin user
     }
 
-    private void setupGroupListener() {
-        DocumentReference groupRef = db.collection("groups")
-                .document(currentGroup.getGroupID());
-
-        // Keep the registration so we can remove the listener if needed
-        groupListenerRegistration = groupRef.addSnapshotListener((snapshot, e) -> {
-            if (e != null) {
-                Log.w("ViewGroupDetail", "Listen failed.", e);
-                return;
-            }
-            if (snapshot != null && snapshot.exists()) {
-                Group updatedGroup = snapshot.toObject(Group.class);
-                if (updatedGroup != null) {
-                    currentGroup = updatedGroup;
-                    Log.d("ViewGroupDetail", "Real-time group update: " + currentGroup.getName());
-                    updateUIWithGroupData();
-                }
-            }
-        });
-    }
-
-    private void updateUIWithGroupData() {
-        // Update group name and avatar
-        groupNameTextView.setText(currentGroup.getName());
-        if (currentGroup.getAvatarURL() != null && !currentGroup.getAvatarURL().isEmpty()) {
-            Glide.with(this).load(currentGroup.getAvatarURL()).into(groupImageView);
-        } else {
-            groupImageView.setImageResource(R.drawable.example_image_1);
-        }
-
-        // Refresh reimbursements (Balance)
-        currentGroup.getReimbursements(reimbursements -> {
-            // If first time, create the adapter; otherwise update
-            if (balanceListAdapter == null) {
-                balanceListAdapter = new BalanceListAdapter(this, currentGroup, reimbursements);
-                balanceListRecyclerView.setAdapter(balanceListAdapter);
-            } else {
-                balanceListAdapter.updateReimbursements(reimbursements);
-            }
-
-            // Update the displayed balance
-            handleDisplayBalance(reimbursements);
-        });
-
-        // Refresh the expenses in real time
-        // If you have a small number of total expenses, you can fetch them all, else you can optimize
-        Expense.fetchAllExpenses(allExpenses -> {
-            // Filter only expenses belonging to this group
-            List<Expense> updatedExpenseList = allExpenses.stream()
-                    .filter(expense -> currentGroup.getExpenseIDs().contains(expense.getExpenseID()))
-                    .sorted((o1, o2) -> o2.getTimestamp().compareTo(o1.getTimestamp()))
-                    .collect(Collectors.toList());
-
-            // Clear + add new data
-            expenseList.clear();
-            expenseList.addAll(updatedExpenseList);
-
-            expenseAdapter.notifyDataSetChanged();
-            Log.d("ViewGroupDetail", "Expense list updated in real-time: " + expenseList.size() + " items");
-        });
-    }
+//    private void setupGroupListener() {
+//        DocumentReference groupRef = db.collection("groups")
+//                .document(currentGroup.getGroupID());
+//
+//        // Keep the registration so we can remove the listener if needed
+//        groupListenerRegistration = groupRef.addSnapshotListener((snapshot, e) -> {
+//            if (e != null) {
+//                Log.w("ViewGroupDetail", "Listen failed.", e);
+//                return;
+//            }
+//            if (snapshot != null && snapshot.exists()) {
+//                Group updatedGroup = snapshot.toObject(Group.class);
+//                if (updatedGroup != null) {
+//                    currentGroup = updatedGroup;
+//                    Log.d("ViewGroupDetail", "Real-time group update: " + currentGroup.getName());
+//                    updateUIWithGroupData();
+//                }
+//            }
+//        });
+//    }
+//
+//    private void updateUIWithGroupData() {
+//        // Update group name and avatar
+//        groupNameTextView.setText(currentGroup.getName());
+//        if (currentGroup.getAvatarURL() != null && !currentGroup.getAvatarURL().isEmpty()) {
+//            Glide.with(this).load(currentGroup.getAvatarURL()).into(groupImageView);
+//        } else {
+//            groupImageView.setImageResource(R.drawable.example_image_1);
+//        }
+//
+//        // Refresh reimbursements (Balance)
+//        currentGroup.getReimbursements(reimbursements -> {
+//            // If first time, create the adapter; otherwise update
+//            if (balanceListAdapter == null) {
+//                balanceListAdapter = new BalanceListAdapter(this, currentGroup, reimbursements);
+//                balanceListRecyclerView.setAdapter(balanceListAdapter);
+//            } else {
+//                balanceListAdapter.updateReimbursements(reimbursements);
+//            }
+//
+//            // Update the displayed balance
+//            handleDisplayBalance(reimbursements);
+//        });
+//
+//        // Refresh the expenses in real time
+//        // If you have a small number of total expenses, you can fetch them all, else you can optimize
+//        Expense.fetchAllExpenses(allExpenses -> {
+//            // Filter only expenses belonging to this group
+//            List<Expense> updatedExpenseList = allExpenses.stream()
+//                    .filter(expense -> currentGroup.getExpenseIDs().contains(expense.getExpenseID()))
+//                    .sorted((o1, o2) -> o2.getTimestamp().compareTo(o1.getTimestamp()))
+//                    .collect(Collectors.toList());
+//
+//            // Clear + add new data
+//            expenseList.clear();
+//            expenseList.addAll(updatedExpenseList);
+//
+//            expenseAdapter.notifyDataSetChanged();
+//            Log.d("ViewGroupDetail", "Expense list updated in real-time: " + expenseList.size() + " items");
+//        });
+//    }
 
 }
