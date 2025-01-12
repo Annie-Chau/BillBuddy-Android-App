@@ -138,6 +138,74 @@ public class HomePage extends Fragment {
         });
     }
 
+//    private void setupRealTimeGroupUpdates() {
+//        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        if (currentUser == null) {
+//            Log.e("HomePage", "No authenticated user found for real-time updates");
+//            return;
+//        }
+//
+//        String currentUserId = currentUser.getUid();
+//
+//        Group.fetchAllGroups(groups -> {
+//            currentGroupList = groups.stream()
+//                    .filter(group -> group.getMemberIDs() != null && group.getMemberIDs().contains(currentUserId))
+//                    .sorted((group1, group2) -> group2.getCreatedDateLongFormat().compareTo(group1.getCreatedDateLongFormat()))
+//                    .collect(Collectors.toCollection(ArrayList::new));
+//
+//            if (prevGroupList.isEmpty()) {
+//                groupAdapter.groupList = currentGroupList;
+//                groupAdapter.notifyDataSetChanged();
+//            } else {
+//                if (prevGroupList.size() < currentGroupList.size()) {
+//                    //perform added
+//                    groupAdapter.groupList.add(0, currentGroupList.get(0));
+//                    groupAdapter.notifyItemInserted(0);
+//                    if (currentGroupList.size() > 1) {
+//                        groupAdapter.notifyItemChanged(1);
+//                    }
+//                    groupRecyclerView.scrollToPosition(0);
+//
+//                } else if (prevGroupList.size() > currentGroupList.size()) {
+//                    //perform delete
+//                    //find the group exist in groupList but not in currentGroupList
+//
+//                    List<Group> groupsToRemove = new ArrayList<>();
+//
+//                    groupAdapter.groupList.forEach(group -> {
+//                        boolean existsInCurrentGroupList = currentGroupList.stream()
+//                                .anyMatch(item -> item.getGroupID().equals(group.getGroupID()));
+//
+//                        if (!existsInCurrentGroupList) {
+//                            Log.d("HomePage", "Found item being removed " + group.getName());
+//                            groupsToRemove.add(group); // Mark group for removal
+//                        }
+//                    });
+//
+//                    groupsToRemove.forEach(group -> {
+//                        int index = groupAdapter.groupList.indexOf(group);
+//                        if (index != -1) {
+//                            groupAdapter.groupList.remove(index);
+//                            groupAdapter.notifyItemRemoved(index);
+//                        }
+//                        if (index < groupAdapter.groupList.size() - 2) { //case delete top and net want need to show date
+//                            groupAdapter.notifyItemChanged(index + 1);
+//                        }
+//                    });
+//
+//                } else {
+//                    return;
+//                }
+//            }
+//            prevGroupList = currentGroupList;
+//            Log.d("HomePage", "Groups updated in real-time. Total groups: " + currentGroupList.size());
+//        });
+//
+//
+//
+//    }
+
+    @SuppressLint("NotifyDataSetChanged")
     private void setupRealTimeGroupUpdates() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
@@ -194,15 +262,18 @@ public class HomePage extends Fragment {
                     });
 
                 } else {
-                    return;
+                    //perform update
+                    for (int i = 0; i < currentGroupList.size(); i++) {
+                        if (currentGroupList.get(i).isDifferentByContent(groupAdapter.groupList.get(i))) {
+                            groupAdapter.groupList.set(i, currentGroupList.get(i));
+                            groupAdapter.notifyItemChanged(i);
+                        }
+                    }
                 }
             }
             prevGroupList = currentGroupList;
             Log.d("HomePage", "Groups updated in real-time. Total groups: " + currentGroupList.size());
         });
-
-
-
     }
 
 //    /**
