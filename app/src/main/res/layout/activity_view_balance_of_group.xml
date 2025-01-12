@@ -21,18 +21,17 @@
             android:layout_marginVertical="30dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingHorizontal="10dp">
+            android:paddingHorizontal="15dp">
 
             <!-- Add a return button -->
-            <ImageButton
+            <Button
                 android:id="@+id/return_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
                 android:background="@android:color/transparent"
-                android:contentDescription="Return Button"
-                android:scaleType="centerInside"
-                android:src="@drawable/ic_return_arrow_icon" />
+                android:drawableStart="@drawable/ic_return_arrow_icon"
+                android:drawableTint="@color/primary"
+                android:contentDescription="Return Button"/>
 
             <!-- Spacer to push TextView to the right -->
             <View
@@ -43,30 +42,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="20dp"
+                android:layout_marginEnd="10dp"
                 android:fontFamily="@font/kavoon"
                 android:text="BillBuddy"
                 android:textColor="@color/primary"
                 android:textSize="30sp"
                 android:textStyle="bold" />
         </LinearLayout>
-
-        <EditText
-            android:id="@+id/search_expense"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginBottom="16dp"
-            android:height="40dp"
-            android:background="@drawable/round_primary_border"
-            android:drawableStart="@drawable/search_icon"
-            android:drawablePadding="8dp"
-            android:drawableTint="@color/black"
-            android:fontFamily="@font/archivo_variable"
-            android:hint="Search"
-            android:padding="8dp"
-            android:textSize="14sp"
-            android:textStyle="bold" />
 
         <!-- Add an ImageView for the group -->
         <FrameLayout
@@ -174,14 +156,30 @@
             android:orientation="vertical"
             android:paddingHorizontal="16dp">
 
+            <EditText
+                android:id="@+id/search_expense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="16dp"
+                android:height="40dp"
+                android:background="@drawable/round_primary_border"
+                android:drawableStart="@drawable/search_icon"
+                android:drawablePadding="8dp"
+                android:drawableTint="@color/black"
+                android:fontFamily="@font/archivo_variable"
+                android:hint="Search"
+                android:padding="8dp"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/expense_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="55dp"
                 android:clipToPadding="false"
                 android:scrollbars="vertical" />
-
 
         </FrameLayout>
 
@@ -213,31 +211,38 @@
 
                 <!-- Text Section -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="135dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
                     <!-- Upper Text -->
                     <TextView
                         android:id="@+id/balance_total_text"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="You are owed"
                         android:textAlignment="textStart"
                         android:textColor="@android:color/black"
                         android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        />
 
                     <!-- Amount Text -->
                     <TextView
                         android:id="@+id/balance_total_amount_text"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="₫ 1,000,320.00"
                         android:textAlignment="center"
                         android:textColor="@android:color/black"
                         android:textSize="24sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        tools:ignore="HardcodedText" />
+
                 </LinearLayout>
 
             </LinearLayout>

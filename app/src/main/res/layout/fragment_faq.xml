@@ -5,21 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    tools:context=".FAQActivity">
-
-    <!-- Return Button -->
-    <ImageButton
-        android:id="@+id/button_return"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Return"
-        android:src="@drawable/ic_return_arrow_icon"
-        android:tint="@color/primary"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    tools:context=".views.faq.FAQPage">
 
     <!-- Title Section -->
     <LinearLayout
@@ -28,8 +14,8 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/button_return"
+        android:layout_marginTop="60dp"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -39,31 +25,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="FAQ"
-            android:textSize="30sp"
+            android:textSize="40sp"
             android:textStyle="bold"
-            android:textColor="@color/black"
-            android:layout_gravity="center" />
-
-        <!-- Subtitle -->
-        <TextView
-            android:id="@+id/subtitle_faq"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Need answers? Find them here..."
-            android:textSize="18sp"
             android:textColor="@color/primary"
-            android:layout_marginTop="8dp"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:fontFamily="@font/notosansbold"
+            />
     </LinearLayout>
 
     <!-- Scrollable FAQ Section -->
+
     <ScrollView
         android:id="@+id/scrollView_faq"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="600dp"
+        android:layout_marginTop="40dp"
         android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title_section"
-        app:layout_constraintBottom_toBottomOf="parent">
+        tools:layout_editor_absoluteX="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -75,36 +55,46 @@
                 android:id="@+id/faq_item_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingVertical="12dp"
+                android:layout_marginBottom="8dp"
                 android:background="@drawable/faq_item_background"
                 android:clickable="true"
                 android:focusable="true"
-                android:layout_marginBottom="8dp">
+                android:orientation="vertical"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="12dp">
 
                 <!-- Question Section -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:gravity="center_vertical"
+                    android:orientation="horizontal"
                     android:padding="8dp">
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_marginTop="0.5dp"
+                        android:fontFamily="@font/notosansbold"
                         android:text="Do I need to register to place orders?"
-                        android:textSize="16sp"
                         android:textColor="@color/black"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" />
+
 
                     <ImageView
                         android:id="@+id/faq_icon_1"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_dropdown_arrow"
-                        android:contentDescription="Expand/Collapse Icon" />
+                        android:contentDescription="Expand/Collapse Icon"
+                        android:src="@drawable/arrow_down"
+                        app:tint="@color/primary" />
+
                 </LinearLayout>
 
                 <!-- Answer Section -->
@@ -112,10 +102,11 @@
                     android:id="@+id/faq_answer_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/notosansregular"
                     android:padding="8dp"
                     android:text="Register simply by setting up an email address and a password. Sign in to view what is already in your shopping cart."
-                    android:textSize="18sp"
                     android:textColor="@color/black"
+                    android:textSize="15sp"
                     android:visibility="gone" />
             </LinearLayout>
 
@@ -124,49 +115,75 @@
                 android:id="@+id/faq_item_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingVertical="12dp"
+                android:layout_marginBottom="8dp"
                 android:background="@drawable/faq_item_background"
                 android:clickable="true"
                 android:focusable="true"
-                android:layout_marginBottom="8dp">
+                android:orientation="vertical"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="12dp">
 
                 <!-- Question Section -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:gravity="center_vertical"
+                    android:orientation="horizontal"
                     android:padding="8dp">
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_marginTop="0.5dp"
+                        android:fontFamily="@font/notosansbold"
                         android:text="How do I register?"
-                        android:textSize="16sp"
                         android:textColor="@color/black"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" />
 
                     <ImageView
                         android:id="@+id/faq_icon_2"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_dropdown_arrow"
-                        android:contentDescription="Expand/Collapse Icon" />
+                        android:contentDescription="Expand/Collapse Icon"
+                        android:src="@drawable/arrow_down"
+                        app:tint="@color/primary" />
+
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/faq_answer_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/notosansregular"
                     android:padding="8dp"
                     android:text="You can register by signing up with your email or using third-party options such as Facebook or Google."
-                    android:textSize="18sp"
                     android:textColor="@color/black"
+                    android:textSize="15sp"
                     android:visibility="gone" />
             </LinearLayout>
 
         </LinearLayout>
+
     </ScrollView>
+
+    <TextView
+        android:id="@+id/subtitle_faq"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Need answers? Find them here..."
+        android:fontFamily="@font/notosansregular"
+        android:textSize="18sp"
+        android:textColor="@color/primary"
+        android:layout_gravity="center"
+        android:textAlignment="center"
+        app:layout_constraintTop_toBottomOf="@id/scrollView_faq"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

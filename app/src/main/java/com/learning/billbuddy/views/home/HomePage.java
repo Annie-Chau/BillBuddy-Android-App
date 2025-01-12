@@ -31,7 +31,6 @@ import com.learning.billbuddy.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class HomePage extends Fragment {
@@ -68,7 +67,7 @@ public class HomePage extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.home_page, container, false);
+        View view = inflater.inflate(R.layout.fragment_home_page, container, false);
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();

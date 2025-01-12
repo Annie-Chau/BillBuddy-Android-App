@@ -20,10 +20,7 @@
             android:name=".EditGroupInfoActivity"
             android:exported="true"/>
         <activity
-            android:name=".FAQActivity"
-            android:exported="true" />
-        <activity
-            android:name=".views.home.AboutUsActivity"
+            android:name=".views.aboutus.AboutUsPage"
             android:exported="true" />
         <activity
             android:name=".views.expense.ViewExpenseDetailActivity"

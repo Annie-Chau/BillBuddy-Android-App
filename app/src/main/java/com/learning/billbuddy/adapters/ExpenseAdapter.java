@@ -44,7 +44,7 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
         return new ExpenseViewHolder(view);
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "ClickableViewAccessibility"})
     @Override
     public void onBindViewHolder(@NonNull ExpenseViewHolder holder, int position) {
         Expense expense = expenseList.get(position);

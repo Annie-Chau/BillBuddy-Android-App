@@ -94,7 +94,7 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
 
     private void updateReimbursement() {
         currentGroup.getReimbursements(reimbursements -> {
-            //sort the reimbursement pirotize the one that are relate to current payerId or payeeId is currentuser
+            //sort the reimbursement prioritize the one that are relate to current payerId or payeeId is currentuser
             reimbursements = reimbursements.stream().sorted((r1, r2) -> {
                 if (r1.getPayeeId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                     return -1;
