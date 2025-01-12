@@ -33,6 +33,7 @@ import com.learning.billbuddy.models.User;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -90,9 +91,9 @@ public class AddExpenseBottomSheet extends BottomSheetDialogFragment {
         // Set up the RecyclerView
         splitRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
+        splitRecyclerView.setAdapter(new SplitAdapter(Collections.emptyList(), 0, splitRecyclerView, selectedCurrency));
         User.fetchAllUsers(users -> {
             SplitAdapter splitAdapter = new SplitAdapter(currentGroup.getMemberList(users), 0, splitRecyclerView, selectedCurrency);
-            splitRecyclerView.setAdapter(splitAdapter);
         });
 
         datePicker.setOnClickListener(v -> {
