@@ -1,6 +1,7 @@
 package com.learning.billbuddy.adapters;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -71,7 +72,12 @@ public class BalanceListAdapter extends RecyclerView.Adapter<BalanceListAdapter.
             } else {
                 holder.accountBalanceProfileTextView.setVisibility(View.GONE);
                 holder.accountBalanceImage.setVisibility(View.VISIBLE);
-                Glide.with(context).load(user.getProfilePictureURL()).circleCrop().into(holder.accountBalanceImage);
+                if (context instanceof Activity && !((Activity) context).isDestroyed()) {
+                    Glide.with(context)
+                            .load(user.getProfilePictureURL())
+                            .circleCrop()
+                            .into(holder.accountBalanceImage);
+                }
             }
 
             holder.accountBalanceMemberName.setText(user.getName() + this.returnStringMeIfMatched(memberId));

@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
@@ -23,7 +21,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.learning.billbuddy.models.Notification;
 import com.learning.billbuddy.models.User;
 import com.learning.billbuddy.views.authentication.Login;
-import com.learning.billbuddy.views.home.AboutUsActivity;
+import com.learning.billbuddy.views.faq.FAQPage;
+import com.learning.billbuddy.views.aboutus.AboutUsPage;
 import com.learning.billbuddy.views.home.HomePage;
 import com.learning.billbuddy.views.profile.Profile;
 
@@ -50,13 +49,11 @@ public class MainActivity extends AppCompatActivity {
                     bundle.putSerializable("user", currentUserData);
                     selectedFragment.setArguments(bundle);
                 } else if (itemId == R.id.bottom_navigation_about_us) { // go to about us page
-                    Intent intent = new Intent(MainActivity.this, AboutUsActivity.class);
-                    startActivity(intent);
-                    return true;
+                    selectedFragment = new AboutUsPage();
                 } else if (itemId == R.id.bottom_navigation_faq) { // go to FAQ page
-                    Intent intent = new Intent(MainActivity.this, FAQActivity.class);
-                    startActivity(intent);
-                    return true;
+                    selectedFragment = new FAQPage();
+                } else {
+                    selectedFragment = new HomePage();
                 }
 
                 getSupportFragmentManager()
@@ -238,10 +235,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Example for fetching users
-    private void fetchUsers() {
-        User.fetchAllUsers(users -> {
-            Log.d("User", users.toString());
-        });
-    }
 }

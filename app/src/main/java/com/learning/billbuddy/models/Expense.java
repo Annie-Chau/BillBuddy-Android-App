@@ -60,7 +60,8 @@ public class Expense implements Serializable {
                 splits, timestamp, currency, false); // Default value for isReimbursed
     }
 
-    public  Boolean getIsReimbursed() {
+    public Boolean getIsReimbursed() {
+        if (isReimbursed == null) return false;
         return isReimbursed;
     }
 

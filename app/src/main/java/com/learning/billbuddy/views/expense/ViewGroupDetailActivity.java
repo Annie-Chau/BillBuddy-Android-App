@@ -63,7 +63,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
     private LinearLayout viewReimbursement;
     private TextView viewReimbursementTextView;
 
-    @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint({"NotifyDataSetChanged", "ClickableViewAccessibility"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -207,6 +207,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void onSearch() {
         String searchQuery = searchExpense.getText().toString().toLowerCase();
         Log.d("HomePage", "before serach y: " + expenseList.size());
@@ -221,6 +222,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         expenseAdapter.notifyDataSetChanged();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void handleUpdateExpenseRealTime() {
         Expense.fetchAllExpenses(expenses -> {
 
@@ -254,9 +256,12 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
                             Log.d("Expense Change", expenseList.toString());
 
                             if (expenseAdapter.expenseList.isEmpty()) {
+
                                 expenseAdapter.expenseList.addAll(expenseList);
                                 expenseAdapter.notifyDataSetChanged();
+
                             } else if (expenseAdapter.getItemCount() < expenseList.size()) {
+
                                 for (int i = 0; i < expenseList.size(); i++) {
                                     if (i >= expenseAdapter.expenseList.size()) {
                                         expenseAdapter.expenseList.add(expenseList.get(i));
@@ -272,6 +277,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
                                         }
                                     }
                                 }
+
                             } else {
                                 expenseAdapter.expenseList.clear();
                                 expenseAdapter.expenseList.addAll(expenseList);
@@ -302,18 +308,24 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         Double amount = getBalanceAmount(reimbursements);
         if (amount > 0) {
             balanceTextView.setText("You are owed");
+            balanceTextView.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
             balanceAmountTextView.setText("đ" + String.format("%.3f", amount));
             balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_green_background));
             balanceThumbIcon.setImageDrawable(getResources().getDrawable(R.drawable.thumb_up_icon));
+            balanceAmountTextView.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
         } else if (Math.round(amount) < 0) {
             balanceTextView.setText("You owe others");
+            balanceTextView.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
             balanceAmountTextView.setText("đ" + String.format("%.3f", amount));
             balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_red_background));
             balanceThumbIcon.setImageDrawable(getResources().getDrawable(R.drawable.thumb_down_icon));
+            balanceAmountTextView.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
         } else {
             balanceTextView.setText("You are all settled");
+            balanceTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.round_gray));
             balanceAmountTextView.setText("đ0.00");
+            balanceAmountTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             balanceThumbIcon.setVisibility(View.GONE);
         }
     }
