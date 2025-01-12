@@ -403,8 +403,17 @@ public class HomePage extends Fragment {
                 groupAdapter.groupList.sort((group1, group2) -> group2.getCreatedDateLongFormat().compareTo(group1.getCreatedDateLongFormat()));
                 break;
             case "Reimbursement Available":
-                //TODO: Implement this
-                groupAdapter.groupList = currentGroupList;
+                List<Group> availableReimbursementGroups = new ArrayList<>();
+                List<Group> currentGroupList = groupAdapter.groupList;
+                for (Group group : currentGroupList) {
+                    group.getReimbursements(result -> {
+                        if (result.size() > 0) {
+                            availableReimbursementGroups.add(group);
+                            groupAdapter.groupList = availableReimbursementGroups;
+                            groupAdapter.notifyDataSetChanged();
+                        }
+                    });
+                }
                 break;
             default:
                 break;
