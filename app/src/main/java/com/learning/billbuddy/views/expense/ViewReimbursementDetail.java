@@ -1,6 +1,8 @@
 package com.learning.billbuddy.views.expense;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,6 +45,17 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
 
     private TextView headingTextView;
 
+    private Handler handler = new Handler(Looper.getMainLooper(), msg -> {
+        if (msg.what == 1) {
+            updateTotalAmountOwed();
+        }
+        return true;
+    });
+
+    public Handler getHandler() {
+        return handler;
+    }
+
     public ViewReimbursementDetail() {
         // Required empty public constructor
     }
@@ -50,6 +63,7 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
     private Group currentGroup;
 
     private ArrayList<Group.Reimbursement> reimbursementArrayList = new ArrayList<>();
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,7 +87,7 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
                     userMap.put(user.getUserID(), user.getName());
                 }
 
-                reimbursementAdapter = new ReimbursementAdapter(getContext(), currentGroup, reimbursementArrayList, userMap);
+                reimbursementAdapter = new ReimbursementAdapter(getContext(), getHandler(), currentGroup, reimbursementArrayList, userMap);
                 recyclerView = view.findViewById(R.id.reimbursement_recycler_view);
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                 recyclerView.setAdapter(reimbursementAdapter);
@@ -92,6 +106,20 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
         return view;
     }
 
+    private void updateTotalAmountOwed() {
+    Double amount = getBalanceAmount(reimbursementAdapter.reimbursementList);
+    if (amount > 0) {
+        totalAmountOwed.setText("đ" + String.format("%.3f", amount));
+        balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_green_background));
+    } else if (amount < 0) {
+        totalAmountOwed.setText("đ" + String.format("%.3f", amount));
+        balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_red_background));
+    } else {
+        balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.round_gray));
+        totalAmountOwed.setText("đ0.00");
+    }
+}
+
     private void updateReimbursement() {
         currentGroup.getReimbursements(reimbursements -> {
             //sort the reimbursement prioritize the one that are relate to current payerId or payeeId is currentuser
@@ -108,6 +136,7 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
             reimbursementAdapter.reimbursementList.clear();
             reimbursementAdapter.reimbursementList.addAll(reimbursements);
             reimbursementAdapter.notifyDataSetChanged();
+            updateTotalAmountOwed();
         });
     }
 
