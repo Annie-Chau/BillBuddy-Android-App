@@ -40,6 +40,11 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
+    implementation(fileTree(mapOf(
+        "dir" to "src/lib",
+        "include" to listOf("*.aar", "*.jar"),
+        "exclude" to listOf("")
+    )))
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -48,7 +53,7 @@ dependencies {
     implementation(libs.play.services.auth)
 
     // Firebase Authentication
-    implementation("com.google.firebase:firebase-auth:22.0.0")
+    implementation("com.google.firebase:firebase-auth:23.1.0")
 
     // Google Sign-In
     implementation(libs.play.services.auth.v2050)
@@ -58,5 +63,9 @@ dependencies {
     annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation ("com.android.support:cardview-v7:26.0.0")
+
+    // Zalo
+    implementation(libs.okhttp)
+    implementation(libs.commons.codec)
 
 }

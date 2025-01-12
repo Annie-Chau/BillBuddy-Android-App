@@ -88,7 +88,7 @@ public class Login extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = firebaseAuth.getCurrentUser();
-                        Toast.makeText(Login.this, "Welcome back, " + (user != null ? user.getEmail() : "User") + "!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Login.this, "Welcome, " + (user != null ? user.getEmail() : "User") + "!", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(Login.this, MainActivity.class);
                         startActivity(intent);
                         finish();
