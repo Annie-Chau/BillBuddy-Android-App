@@ -5,8 +5,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,7 +16,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.learning.billbuddy.R;
 import com.learning.billbuddy.adapters.ReimbursementAdapter;
-import com.learning.billbuddy.models.Expense;
 import com.learning.billbuddy.models.Group;
 import com.learning.billbuddy.models.User;
 
@@ -65,9 +62,9 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
         balanceTotalBackground = view.findViewById(R.id.reimbursement_amount);
 
 
-        User.getUsersBydIds(Objects.requireNonNull(currentGroup.getMemberIDs()), new User.IUsersCallBack() {
+        User.getUsersByIds(Objects.requireNonNull(currentGroup.getMemberIDs()), new User.IUsersCallBack() {
             @Override
-            public void onSuccess(ArrayList<User> users) {
+            public void onSuccess(List<User> users) {
                 Map<String, String> userMap = new HashMap<>();
                 for (User user : users) {
                     userMap.put(user.getUserID(), user.getName());
@@ -79,11 +76,6 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
                 recyclerView.setAdapter(reimbursementAdapter);
                 updateReimbursement();
                 handleDisplayBalance(reimbursementArrayList);
-            }
-
-            @Override
-            public void onFailure(String error) {
-
             }
         });
 

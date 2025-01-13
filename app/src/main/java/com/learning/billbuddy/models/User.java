@@ -2,23 +2,18 @@ package com.learning.billbuddy.models;
 
 import android.util.Log;
 
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
+import androidx.annotation.NonNull;
+
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.learning.billbuddy.interfaces.IResponseCallback;
 import com.learning.billbuddy.utils.UserCallback;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class User implements Serializable {
@@ -30,15 +25,15 @@ public class User implements Serializable {
     private String profilePictureURL; // URL from Firebase storage
     private String registrationMethod; // Enum{"Facebook", "Google", "Email", "Phone number"}
     private List<String> notificationIds;
+    private boolean isPremium;
 
     // No-argument constructor
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-
     // Constructor
-    public User(String userID, String name, String email, String phoneNumber, String profilePictureURL, String registrationMethod, List<String> notificationIds) {
+    public User(String userID, String name, String email, String phoneNumber, String profilePictureURL, String registrationMethod, List<String> notificationIds, Boolean isPremium) {
         this.userID = userID;
         this.name = name;
         this.email = email;
@@ -46,6 +41,7 @@ public class User implements Serializable {
         this.profilePictureURL = profilePictureURL;
         this.registrationMethod = registrationMethod;
         this.notificationIds = notificationIds;
+        this.isPremium = isPremium;
     }
 
     // Getters and setters
@@ -105,23 +101,12 @@ public class User implements Serializable {
         this.notificationIds = notificationIds;
     }
 
-    // Methods
-    public void register() {
-        // Implement registration logic here
-        // This might involve interacting with Firebase Authentication
+    public boolean isPremium() {
+        return isPremium;
     }
 
-    public void login() {
-        // Implement login logic here
-        // This might involve interacting with Firebase Authentication
-    }
-
-    public void joinGroup() {
-        // Implement join group logic here
-    }
-
-    public void sendMessage() {
-        // Implement send message logic here
+    public void setPremium(boolean premium) {
+        isPremium = premium;
     }
 
     public static void fetchAllUsers(final UserCallback callback) {
@@ -146,7 +131,8 @@ public class User implements Serializable {
                                     document.getString("phoneNumber"),
                                     document.getString("profilePictureURL"),
                                     document.getString("registrationMethod"),
-                                    (List<String>) document.get("notificationIds")
+                                    (List<String>) document.get("notificationIds"),
+                                    document.getBoolean("isPremium")
                             ));
                         }
                     }
@@ -156,7 +142,7 @@ public class User implements Serializable {
     }
 
     // Method to create a new user
-    public static void createUser(String userID, String name, String email, String phoneNumber, String profilePictureURL, String registrationMethod, List<String> notificationIds) {
+    public static void createUser(String userID, String name, String email, String phoneNumber, String profilePictureURL, String registrationMethod, List<String> notificationIds, boolean isPremium) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Create a new User object
@@ -168,6 +154,7 @@ public class User implements Serializable {
         userData.put("profilePictureURL", profilePictureURL);
         userData.put("registrationMethod", registrationMethod);
         userData.put("notificationIds", notificationIds);
+        userData.put("isPremium", isPremium);
 
         // Add the new user to the "users" collection in Firestore
         db.collection("users")
@@ -198,17 +185,13 @@ public class User implements Serializable {
                 .collect(Collectors.toList());
     }
 
-    public static void getUsersBydIds(List<String> userIds, IUsersCallBack callback) {
+    public static void getUsersByIds(List<String> userIds, IUsersCallBack callback) {
         fetchAllUsers(users -> {
-            ArrayList<User> result = new ArrayList<>();
-            for (User user : users) {
-                if (userIds.contains(user.getUserID())) {
-                    result.add(user);
-                }
-            }
+            List<User> result = users.stream()
+                    .filter(user -> userIds.contains(user.getUserID()))
+                    .collect(Collectors.toList());
             callback.onSuccess(result);
         });
-
     }
 
     public void getNumberOfGroupPossessed(final GroupCountCallback callback) {
@@ -236,11 +219,10 @@ public class User implements Serializable {
     }
 
     public interface IUsersCallBack {
-        void onSuccess(ArrayList<User> users);
-
-        void onFailure(String error);
+        void onSuccess(List<User> users);
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "User{" +
@@ -251,6 +233,7 @@ public class User implements Serializable {
                 ", profilePictureURL='" + profilePictureURL + '\'' +
                 ", registrationMethod='" + registrationMethod + '\'' +
                 ", notificationIds=" + notificationIds +
+                ", isPremium=" + isPremium +
                 '}';
     }
 }

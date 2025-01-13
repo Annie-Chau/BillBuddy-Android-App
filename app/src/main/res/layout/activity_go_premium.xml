@@ -44,16 +44,16 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#FFFFFF"
-        android:padding="16dp"
+        android:background="@android:color/transparent"
+        android:paddingHorizontal="16dp"
         android:layout_marginTop="10dp"
         app:layout_constraintTop_toBottomOf="@id/top_bar"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="15dp"
         >
 
         <LinearLayout
@@ -119,147 +119,143 @@
             </LinearLayout>
 
             <!-- Subscription Options -->
+
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_height="160dp"
                 android:layout_marginTop="24dp"
-                android:weightSum="3">
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingHorizontal="5dp"
+                android:weightSum="2">
+
+                <!--                <LinearLayout-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:layout_marginStart="8dp"-->
+<!--                    android:layout_marginEnd="8dp"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:background="@drawable/bg_subscription_card_2"-->
+<!--                    android:orientation="vertical"-->
+<!--                    android:padding="12dp">-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="£1375"-->
+<!--                        android:textColor="#000000"-->
+<!--                        android:textSize="16sp"-->
+<!--                        android:textStyle="bold" />-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginTop="4dp"-->
+<!--                        android:text="per week"-->
+<!--                        android:textColor="#555555"-->
+<!--                        android:textSize="14sp" />-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginTop="4dp"-->
+<!--                        android:text="then £1099 per year"-->
+<!--                        android:textColor="#888888"-->
+<!--                        android:textSize="12sp" />-->
+
+<!--                </LinearLayout>-->
 
                 <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/free_plan"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:orientation="vertical"
                     android:background="@drawable/bg_subscription_card"
+                    android:orientation="vertical"
                     android:padding="12dp">
 
                     <TextView
+                        android:id="@+id/free_plan_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Free"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
-                        android:textColor="@color/white" />
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/free_plan_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="7 days trial"
                         android:layout_marginTop="4dp"
-                        android:textSize="14sp"
-                        android:textColor="@color/white" />
+                        android:text="Limited to 6 groups"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="then £1099 per year"
-                        android:layout_marginTop="4dp"
-                        android:textSize="12sp"
-                        android:textColor="@color/white" />
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_subscription_card_2"
-                    android:padding="12dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="£1375"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
-                        android:textColor="#000000" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="per week"
-                        android:layout_marginTop="4dp"
-                        android:textSize="14sp"
-                        android:textColor="#555555" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="then £1099 per year"
-                        android:layout_marginTop="4dp"
-                        android:textSize="12sp"
-                        android:textColor="#888888" />
-
-                </LinearLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp"/>
 
                 <FrameLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    >
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
 
                     <LinearLayout
+                        android:id="@+id/premium_plan"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_subscription_card"
                         android:orientation="vertical"
-                        android:background="@drawable/bg_subscription_card_2"
                         android:padding="12dp">
 
                         <TextView
+                            android:id="@+id/premium_plan_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="£537"
-                            android:textStyle="bold"
-                            android:textSize="16sp"
-                            android:textColor="#000000" />
+                            android:text="VND 43.000"
+                            android:textColor="#000000"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/premium_plan_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="per week"
                             android:layout_marginTop="4dp"
-                            android:textSize="14sp"
-                            android:textColor="#555555" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="then £1099 per year"
-                            android:layout_marginTop="4dp"
-                            android:textSize="12sp"
-                            android:textColor="#888888" />
+                            android:text="for the first month. Unlimited group creation"
+                            android:textColor="#888888"
+                            android:textSize="14sp" />
 
                     </LinearLayout>
 
                     <FrameLayout
+                        android:id="@+id/premium_plan_offer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="top|end"
-                        android:layout_marginRight="4dp"
                         android:layout_marginTop="-4dp"
+                        android:layout_marginEnd="6dp"
                         >
 
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:src="@drawable/bookmark_filled"
-                            app:tint="@color/primary"
-                            />
+                            app:tint="@color/primary" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="24%\nOFF"
+                            android:layout_gravity="top|center"
+                            android:layout_marginTop="6dp"
                             android:fontFamily="@font/leaguespartanbold"
+                            android:text="24%\nOFF"
                             android:textAlignment="center"
                             android:textColor="@color/white"
-                            android:layout_marginTop="5dp"
-                            android:layout_gravity="top|center"
-                            android:textSize="10sp"
-                            />
+                            android:textSize="14sp" />
 
                     </FrameLayout>
 
@@ -267,45 +263,44 @@
 
             </LinearLayout>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:textAlignment="center"
-                android:fontFamily="@font/notosansregular"
-                android:text="Try premium 7 days for free"
-                android:textSize="12.5sp"
-                android:letterSpacing="0.1"
-                />
+                android:orientation="vertical"
+                android:layout_marginTop="24dp">
 
-            <!-- Select Package Button -->
-            <Button
-                android:id="@+id/selectPackageButton"
-                android:layout_gravity="center"
-                android:layout_width="300dp"
-                android:layout_height="70dp"
-                android:layout_marginTop="5dp"
-                android:backgroundTint="@color/primary"
-                android:text="Select this package"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/try_premium_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
 
-            <!-- Restore Premium Button -->
-            <Button
-                android:id="@+id/restorePremiumButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="12dp"
-                android:background="@android:color/transparent"
-                android:text="Restore Premium"
-                android:textColor="@color/primary" />
+                    android:textAlignment="center"
+                    android:fontFamily="@font/notosansregular"
+                    android:text="Try premium 7 days for free"
+                    android:textSize="12.5sp"
+                    android:letterSpacing="0.1"
+                    />
+
+                <!-- Select Package Button -->
+                <Button
+                    android:id="@+id/selectPackageButton"
+                    android:layout_gravity="center"
+                    android:layout_width="300dp"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/round_background"
+                    android:backgroundTint="@color/primary"
+                    android:text="Select this package"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
             <!-- Footer Text -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="16dp"
                 android:text="Terms and conditions apply"
                 android:textSize="12sp"
                 android:textColor="#888888"
