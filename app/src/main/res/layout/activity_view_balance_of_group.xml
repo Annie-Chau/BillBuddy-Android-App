@@ -156,6 +156,7 @@
             android:orientation="vertical"
             android:paddingHorizontal="16dp">
 
+
             <EditText
                 android:id="@+id/search_expense"
                 android:layout_width="match_parent"

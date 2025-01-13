@@ -162,6 +162,10 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         setupGroupListener();
         expenseRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
+        // Set up search listener
+        setupSearchListener();
+        // Load initial data
+        loadExpenses();
     }
 
     private void navigateToEditGroupInfo() {
@@ -218,6 +222,64 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Set up the TextWatcher for real-time search.
+     */
+    private void setupSearchListener() {
+        searchExpense.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not needed
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Not needed
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                onSearch(s.toString());
+            }
+        });
+    }
+
+    /**
+     * Perform the search and update the RecyclerView.
+     *
+     * @param query The search query entered by the user.
+     */
+    @SuppressLint("NotifyDataSetChanged")
+    private void onSearch(String query) {
+        String searchQuery = query.trim().toLowerCase();
+
+        if (searchQuery.isEmpty()) {
+            // Reset to the full list
+            expenseAdapter.expenseList = expenseList;
+        } else {
+            // Filter the expenses
+            expenseAdapter.expenseList = expenseList.stream()
+                    .filter(expense -> expense.isQualifyForSearch(searchQuery))
+                    .collect(Collectors.toList());
+        }
+        expenseAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Load expenses and set up the initial list.
+     */
+    private void loadExpenses() {
+        Expense.fetchAllExpenses(allExpenses -> {
+            // Filter expenses belonging to the current group
+            expenseList = allExpenses.stream()
+                    .filter(expense -> currentGroup.getExpenseIDs().contains(expense.getExpenseID()))
+                    .collect(Collectors.toList());
+
+            // Update adapter and UI
+            expenseAdapter.expenseList = expenseList;
+            expenseAdapter.notifyDataSetChanged();
+        });
+    }
 
     private void navigateToChatBox() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -353,44 +415,9 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
             Log.d("ViewGroupDetail", "Expense list updated in real-time: " + expenseList.size() + " items");
         });
 
-        // Good
-//        Expense.fetchAllExpenses(allExpenses -> {
-//            // Filter only expenses belonging to this group
-//            List<Expense> updatedExpenseList = allExpenses.stream()
-//                    .filter(expense -> currentGroup.getExpenseIDs().contains(expense.getExpenseID()))
-//                    .sorted((expense1, expense2) -> {
-//                        int dateComparison = expense2.getCreatedTime().compareTo(expense1.getTimestamp());
-//                        if (dateComparison != 0) {
-//                            return dateComparison;
-//                        }
-//                        return Long.compare(expense2.getCreatedTime().getTime(), expense1.getCreatedTime().getTime());
-//                    })
-//                    .collect(Collectors.toList());
-//
-//            // Check if a new expense is added
-//            boolean isNewExpenseAdded = updatedExpenseList.size() > expenseList.size();
-//
-//            // Clear + add new data
-//            expenseList.clear();
-//            expenseList.addAll(updatedExpenseList);
-//
-//            if (isNewExpenseAdded) {
-//                // Notify adapter of the new item and scroll to its position
-//                int newExpensePosition = 0; // New expense will be at the top
-//                expenseAdapter.notifyItemInserted(newExpensePosition);
-//                expenseRecyclerView.scrollToPosition(newExpensePosition);
-//            } else {
-//                // Notify adapter of data changes
-//                expenseAdapter.notifyDataSetChanged();
-//            }
-//
-//            Log.d("ViewGroupDetail", "Expense list updated in real-time: " + expenseList.size() + " items");
-//        });
-
-
         updateGroupReimbursements();
 
-        if (balanceListAdapter != null) {
+        if(balanceListAdapter != null) {
             balanceListAdapter.notifyDataSetChanged();
         }
 
@@ -462,7 +489,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
     private void updateGroupReimbursements() {
         // Update the current group with the new data
         currentGroup.getReimbursements(reimbursements -> {
-            if (balanceListAdapter == null) {
+            if(balanceListAdapter == null) {
                 balanceListAdapter = new BalanceListAdapter(this, currentGroup, reimbursements);
                 balanceListRecyclerView.setAdapter(balanceListAdapter);
             } else {
