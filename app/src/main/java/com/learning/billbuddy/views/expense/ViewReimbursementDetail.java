@@ -2,12 +2,15 @@ package com.learning.billbuddy.views.expense;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -38,6 +41,17 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
     private TextView balanceTotalBackground;
 
     private TextView headingTextView;
+
+    private Handler handler = new Handler(Looper.getMainLooper(), msg -> {
+        if (msg.what == 1) {
+            updateTotalAmountOwed();
+        }
+        return true;
+    });
+
+    public Handler getHandler() {
+        return handler;
+    }
 
     public ViewReimbursementDetail() {
         // Required empty public constructor
@@ -88,6 +102,31 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
     }
 
     @SuppressLint("NotifyDataSetChanged")
+    private void updateTotalAmountOwed() {
+        // Check if the fragment is attached before accessing resources
+        if (!isAdded()) {
+            Log.e("ViewReimbursementDetail", "Fragment not attached. Skipping updateTotalAmountOwed.");
+            return;
+        }
+
+        try {
+            Double amount = getBalanceAmount(reimbursementAdapter.reimbursementList);
+            if (amount > 0) {
+                totalAmountOwed.setText("đ" + String.format("%.3f", amount));
+                balanceTotalBackground.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_green_background));
+            } else if (amount < 0) {
+                totalAmountOwed.setText("đ" + String.format("%.3f", amount));
+                balanceTotalBackground.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_red_background));
+            } else {
+                balanceTotalBackground.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.round_gray));
+                totalAmountOwed.setText("đ0.00");
+            }
+        } catch(Exception e) {
+            Log.e("ViewReimbursementDetail", "Error updating total amount owed: ", e);
+        }
+
+    }
+
     private void updateReimbursement() {
         currentGroup.getReimbursements(reimbursements -> {
             //sort the reimbursement prioritize the one that are relate to current payerId or payeeId is currentuser
@@ -104,6 +143,7 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
             reimbursementAdapter.reimbursementList.clear();
             reimbursementAdapter.reimbursementList.addAll(reimbursements);
             reimbursementAdapter.notifyDataSetChanged();
+            updateTotalAmountOwed();
         });
     }
 

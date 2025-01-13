@@ -1,6 +1,7 @@
 package com.learning.billbuddy.adapters;
 
 import android.content.Context;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.learning.billbuddy.R;
 import com.learning.billbuddy.models.Expense;
 import com.learning.billbuddy.models.Group;
+import com.learning.billbuddy.views.expense.ViewReimbursementDetail;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,6 +27,7 @@ import java.util.Map;
 public class ReimbursementAdapter extends RecyclerView.Adapter<ReimbursementAdapter.ReimbursementViewHolder> {
 
     private final Context context;
+    private final Handler handler;
 
     private FirebaseUser currentUser;
     public List<Group.Reimbursement> reimbursementList;
@@ -33,8 +36,9 @@ public class ReimbursementAdapter extends RecyclerView.Adapter<ReimbursementAdap
 
     private Group group;
 
-    public ReimbursementAdapter(Context context, Group group, List<Group.Reimbursement> reimbursementList, Map<String, String> userMap) {
+    public ReimbursementAdapter(Context context, Handler handler, Group group, List<Group.Reimbursement> reimbursementList, Map<String, String> userMap) {
         this.context = context;
+        this.handler = handler;
         this.reimbursementList = reimbursementList;
         this.currentUser = FirebaseAuth.getInstance().getCurrentUser();
         this.userMap = userMap;
@@ -108,6 +112,7 @@ public class ReimbursementAdapter extends RecyclerView.Adapter<ReimbursementAdap
                     true
             );
             notifyDataSetChanged();
+            handler.sendEmptyMessage(1);
         });
     }
 
