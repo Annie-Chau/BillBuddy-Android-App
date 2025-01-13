@@ -95,7 +95,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
-                android:id="@+id/rename_button"
+                android:id="@+id/edit_group_button"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginStart="3dp"
