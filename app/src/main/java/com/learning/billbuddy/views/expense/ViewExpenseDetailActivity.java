@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -23,6 +24,7 @@ import com.learning.billbuddy.models.User;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class ViewExpenseDetailActivity extends AppCompatActivity {
 
@@ -50,6 +52,13 @@ public class ViewExpenseDetailActivity extends AppCompatActivity {
         topheading = findViewById(R.id.expense_detail_top_heading);
         bottomHeading = findViewById(R.id.expense_detail_bottom_heading);
 
+        User.fetchAllUsers(users -> {
+            users.stream()
+                    .filter(user -> Objects.equals(user.getUserID(), Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()))
+                    .findFirst()
+                    .ifPresent(user -> findViewById(R.id.premium_text)
+                            .setVisibility(user.isPremium() ? View.VISIBLE : View.GONE));
+        });
 
         currentExpense = (Expense) getIntent().getSerializableExtra("expense");
 

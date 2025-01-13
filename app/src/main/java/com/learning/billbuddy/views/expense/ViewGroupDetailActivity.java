@@ -7,10 +7,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -19,7 +16,6 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,11 +24,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.learning.billbuddy.ChatBoxActivity;
 import com.learning.billbuddy.EditGroupInfoActivity;
@@ -41,6 +33,7 @@ import com.learning.billbuddy.adapters.BalanceListAdapter;
 import com.learning.billbuddy.adapters.ExpenseAdapter;
 import com.learning.billbuddy.models.Expense;
 import com.learning.billbuddy.models.Group;
+import com.learning.billbuddy.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +66,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setNavigationBarColor(getResources().getColor(R.color.background));
-        setContentView(R.layout.activity_view_balance_of_group);
+        setContentView(R.layout.activity_view_group_detail);
 
         // Initialize UI elements
         segmentGroup = findViewById(R.id.segment_button_group);
@@ -106,6 +99,13 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         findViewById(R.id.expense_content).setVisibility(View.VISIBLE);
         findViewById(R.id.balance_content).setVisibility(View.GONE);
 
+        User.fetchAllUsers(users -> {
+            users.stream()
+                    .filter(user -> Objects.equals(user.getUserID(), Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()))
+                    .findFirst()
+                    .ifPresent(user -> findViewById(R.id.premium_text)
+                            .setVisibility(user.isPremium() ? View.VISIBLE : View.GONE));
+        });
 
         currentGroup.getReimbursements(this::handleDisplayBalance);
 

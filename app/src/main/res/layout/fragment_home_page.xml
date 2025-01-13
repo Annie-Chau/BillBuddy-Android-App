@@ -18,13 +18,35 @@
             android:layout_marginBottom="16dp"
             android:orientation="horizontal">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/kavoon"
-                android:text="BillBuddy"
-                android:textColor="@color/primary"
-                android:textSize="24sp" />
+                android:orientation="horizontal"
+                android:gravity="end"
+                android:layout_gravity="end"
+                android:layout_marginEnd="10dp"
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/kavoon"
+                    android:text="BillBuddy"
+                    android:textColor="@color/primary"
+                    android:textSize="30sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/premium_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Premium"
+                    android:fontFamily="@font/leaguespartanbold"
+                    android:layout_marginStart="5dp"
+                    android:textSize="20sp"
+                    />
+
+            </LinearLayout>
 
             <View
                 android:layout_width="0dp"

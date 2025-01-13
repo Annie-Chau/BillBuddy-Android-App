@@ -37,6 +37,14 @@ public class GoPremiumActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_go_premium);
 
+        User.fetchAllUsers(users -> {
+            users.stream()
+                    .filter(user -> Objects.equals(user.getUserID(), Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()))
+                    .findFirst()
+                    .ifPresent(user -> findViewById(R.id.premium_text)
+                            .setVisibility(user.isPremium() ? View.VISIBLE : View.GONE));
+        });
+
         StrictMode.ThreadPolicy policy = new
                 StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
