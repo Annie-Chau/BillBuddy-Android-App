@@ -320,31 +320,36 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
                     })
                     .collect(Collectors.toList());
 
-            // Clear the list and update the adapter
-            expenseList.clear();
-            expenseList.addAll(updatedExpenseList);
-            expenseAdapter.notifyDataSetChanged();
+            if (expenseAdapter.expenseList.isEmpty()) {
+                expenseAdapter.expenseList.addAll(updatedExpenseList);
+                expenseAdapter.notifyDataSetChanged();
+            } else {
+                Log.d("ViewGroupDetail", "expenseAdapter.expenseList.size() " + expenseAdapter.expenseList.size());
+                Log.d("ViewGroupDetail", "updatedExpenseList.size() " + updatedExpenseList.size());
+                if (expenseAdapter.expenseList.size() < updatedExpenseList.size()) {
+                    Log.d("ViewGroupDetail", "New expense added!");
+                    for (int i = 0; i < expenseAdapter.expenseList.size(); i++) {
+                        if (!expenseAdapter.expenseList.get(i).getExpenseID().equals(updatedExpenseList.get(i).getExpenseID())) {
+                            Log.d("ViewGroupDetail", "New expense added: " + updatedExpenseList.get(i).getTitle());
+                            expenseAdapter.expenseList.add(i, updatedExpenseList.get(i));
+                            expenseAdapter.notifyItemInserted(i);
+                            if (i < expenseAdapter.expenseList.size() - 1) {
+                                expenseAdapter.notifyItemChanged(i + 1);
+                            }
+                            expenseRecyclerView.scrollToPosition(i);
+                            return;
+                        }
+                    }
 
-//            // Check for newly added expenses
-//            if (expenseList.isEmpty()) {
-//                expenseList.addAll(updatedExpenseList);
-//                expenseAdapter.notifyDataSetChanged();
-//            } else {
-//                int newItemsCount = 0;
-//                for (int i = 0; i < updatedExpenseList.size(); i++) {
-//                    if (!expenseList.contains(updatedExpenseList.get(i))) {
-//                        expenseList.add(i, updatedExpenseList.get(i));
-//                        expenseAdapter.notifyItemInserted(i);
-//                        newItemsCount++;
-//                    }
-//                }
-//
-//                // Ensure that the animation works correctly and scroll to the newly added item
-//                if (newItemsCount > 0) {
-//                    expenseRecyclerView.scrollToPosition(0);
-//                }
-//            }
-
+                    expenseAdapter.expenseList.add(updatedExpenseList.get(expenseAdapter.expenseList.size() - 1));
+                    expenseAdapter.notifyItemInserted(expenseAdapter.expenseList.size() - 1);
+                    expenseRecyclerView.scrollToPosition(expenseAdapter.expenseList.size() - 1);
+                } else {
+                    expenseAdapter.expenseList.clear();
+                    expenseAdapter.expenseList.addAll(updatedExpenseList);
+                    expenseAdapter.notifyDataSetChanged();
+                }
+            }
             Log.d("ViewGroupDetail", "Expense list updated in real-time: " + expenseList.size() + " items");
         });
 
@@ -385,7 +390,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
 
         updateGroupReimbursements();
 
-        if(balanceListAdapter != null) {
+        if (balanceListAdapter != null) {
             balanceListAdapter.notifyDataSetChanged();
         }
 
@@ -393,6 +398,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
 
     /**
      * Handle updates to the expense list with animations.
+     *
      * @param updatedExpenseList The updated list of expenses.
      */
     @SuppressLint("NotifyDataSetChanged")
@@ -456,7 +462,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
     private void updateGroupReimbursements() {
         // Update the current group with the new data
         currentGroup.getReimbursements(reimbursements -> {
-            if(balanceListAdapter == null) {
+            if (balanceListAdapter == null) {
                 balanceListAdapter = new BalanceListAdapter(this, currentGroup, reimbursements);
                 balanceListRecyclerView.setAdapter(balanceListAdapter);
             } else {
