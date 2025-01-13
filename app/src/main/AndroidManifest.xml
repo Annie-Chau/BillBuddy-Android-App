@@ -17,8 +17,8 @@
         android:theme="@style/Theme.BillBuddy"
         tools:targetApi="31">
         <activity
-            android:name=".EditGroupInfoActivity"
-            android:exported="true"/>
+            android:name=".GoPremiumActivity"
+            android:exported="false" />
         <activity
             android:name=".views.aboutus.AboutUsPage"
             android:exported="true" />
@@ -38,6 +38,9 @@
             android:name=".views.authentication.Login"
             android:exported="false" />
         <activity
+            android:name=".PaymentNotificationActivity"
+            android:exported="false" />
+        <activity
             android:name=".ChatBoxActivity"
             android:exported="true" />
         <activity
@@ -45,7 +48,6 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

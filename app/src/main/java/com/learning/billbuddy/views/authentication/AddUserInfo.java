@@ -1,5 +1,6 @@
 package com.learning.billbuddy.views.authentication;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -53,6 +54,7 @@ public class AddUserInfo extends AppCompatActivity {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,20 +115,23 @@ public class AddUserInfo extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        if (userAuth.getPhotoUrl() == null) {
-            if (currentUser != null) {
-                userAvatarText.setText(currentUser.getName().substring(0, 1));
-                userAvatarText.setVisibility(View.VISIBLE);
-                userAvatar.setVisibility(View.GONE);
-            } else {
+        if (currentUser != null) {
+            if (userAuth != null){
+                if (userAuth.getPhotoUrl() == null) {
+                    userAvatarText.setText(currentUser.getName().substring(0, 1));
+                    userAvatarText.setVisibility(View.VISIBLE);
+                    userAvatar.setVisibility(View.GONE);
+                } else {
+                    userAvatarText.setVisibility(View.GONE);
+                    userAvatar.setVisibility(View.VISIBLE);
+                    Glide.with(this).load(userAuth.getPhotoUrl()).circleCrop().into(userAvatar);
+                }
+            }
+             else {
                 userAvatarText.setVisibility(View.GONE);
                 userAvatar.setVisibility(View.VISIBLE);
                 userAvatar.setImageDrawable(getDrawable(R.drawable.person_icon));
             }
-        } else {
-            userAvatarText.setVisibility(View.GONE);
-            userAvatar.setVisibility(View.VISIBLE);
-            Glide.with(this).load(userAuth.getPhotoUrl()).circleCrop().into(userAvatar);
         }
 
         // Change the avatar of the user
@@ -177,14 +182,15 @@ public class AddUserInfo extends AppCompatActivity {
                     userId,
                     nameInput.getText().toString(),
                     phoneInput.getText().toString(),
-                    "XXX");
+                    "");
             Toast.makeText(AddUserInfo.this, "User updated successfully!", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(AddUserInfo.this, MainActivity.class);
             startActivity(intent);
             finish();
 
         } else {
-            User.createUser(userId, name, email, phone, userAuth.getPhotoUrl().toString(), registrationMethod, new ArrayList<>());
+            String photoUrl = (userAuth != null ? Objects.requireNonNull(userAuth.getPhotoUrl()).toString() : "");
+            User.createUser(userId, name, email, phone, photoUrl, registrationMethod, new ArrayList<>(), false);
             Toast.makeText(AddUserInfo.this, "User created successfully!", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(AddUserInfo.this, Objects.equals(registrationMethod, "Google Account") ? MainActivity.class : Login.class);
             startActivity(intent);

@@ -19,13 +19,13 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.learning.billbuddy.views.authentication.AddUserInfo;
 import com.learning.billbuddy.R;
 import com.learning.billbuddy.models.User;
+import com.learning.billbuddy.views.authentication.AddUserInfo;
 import com.learning.billbuddy.views.authentication.Login;
+import com.learning.billbuddy.GoPremiumActivity;
 
 public class Profile extends Fragment {
-
 
     private ImageView profileImage;
     private TextView profileImageTextView;
@@ -40,7 +40,6 @@ public class Profile extends Fragment {
 
     private User currentUser;
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -49,6 +48,12 @@ public class Profile extends Fragment {
 
         Button logoutButton = view.findViewById(R.id.profile_logout_button);
         logoutButton.setOnClickListener(v -> logout());
+
+        Button topUpButton = view.findViewById(R.id.top_up_button);
+        topUpButton.setOnClickListener(v -> {
+            Intent intent = new Intent(requireActivity(), GoPremiumActivity.class);
+            startActivity(intent);
+        });
 
         FirebaseUser userAuth = FirebaseAuth.getInstance().getCurrentUser();
 

@@ -56,7 +56,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="12dp"
                 android:fontFamily="@font/archivo_variable"
-                android:text="đ500,000.00"
+                android:text="VND 500,000.00"
                 android:textColor="@color/black"
                 android:textSize="24sp"
                 android:textStyle="bold" />

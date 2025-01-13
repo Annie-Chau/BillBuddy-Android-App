@@ -31,6 +31,7 @@ import com.learning.billbuddy.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class HomePage extends Fragment {
@@ -81,6 +82,15 @@ public class HomePage extends Fragment {
         groupAdapter = new GroupAdapter(requireContext(), currentGroupList);
         groupRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         groupRecyclerView.setAdapter(groupAdapter);
+
+        User.fetchAllUsers(users -> {
+            users.stream()
+                    .filter(user -> Objects.equals(user.getUserID(), Objects.requireNonNull(mAuth.getCurrentUser()).getUid()))
+                    .findFirst()
+                    .ifPresent(user -> view.findViewById(R.id.premium_text)
+                            .setVisibility(user.isPremium() ? View.VISIBLE : View.GONE));
+        });
+
 
         setupRealTimeGroupUpdates();
 

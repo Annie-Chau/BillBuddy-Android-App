@@ -7,10 +7,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -19,7 +16,6 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,11 +24,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.learning.billbuddy.ChatBoxActivity;
 import com.learning.billbuddy.EditGroupInfoActivity;
@@ -41,6 +33,7 @@ import com.learning.billbuddy.adapters.BalanceListAdapter;
 import com.learning.billbuddy.adapters.ExpenseAdapter;
 import com.learning.billbuddy.models.Expense;
 import com.learning.billbuddy.models.Group;
+import com.learning.billbuddy.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +64,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setNavigationBarColor(getResources().getColor(R.color.background));
-        setContentView(R.layout.activity_view_balance_of_group);
+        setContentView(R.layout.activity_view_group_detail);
 
         // Initialize UI elements
         segmentGroup = findViewById(R.id.segment_button_group);
@@ -94,10 +87,8 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         searchExpense = findViewById(R.id.search_expense);
         db = FirebaseFirestore.getInstance();
 
-
         balanceListRecyclerView = findViewById(R.id.balance_list_recycler_view);
         balanceListRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
 
         // Retrieve data from Intent
         currentGroup = (Group) getIntent().getSerializableExtra("group");
@@ -106,10 +97,15 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         findViewById(R.id.expense_content).setVisibility(View.VISIBLE);
         findViewById(R.id.balance_content).setVisibility(View.GONE);
 
-
-        currentGroup.getReimbursements(reimbursements -> {
-            handleDisplayBalance(reimbursements);
+        User.fetchAllUsers(users -> {
+            users.stream()
+                    .filter(user -> Objects.equals(user.getUserID(), Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()))
+                    .findFirst()
+                    .ifPresent(user -> findViewById(R.id.premium_text)
+                            .setVisibility(user.isPremium() ? View.VISIBLE : View.GONE));
         });
+
+        currentGroup.getReimbursements(this::handleDisplayBalance);
 
         // Set data to views
         groupNameTextView.setText(currentGroup.getName());
@@ -148,10 +144,15 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         // Set onClick for viewReimbursement
         viewReimbursement.setOnClickListener(v -> {
             ViewReimbursementDetail bottomSheet = new ViewReimbursementDetail();
-            Bundle args = new Bundle();
-            args.putSerializable("group", currentGroup);
-            bottomSheet.setArguments(args);
-            bottomSheet.show(ViewGroupDetailActivity.this.getSupportFragmentManager(), "ViewReimbursementDetail");
+            currentGroup.getReimbursements(reimbursements -> {
+                Double amount = getBalanceAmount(reimbursements);
+                Log.d("amount", String.valueOf(amount));
+                Bundle args = new Bundle();
+                args.putSerializable("group", currentGroup);
+                args.putDouble("amount", amount);
+                bottomSheet.setArguments(args);
+                bottomSheet.show(ViewGroupDetailActivity.this.getSupportFragmentManager(), "ViewReimbursementDetail");
+            });
         });
 
         updateGroupInfoButton.setOnClickListener(v -> navigateToEditGroupInfo());
@@ -284,19 +285,20 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
     }
 
 
+    @SuppressLint({"DefaultLocale", "SetTextI18n", "UseCompatLoadingForDrawables"})
     private void handleDisplayBalance(List<Group.Reimbursement> reimbursements) {
         Double amount = getBalanceAmount(reimbursements);
         if (amount > 0) {
             balanceTextView.setText("You are owed");
             balanceTextView.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
-            balanceAmountTextView.setText("đ" + String.format("%.3f", amount));
+            balanceAmountTextView.setText("VND " + String.format("%.2f", amount));
             balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_green_background));
             balanceThumbIcon.setImageDrawable(getResources().getDrawable(R.drawable.thumb_up_icon));
             balanceAmountTextView.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
         } else if (Math.round(amount) < 0) {
             balanceTextView.setText("You owe others");
             balanceTextView.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
-            balanceAmountTextView.setText("đ" + String.format("%.3f", amount));
+            balanceAmountTextView.setText("VND " + String.format("%.2f", Math.abs(amount)));
             balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_red_background));
             balanceThumbIcon.setImageDrawable(getResources().getDrawable(R.drawable.thumb_down_icon));
             balanceAmountTextView.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
@@ -304,7 +306,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
             balanceTextView.setText("You are all settled");
             balanceTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.round_gray));
-            balanceAmountTextView.setText("đ0.00");
+            balanceAmountTextView.setText("VND 0.00");
             balanceAmountTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             balanceThumbIcon.setVisibility(View.GONE);
         }
@@ -314,7 +316,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         Double amount = 0.0;
         for (Group.Reimbursement reimbursement : reimbursements) {
-            if (reimbursement.getPayeeId().equals(currentUser.getUid())) {
+            if (reimbursement.getPayeeId().equals(Objects.requireNonNull(currentUser).getUid())) {
                 amount -= reimbursement.getAmount();
             } else if (reimbursement.getPayerId().equals(currentUser.getUid())) {
                 amount += reimbursement.getAmount();
@@ -322,7 +324,6 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         }
 
         return amount;
-        // Logic to calculate the amount owed to currentLogin user
     }
 
     private void setupGroupListener() {

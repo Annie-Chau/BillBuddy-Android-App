@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.firebase.Firebase;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -24,10 +26,12 @@ import com.learning.billbuddy.R;
 import com.learning.billbuddy.adapters.MemberAdapter;
 import com.learning.billbuddy.models.Group;
 import com.learning.billbuddy.models.Notification;
+import com.learning.billbuddy.models.User;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class AddGroupBottomSheet extends BottomSheetDialogFragment implements MemberAdapter.OnRemoveClickListener {
@@ -94,7 +98,27 @@ public class AddGroupBottomSheet extends BottomSheetDialogFragment implements Me
         membersRecyclerView.setHasFixedSize(true);
 
         // Set click listeners
-        createButton.setOnClickListener(v -> createGroup());
+        createButton.setOnClickListener(v -> {
+            FirebaseAuth mAuth = FirebaseAuth.getInstance();
+            String currentUserId = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
+
+            User.fetchAllUsers(users -> {
+                users.stream()
+                        .filter(user -> Objects.equals(user.getUserID(), currentUserId))
+                        .findFirst()
+                        .ifPresent(user -> {
+                            if (!user.isPremium()) {
+                                user.getNumberOfGroupPossessed(count -> {
+                                    if (count < 6) {
+                                        createGroup();
+                                    }
+                                    else Toast.makeText(v.getContext(), "You can only create up to 6 groups as a free user. Upgrade to Premium for unlimited groups.", Toast.LENGTH_LONG).show();
+                                });
+                            }
+                        });
+            });
+        });
+
         addMemberButton.setOnClickListener(v -> addMember());
         cancelButton.setOnClickListener(v -> dismiss());
 

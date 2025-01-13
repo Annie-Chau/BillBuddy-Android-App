@@ -37,7 +37,6 @@ public class ViewExpenseParticipantAdapter extends RecyclerView.Adapter<ViewExpe
     @SuppressLint("DefaultLocale")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Log.d("AHAHA", expense.toString());
         Map<String, Double> participant = expense.getSplits().get(position);
 
         holder.participantName.setText(expense.getParticipantNameList(userList).get(position));
