@@ -64,7 +64,7 @@ public class ReimbursementAdapter extends RecyclerView.Adapter<ReimbursementAdap
         holder.reimbursementName.setText(reimbursementName);
 
         // Set the reimbursement amount
-        holder.reimbursementAmount.setText("đ" + String.format("%.3f", reimbursement.getAmount()));
+        holder.reimbursementAmount.setText("VND " + String.format("%.2f", reimbursement.getAmount()));
 
         // Set the other participants
 

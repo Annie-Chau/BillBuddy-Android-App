@@ -41,7 +41,7 @@
         android:fontFamily="@font/archivo_variable"
         android:paddingHorizontal="24dp"
         android:paddingVertical="8dp"
-        android:text="đ420,0000"
+        android:text="VND 420,0000"
         android:textColor="@color/white"
         android:textSize="28sp"
         android:textStyle="bold" />

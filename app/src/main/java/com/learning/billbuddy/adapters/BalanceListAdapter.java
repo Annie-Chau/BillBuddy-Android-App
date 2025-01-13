@@ -86,7 +86,7 @@ public class BalanceListAdapter extends RecyclerView.Adapter<BalanceListAdapter.
             }
 
             holder.accountBalanceMemberName.setText(user.getName() + this.returnStringMeIfMatched(memberId));
-            holder.accountBalanceAmount.setText("đ" + String.format("%.3f", Math.abs(getBalanceAmount(reimbursementList, memberId))));
+            holder.accountBalanceAmount.setText("VND " + String.format("%.2f", Math.abs(getBalanceAmount(reimbursementList, memberId))));
 
             if (getBalanceAmount(reimbursementList, memberId) > 0) {
                 holder.accountBalanceAmount.setTextColor(context.getResources().getColor(R.color.light_green));
