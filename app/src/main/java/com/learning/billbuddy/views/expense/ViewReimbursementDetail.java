@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -107,18 +108,29 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
     }
 
     private void updateTotalAmountOwed() {
-    Double amount = getBalanceAmount(reimbursementAdapter.reimbursementList);
-    if (amount > 0) {
-        totalAmountOwed.setText("đ" + String.format("%.3f", amount));
-        balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_green_background));
-    } else if (amount < 0) {
-        totalAmountOwed.setText("đ" + String.format("%.3f", amount));
-        balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_red_background));
-    } else {
-        balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.round_gray));
-        totalAmountOwed.setText("đ0.00");
+        // Check if the fragment is attached before accessing resources
+        if (!isAdded()) {
+            Log.e("ViewReimbursementDetail", "Fragment not attached. Skipping updateTotalAmountOwed.");
+            return;
+        }
+
+        try {
+            Double amount = getBalanceAmount(reimbursementAdapter.reimbursementList);
+            if (amount > 0) {
+                totalAmountOwed.setText("đ" + String.format("%.3f", amount));
+                balanceTotalBackground.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_green_background));
+            } else if (amount < 0) {
+                totalAmountOwed.setText("đ" + String.format("%.3f", amount));
+                balanceTotalBackground.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_red_background));
+            } else {
+                balanceTotalBackground.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.round_gray));
+                totalAmountOwed.setText("đ0.00");
+            }
+        } catch(Exception e) {
+            Log.e("ViewReimbursementDetail", "Error updating total amount owed: ", e);
+        }
+
     }
-}
 
     private void updateReimbursement() {
         currentGroup.getReimbursements(reimbursements -> {
@@ -141,16 +153,38 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
     }
 
     private void handleDisplayBalance(List<Group.Reimbursement> reimbursements) {
-        Double amount = getBalanceAmount(reimbursements);
-        if (amount > 0) {
-            balanceTotalBackground.setText("đ" + String.format("%.3f", amount));
-            balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_green_background));
-        } else if (amount < 0) {
-            totalAmountOwed.setText("đ" + String.format("%.3f", amount));
-            balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_red_background));
-        } else {
-            balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.round_gray));
-            totalAmountOwed.setText("đ0.00");
+//        Double amount = getBalanceAmount(reimbursements);
+//        if (amount > 0) {
+//            balanceTotalBackground.setText("đ" + String.format("%.3f", amount));
+//            balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_green_background));
+//        } else if (amount < 0) {
+//            totalAmountOwed.setText("đ" + String.format("%.3f", amount));
+//            balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_red_background));
+//        } else {
+//            balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.round_gray));
+//            totalAmountOwed.setText("đ0.00");
+//        }
+
+        if (!isAdded()) {
+            Log.e("ViewReimbursementDetail", "Fragment not attached. Skipping handleDisplayBalance.");
+            return;
+        }
+
+        try {
+            Double amount = getBalanceAmount(reimbursements);
+
+            if (amount > 0) {
+                balanceTotalBackground.setText("đ" + String.format("%.3f", amount));
+                balanceTotalBackground.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_green_background));
+            } else if (amount < 0) {
+                totalAmountOwed.setText("đ" + String.format("%.3f", amount));
+                balanceTotalBackground.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_red_background));
+            } else {
+                balanceTotalBackground.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.round_gray));
+                totalAmountOwed.setText("đ0.00");
+            }
+        } catch (Exception e) {
+            Log.e("ViewReimbursementDetail", "Error in handleDisplayBalance: ", e);
         }
     }
 
