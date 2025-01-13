@@ -88,7 +88,7 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
                 userMap.put(user.getUserID(), user.getName());
             }
 
-            reimbursementAdapter = new ReimbursementAdapter(getContext(), currentGroup, reimbursementArrayList, userMap);
+            reimbursementAdapter = new ReimbursementAdapter(getContext(), getHandler(), currentGroup, reimbursementArrayList, userMap);
             recyclerView = view.findViewById(R.id.reimbursement_recycler_view);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             recyclerView.setAdapter(reimbursementAdapter);
@@ -101,7 +101,7 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
         return view;
     }
 
-    @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint({"NotifyDataSetChanged", "DefaultLocale", "SetTextI18n"})
     private void updateTotalAmountOwed() {
         // Check if the fragment is attached before accessing resources
         if (!isAdded()) {
@@ -112,14 +112,14 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
         try {
             Double amount = getBalanceAmount(reimbursementAdapter.reimbursementList);
             if (amount > 0) {
-                totalAmountOwed.setText("đ" + String.format("%.3f", amount));
+                balanceTotalBackground.setText("VND " + String.format("%.2f", amount));
                 balanceTotalBackground.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_green_background));
             } else if (amount < 0) {
-                totalAmountOwed.setText("đ" + String.format("%.3f", amount));
+                balanceTotalBackground.setText("VND " + String.format("%.2f", Math.abs(amount)));
                 balanceTotalBackground.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_red_background));
             } else {
                 balanceTotalBackground.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.round_gray));
-                totalAmountOwed.setText("đ0.00");
+                balanceTotalBackground.setText("VND 0.00");
             }
         } catch(Exception e) {
             Log.e("ViewReimbursementDetail", "Error updating total amount owed: ", e);
