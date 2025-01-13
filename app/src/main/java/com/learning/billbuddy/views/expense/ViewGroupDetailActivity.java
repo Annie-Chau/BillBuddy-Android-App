@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -37,6 +38,7 @@ import com.learning.billbuddy.models.Group;
 import com.learning.billbuddy.models.User;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -160,6 +162,8 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
 
         // Handle edit group info button
         setupGroupListener();
+        expenseRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
     }
 
     private void navigateToEditGroupInfo() {
@@ -211,63 +215,8 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
 
             FirebaseFirestore.getInstance()
                     .collection("groups")
-                    .document(currentGroup.getGroupID())
-                    .addSnapshotListener((documentSnapshot, e) -> {
+                    .document(currentGroup.getGroupID());
 
-                        if (e != null) {
-                            return;
-                        }
-
-                        if (documentSnapshot != null && documentSnapshot.exists()) {
-                            currentGroup = documentSnapshot.toObject(Group.class);
-                            expenseList = expenses.stream()
-                                    .filter(expense ->
-                                            Objects.requireNonNull(currentGroup)
-                                                    .getExpenseIDs()
-                                                    .contains(expense.getExpenseID()))
-                                    //sort by timestamp first if equal sort by id in descending order
-                                    .sorted((e1, e2) -> {
-                                        if (e1.getTimestamp().compareTo(e2.getTimestamp()) == 0) {
-                                            return e2.getExpenseID().compareTo(e1.getExpenseID());
-                                        }
-                                        return e2.getTimestamp().compareTo(e1.getTimestamp());
-                                    })
-
-                                    .collect(Collectors.toList());
-
-                            Log.d("Expense", expenses.toString());
-                            Log.d("Expense Change", expenseList.toString());
-
-                            if (expenseAdapter.expenseList.isEmpty()) {
-
-                                expenseAdapter.expenseList.addAll(expenseList);
-                                expenseAdapter.notifyDataSetChanged();
-
-                            } else if (expenseAdapter.getItemCount() < expenseList.size()) {
-
-                                for (int i = 0; i < expenseList.size(); i++) {
-                                    if (i >= expenseAdapter.expenseList.size()) {
-                                        expenseAdapter.expenseList.add(expenseList.get(i));
-                                        expenseRecyclerView.scrollToPosition(i - 1);
-                                        expenseAdapter.notifyItemInserted(i);
-
-                                    } else if (!expenseAdapter.expenseList.get(i).getExpenseID().equals(expenseList.get(i).getExpenseID())) {
-                                        expenseAdapter.expenseList.add(i, expenseList.get(i));
-                                        expenseRecyclerView.scrollToPosition(i);
-                                        expenseAdapter.notifyItemInserted(i);
-                                        if (i + 1 < expenseAdapter.expenseList.size()) {
-                                            expenseAdapter.notifyItemChanged(i + 1);
-                                        }
-                                    }
-                                }
-
-                            } else {
-                                expenseAdapter.expenseList.clear();
-                                expenseAdapter.expenseList.addAll(expenseList);
-                                expenseAdapter.notifyDataSetChanged();
-                            }
-                        }
-                    });
         });
     }
 
@@ -357,21 +306,84 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
             groupImageView.setImageResource(R.drawable.example_image_1);
         }
 
-        // Refresh the expenses in real time
+
         Expense.fetchAllExpenses(allExpenses -> {
-            // Filter only expenses belonging to this group to fetch
+            // Filter expenses belonging to this group
             List<Expense> updatedExpenseList = allExpenses.stream()
                     .filter(expense -> currentGroup.getExpenseIDs().contains(expense.getExpenseID()))
-                    .sorted((o1, o2) -> o2.getTimestamp().compareTo(o1.getTimestamp()))
+                    .sorted((expense1, expense2) -> {
+                        // Sort by date (descending)
+                        int dateComparison = compareDates(expense1.getTimestamp(), expense2.getTimestamp());
+                        if (dateComparison != 0) {
+                            return dateComparison; // If the dates are different, sort by date
+                        }
+                        // If dates are the same, sort by creation time (descending)
+                        return compareDates(expense1.getCreatedTime(), expense2.getCreatedTime());
+                    })
                     .collect(Collectors.toList());
 
-            // Clear + add new data
+            // Clear the list and update the adapter
             expenseList.clear();
             expenseList.addAll(updatedExpenseList);
-
             expenseAdapter.notifyDataSetChanged();
+
+//            // Check for newly added expenses
+//            if (expenseList.isEmpty()) {
+//                expenseList.addAll(updatedExpenseList);
+//                expenseAdapter.notifyDataSetChanged();
+//            } else {
+//                int newItemsCount = 0;
+//                for (int i = 0; i < updatedExpenseList.size(); i++) {
+//                    if (!expenseList.contains(updatedExpenseList.get(i))) {
+//                        expenseList.add(i, updatedExpenseList.get(i));
+//                        expenseAdapter.notifyItemInserted(i);
+//                        newItemsCount++;
+//                    }
+//                }
+//
+//                // Ensure that the animation works correctly and scroll to the newly added item
+//                if (newItemsCount > 0) {
+//                    expenseRecyclerView.scrollToPosition(0);
+//                }
+//            }
+
             Log.d("ViewGroupDetail", "Expense list updated in real-time: " + expenseList.size() + " items");
         });
+
+        // Good
+//        Expense.fetchAllExpenses(allExpenses -> {
+//            // Filter only expenses belonging to this group
+//            List<Expense> updatedExpenseList = allExpenses.stream()
+//                    .filter(expense -> currentGroup.getExpenseIDs().contains(expense.getExpenseID()))
+//                    .sorted((expense1, expense2) -> {
+//                        int dateComparison = expense2.getCreatedTime().compareTo(expense1.getTimestamp());
+//                        if (dateComparison != 0) {
+//                            return dateComparison;
+//                        }
+//                        return Long.compare(expense2.getCreatedTime().getTime(), expense1.getCreatedTime().getTime());
+//                    })
+//                    .collect(Collectors.toList());
+//
+//            // Check if a new expense is added
+//            boolean isNewExpenseAdded = updatedExpenseList.size() > expenseList.size();
+//
+//            // Clear + add new data
+//            expenseList.clear();
+//            expenseList.addAll(updatedExpenseList);
+//
+//            if (isNewExpenseAdded) {
+//                // Notify adapter of the new item and scroll to its position
+//                int newExpensePosition = 0; // New expense will be at the top
+//                expenseAdapter.notifyItemInserted(newExpensePosition);
+//                expenseRecyclerView.scrollToPosition(newExpensePosition);
+//            } else {
+//                // Notify adapter of data changes
+//                expenseAdapter.notifyDataSetChanged();
+//            }
+//
+//            Log.d("ViewGroupDetail", "Expense list updated in real-time: " + expenseList.size() + " items");
+//        });
+
 
         updateGroupReimbursements();
 
@@ -379,6 +391,68 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
             balanceListAdapter.notifyDataSetChanged();
         }
 
+    }
+
+    /**
+     * Handle updates to the expense list with animations.
+     * @param updatedExpenseList The updated list of expenses.
+     */
+    @SuppressLint("NotifyDataSetChanged")
+    private void handleExpenseUpdates(List<Expense> updatedExpenseList) {
+        boolean hasNewItem = false;
+
+        // Remove expenses no longer in the list
+        List<Expense> expensesToRemove = new ArrayList<>();
+        for (Expense existingExpense : expenseList) {
+            if (!updatedExpenseList.contains(existingExpense)) {
+                int index = expenseList.indexOf(existingExpense);
+                expenseList.remove(existingExpense);
+                expenseAdapter.notifyItemRemoved(index);
+                expensesToRemove.add(existingExpense);
+            }
+        }
+
+        // Add new expenses and animate
+        for (int i = 0; i < updatedExpenseList.size(); i++) {
+            Expense updatedExpense = updatedExpenseList.get(i);
+            if (!expenseList.contains(updatedExpense)) {
+                expenseList.add(i, updatedExpense);
+                expenseAdapter.notifyItemInserted(i);
+                hasNewItem = true;
+            }
+        }
+
+        // Re-sort the list to ensure order consistency
+        expenseList.sort((expense1, expense2) -> {
+            int dateComparison = compareDates(expense2.getTimestamp(), expense1.getTimestamp());
+            if (dateComparison != 0) {
+                return dateComparison; // If dates differ, sort by date
+            }
+            // Sort by createdTime (descending) for expenses on the same date
+            return compareDates(expense2.getCreatedTime(), expense1.getCreatedTime());
+        });
+
+        expenseAdapter.notifyDataSetChanged();
+
+        // Scroll to the top if a new expense is added
+        if (hasNewItem) {
+            expenseRecyclerView.scrollToPosition(0);
+        }
+    }
+
+    /**
+     * Compares two dates, handling null values safely.
+     * Null is treated as "older."
+     *
+     * @param date1 The first date
+     * @param date2 The second date
+     * @return -1 if date1 is after date2, 1 if date1 is before date2, 0 if equal
+     */
+    private int compareDates(Date date1, Date date2) {
+        if (date1 == null && date2 == null) return 0; // Both are null, treat as equal
+        if (date1 == null) return 1; // Null is treated as "older"
+        if (date2 == null) return -1; // Null is treated as "older"
+        return date2.compareTo(date1); // Descending order
     }
 
     private void updateGroupReimbursements() {
