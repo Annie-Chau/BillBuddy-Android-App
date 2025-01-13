@@ -165,7 +165,8 @@ public class AddExpenseBottomSheet extends BottomSheetDialogFragment {
                         SplitAdapter.getSplits(splitAdapter.getSplitItems()),
                         new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(date),
                         selectedCurrency,
-                        false
+                        false,
+                        new Date()
                 );
             } catch (ParseException e) {
                 throw new RuntimeException(e);

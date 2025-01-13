@@ -168,6 +168,180 @@
                     android:visibility="gone" />
             </LinearLayout>
 
+            <!-- FAQ Item 3 -->
+            <LinearLayout
+                android:id="@+id/faq_item_3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/faq_item_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="12dp">
+
+                <!-- Question Section -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="0.5dp"
+                        android:fontFamily="@font/notosansbold"
+                        android:text="How do I change my name on the app?"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/faq_icon_3"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:contentDescription="Expand/Collapse Icon"
+                        android:src="@drawable/arrow_down"
+                        app:tint="@color/primary" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/faq_answer_3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/notosansregular"
+                    android:padding="8dp"
+                    android:text="You can register by signing up with your email or using third-party options such as Facebook or Google."
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- FAQ Item 2 -->
+            <LinearLayout
+                android:id="@+id/faq_item_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/faq_item_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="12dp">
+
+                <!-- Question Section -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="0.5dp"
+                        android:fontFamily="@font/notosansbold"
+                        android:text="How do I delete a group?"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/faq_icon_4"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:contentDescription="Expand/Collapse Icon"
+                        android:src="@drawable/arrow_down"
+                        app:tint="@color/primary" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/faq_answer_4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/notosansregular"
+                    android:padding="8dp"
+                    android:text="You can register by signing up with your email or using third-party options such as Facebook or Google."
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- FAQ Item 5 -->
+            <LinearLayout
+                android:id="@+id/faq_item_5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/faq_item_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="12dp">
+
+                <!-- Question Section -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="0.5dp"
+                        android:fontFamily="@font/notosansbold"
+                        android:text="Do I need to pay for the app?"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/faq_icon_5"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:contentDescription="Expand/Collapse Icon"
+                        android:src="@drawable/arrow_down"
+                        app:tint="@color/primary" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/faq_answer_5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/notosansregular"
+                    android:padding="8dp"
+                    android:text="You can register by signing up with your email or using third-party options such as Facebook or Google."
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
         </LinearLayout>
 
     </ScrollView>

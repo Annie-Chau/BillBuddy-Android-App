@@ -65,6 +65,8 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
         } else {
             holder.createdDate.setVisibility(View.GONE);
         }
+
+
         if (expense.getIsReimbursed()) {
             holder.expenseImageView.setImageDrawable(context.getDrawable(R.drawable.card));
         } else {
