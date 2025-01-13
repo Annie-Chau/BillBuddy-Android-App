@@ -68,4 +68,7 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.commons.codec)
 
+    implementation ("com.stripe:stripe-android:21.3.1")
+
+
 }

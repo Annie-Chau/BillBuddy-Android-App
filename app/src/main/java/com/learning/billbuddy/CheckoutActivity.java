@@ -1,110 +1,56 @@
 package com.learning.billbuddy;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.os.StrictMode;
 import android.util.Log;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.learning.billbuddy.Api.CreateOrder;
-import com.learning.billbuddy.Constant.AppInfo;
 import com.learning.billbuddy.models.User;
+import com.learning.billbuddy.views.home.HomePage;
 import com.stripe.android.paymentsheet.PaymentSheet;
 import com.stripe.android.paymentsheet.PaymentSheetResult;
+
+import okhttp3.*;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Objects;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
-import vn.zalopay.sdk.Environment;
-import vn.zalopay.sdk.ZaloPayError;
-import vn.zalopay.sdk.ZaloPaySDK;
-import vn.zalopay.sdk.listeners.PayOrderListener;
-
-public class GoPremiumActivity extends AppCompatActivity {
-
+public class CheckoutActivity extends AppCompatActivity {
     private static final String TAG = "CheckoutActivity";
     private static final String BACKEND_URL = "http://10.0.2.2:4242";
 
     private String paymentIntentClientSecret;
     private PaymentSheet paymentSheet;
 
-    private Button selectPackageButton;
+    private Button payButton;
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_go_premium);
-        Button backButton = findViewById(R.id.backButton);
-        selectPackageButton = findViewById(R.id.selectPackageButton);
 
+        setContentView(R.layout.activity_checkout);
 
-        User.fetchAllUsers(users -> {
-            users.stream()
-                    .filter(user -> Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid().equals(user.getUserID()))
-                    .findFirst()
-                    .ifPresent(
-                            user -> {
-                                findViewById(R.id.free_plan).setSelected(!user.isPremium());
-                                findViewById(R.id.premium_plan).setSelected(user.isPremium());
+        // Hook up the pay button
+        payButton = findViewById(R.id.pay_button);
+        payButton.setOnClickListener(this::onPayClicked);
+        payButton.setEnabled(false);
 
-                                TextView freePlanTitle = findViewById(R.id.free_plan_title);
-                                TextView premiumPlanTitle = findViewById(R.id.premium_plan_title);
-                                freePlanTitle.setTextColor(!user.isPremium() ? Color.WHITE : Color.BLACK);
-                                premiumPlanTitle.setTextColor(user.isPremium() ? Color.WHITE : Color.BLACK);
-
-                                TextView freePlanText = findViewById(R.id.free_plan_text);
-                                TextView premiumPlanText = findViewById(R.id.premium_plan_text);
-                                freePlanText.setTextColor(!user.isPremium() ? Color.WHITE : Color.parseColor("#888888"));
-                                premiumPlanText.setTextColor(user.isPremium() ? Color.WHITE : Color.parseColor("#888888"));
-
-                                findViewById(R.id.premium_plan_offer).setVisibility(user.isPremium() ? View.GONE : View.VISIBLE);
-                                findViewById(R.id.premium_text).setVisibility(user.isPremium() ? View.VISIBLE : View.GONE);
-
-                                if (user.isPremium()) {
-                                    selectPackageButton.setText("PREMIUM MEMBERSHIP ACTIVE");
-                                    selectPackageButton.setTextColor(Color.BLACK);
-                                    selectPackageButton.setEnabled(false);
-                                    selectPackageButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#888888")));
-                                } else {
-                                    selectPackageButton.setText("UPGRADE TO PREMIUM MEMBERSHIP");
-                                    selectPackageButton.setTextColor(Color.WHITE);
-                                    selectPackageButton.setEnabled(true);
-                                    selectPackageButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primary)));
-                                }
-                            }
-                    );
-        });
-
-        selectPackageButton.setOnClickListener(this::onPayClicked);
         paymentSheet = new PaymentSheet(this, this::onPaymentSheetResult);
-        fetchPaymentIntent();
 
-        backButton.setOnClickListener(v -> finish());
+
+        fetchPaymentIntent();
     }
 
     private void showAlert(String title, @Nullable String message) {
@@ -156,7 +102,7 @@ public class GoPremiumActivity extends AppCompatActivity {
                         } else {
                             final JSONObject responseJson = parseResponse(response.body());
                             paymentIntentClientSecret = responseJson.optString("clientSecret");
-//                            runOnUiThread(() -> selectPackageButton.setEnabled(true));
+                            runOnUiThread(() -> payButton.setEnabled(true));
                             Log.i(TAG, "Retrieved PaymentIntent");
                         }
                     }
@@ -178,6 +124,7 @@ public class GoPremiumActivity extends AppCompatActivity {
     private void onPayClicked(View view) {
         PaymentSheet.Configuration configuration = new PaymentSheet.Configuration.Builder("Example, Inc.")
                 .build();
+
         // Present Payment Sheet
         paymentSheet.presentWithPaymentIntent(paymentIntentClientSecret, configuration);
     }

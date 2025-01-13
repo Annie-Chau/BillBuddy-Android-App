@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.learning.billbuddy.utils.CurrentUserCallback;
 import com.learning.billbuddy.utils.UserCallback;
 
 import java.io.Serializable;
@@ -220,6 +221,44 @@ public class User implements Serializable {
 
     public interface IUsersCallBack {
         void onSuccess(List<User> users);
+    }
+
+    public static void upgradePremiumLifeTime(String userID){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users")
+                .document(userID)
+                .update("isPremium", true)
+                .addOnSuccessListener(aVoid -> Log.d("PremiumStatus", "User's premium status updated successfully"))
+                .addOnFailureListener(e -> Log.e("PremiumStatus", "Error updating premium status", e));
+    }
+
+    public static void listenOnUserChange(String userID, final CurrentUserCallback callback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("users")
+                .document(userID)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.e("User Fetching", "Error listening to user updates: " + error);
+                        callback.onCallback(null);
+                        return;
+                    }
+
+                    if (value != null) {
+                        User user = new User(
+                                value.getString("userID"),
+                                value.getString("name"),
+                                value.getString("email"),
+                                value.getString("phoneNumber"),
+                                value.getString("profilePictureURL"),
+                                value.getString("registrationMethod"),
+                                (List<String>) value.get("notificationIds"),
+                                value.getBoolean("isPremium")
+                        );
+                        callback.onCallback(user);
+                    }
+                });
+
     }
 
     @NonNull
