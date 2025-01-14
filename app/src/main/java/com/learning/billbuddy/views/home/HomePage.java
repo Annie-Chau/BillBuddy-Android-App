@@ -1,6 +1,7 @@
 package com.learning.billbuddy.views.home;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,6 +26,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.learning.billbuddy.CheckoutActivity;
 import com.learning.billbuddy.R;
 import com.learning.billbuddy.adapters.GroupAdapter;
 import com.learning.billbuddy.models.Group;
@@ -65,6 +68,10 @@ public class HomePage extends Fragment {
     private ArrayList<Group> prevGroupList;
     private ArrayList<Group> currentGroupList;
 
+    private TextView homeViewTitle;
+
+    private User currentUser;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -75,6 +82,7 @@ public class HomePage extends Fragment {
         groupRecyclerView = view.findViewById(R.id.group_list);
         searchGroupEditText = view.findViewById(R.id.home_view_search_text_field);
         filterSelection = view.findViewById(R.id.home_spinner_filter_selection);
+        homeViewTitle = view.findViewById(R.id.home_view_title);
 
         // Setup RecyclerView
         prevGroupList = new ArrayList<>();
@@ -145,6 +153,17 @@ public class HomePage extends Fragment {
                 Log.d("HomePage", "No matching user documents found");
             }
         });
+    }
+
+    private void updateHomePageUI() {
+        if (currentUser == null) {
+            return;
+        }
+        if (currentUser.isPremium()) {
+            homeViewTitle.setText("BillBuddy Premium");
+        } else {
+            homeViewTitle.setText("BillBuddy");
+        }
     }
 
 //    private void setupRealTimeGroupUpdates() {

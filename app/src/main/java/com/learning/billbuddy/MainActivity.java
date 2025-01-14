@@ -25,6 +25,7 @@ import com.learning.billbuddy.views.faq.FAQPage;
 import com.learning.billbuddy.views.aboutus.AboutUsPage;
 import com.learning.billbuddy.views.home.HomePage;
 import com.learning.billbuddy.views.profile.Profile;
+import com.stripe.android.PaymentConfiguration;
 
 import java.util.List;
 
@@ -66,6 +67,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        PaymentConfiguration.init(
+                getApplicationContext(),
+                "pk_test_51OOEMsBPdNjvUPpnFo22wREaih1qdKt9D99x0wHYsnst1OZ3LbQVWfPJSid4srtIu4WPd0F9k5hUYoINZ7DomcjS00XVnlIhqL"
+        );
         getWindow().setNavigationBarColor(getColor(R.color.bottom_navigation));
         super.onCreate(savedInstanceState);
 
@@ -146,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void displayNotification(Notification notification) {
+        private void displayNotification(Notification notification) {
         String messageID = notification.getMessageID();
         if (messageID == null || messageID.isEmpty()) {
             // Handle notifications without a messageID directly
