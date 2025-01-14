@@ -154,7 +154,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
                 args.putSerializable("group", currentGroup);
                 args.putDouble("amount", amount);
                 bottomSheet.setArguments(args);
-                bottomSheet.show(ViewGroupDetailActivity.this.getSupportFragmentManager(), "ViewReimbursementDetail");
+                if (!bottomSheet.isAdded()) bottomSheet.show(ViewGroupDetailActivity.this.getSupportFragmentManager(), "ViewReimbursementDetail");
             });
         });
 
@@ -368,7 +368,6 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         } else {
             groupImageView.setImageResource(R.drawable.example_image_1);
         }
-
 
         Expense.fetchAllExpenses(allExpenses -> {
             // Filter expenses belonging to this group
