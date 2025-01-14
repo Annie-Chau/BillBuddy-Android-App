@@ -157,7 +157,6 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
             bottomSheet.setArguments(args);
             if (!bottomSheet.isAdded()) bottomSheet.show(ViewGroupDetailActivity.this.getSupportFragmentManager(), "ViewReimbursementDetail");
 
-
 //            currentGroup.getReimbursements(reimbursements -> {
 //                Double amount = getBalanceAmount(reimbursements);
 //                Log.d("amount", String.valueOf(amount));
