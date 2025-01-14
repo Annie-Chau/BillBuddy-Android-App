@@ -250,7 +250,7 @@ public class Expense implements Serializable {
     // Method to create a new expense
     public static void createExpense(String groupID, String title, String avatarURL, Double amount, String notes,
                                      String billPictureURL, String payerID, List<String> participantIDs,
-                                     List<Map<String, Double>> splits, Date timestamp, String currency, Boolean isReimbursed) { // Updated parameter
+                                     List<Map<String, Double>> splits, Date timestamp, String currency, Boolean isReimbursed, Date createdTime) { // Updated parameter
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String expenseID = db.collection("expenses").document().getId();
 
