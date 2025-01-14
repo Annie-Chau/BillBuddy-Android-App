@@ -147,15 +147,24 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         // Set onClick for viewReimbursement
         viewReimbursement.setOnClickListener(v -> {
             ViewReimbursementDetail bottomSheet = new ViewReimbursementDetail();
-            currentGroup.getReimbursements(reimbursements -> {
-                Double amount = getBalanceAmount(reimbursements);
-                Log.d("amount", String.valueOf(amount));
-                Bundle args = new Bundle();
-                args.putSerializable("group", currentGroup);
-                args.putDouble("amount", amount);
-                bottomSheet.setArguments(args);
-                if (!bottomSheet.isAdded()) bottomSheet.show(ViewGroupDetailActivity.this.getSupportFragmentManager(), "ViewReimbursementDetail");
-            });
+
+//            Double amount = getBalanceAmount(reimbursements);
+//            Log.d("amount", String.valueOf(amount));
+//            args.putDouble("amount", amount);
+            Bundle args = new Bundle();
+            args.putSerializable("group", currentGroup);
+            bottomSheet.setArguments(args);
+            if (!bottomSheet.isAdded()) bottomSheet.show(ViewGroupDetailActivity.this.getSupportFragmentManager(), "ViewReimbursementDetail");
+
+//            currentGroup.getReimbursements(reimbursements -> {
+//                Double amount = getBalanceAmount(reimbursements);
+//                Log.d("amount", String.valueOf(amount));
+//                Bundle args = new Bundle();
+//                args.putSerializable("group", currentGroup);
+//                args.putDouble("amount", amount);
+//                bottomSheet.setArguments(args);
+//                if (!bottomSheet.isAdded()) bottomSheet.show(ViewGroupDetailActivity.this.getSupportFragmentManager(), "ViewReimbursementDetail");
+//            });
         });
 
         updateGroupInfoButton.setOnClickListener(v -> navigateToEditGroupInfo());
@@ -169,6 +178,8 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         // Load initial data
         loadExpenses();
     }
+
+
 
     private void navigateToEditGroupInfo() {
         Intent intent = new Intent(ViewGroupDetailActivity.this, EditGroupInfoActivity.class);
@@ -405,7 +416,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
                         }
                     }
 
-                    expenseAdapter.expenseList.add(updatedExpenseList.get(expenseAdapter.expenseList.size() - 1));
+                    expenseAdapter.expenseList.add(updatedExpenseList.get(updatedExpenseList.size() - 1));
                     expenseAdapter.notifyItemInserted(expenseAdapter.expenseList.size() - 1);
                     expenseRecyclerView.scrollToPosition(expenseAdapter.expenseList.size() - 1);
                 } else {
