@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -95,15 +96,32 @@ public class HomePage extends Fragment {
             users.stream()
                     .filter(user -> Objects.equals(user.getUserID(), Objects.requireNonNull(mAuth.getCurrentUser()).getUid()))
                     .findFirst()
-                    .ifPresent(user -> view.findViewById(R.id.premium_text)
-                            .setVisibility(user.isPremium() ? View.VISIBLE : View.GONE));
+                    .ifPresent(user -> {
+                        currentUser = user;
+                        view.findViewById(R.id.premium_text)
+                                .setVisibility(user.isPremium() ? View.VISIBLE : View.GONE);
+                    });
         });
 
 
         setupRealTimeGroupUpdates();
 
         ImageButton addParticipantButton = view.findViewById(R.id.to_add_group_btn);
-        addParticipantButton.setOnClickListener(v -> openAddGroupDialog());
+        addParticipantButton.setOnClickListener(v -> {
+            if (currentUser == null) {
+                Toast.makeText(requireContext(), "No authenticated user found", Toast.LENGTH_LONG).show();
+                return;
+            }
+            if (currentGroupList.size() < 6) {
+                openAddGroupDialog();
+            } else {
+                if (!currentUser.isPremium()) {
+                    Toast.makeText(requireContext(), "Upgrade to premium to create more groups!", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                openAddGroupDialog();
+            }
+        });
         this.handleSearchGroupEditText();
 
         filterSelection.setDropDownVerticalOffset(150);
@@ -153,17 +171,6 @@ public class HomePage extends Fragment {
                 Log.d("HomePage", "No matching user documents found");
             }
         });
-    }
-
-    private void updateHomePageUI() {
-        if (currentUser == null) {
-            return;
-        }
-        if (currentUser.isPremium()) {
-            homeViewTitle.setText("BillBuddy Premium");
-        } else {
-            homeViewTitle.setText("BillBuddy");
-        }
     }
 
 //    private void setupRealTimeGroupUpdates() {

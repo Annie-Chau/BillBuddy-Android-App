@@ -98,26 +98,7 @@ public class AddGroupBottomSheet extends BottomSheetDialogFragment implements Me
         membersRecyclerView.setHasFixedSize(true);
 
         // Set click listeners
-        createButton.setOnClickListener(v -> {
-            FirebaseAuth mAuth = FirebaseAuth.getInstance();
-            String currentUserId = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
-
-            User.fetchAllUsers(users -> {
-                users.stream()
-                        .filter(user -> Objects.equals(user.getUserID(), currentUserId))
-                        .findFirst()
-                        .ifPresent(user -> {
-                            if (!user.isPremium()) {
-                                user.getNumberOfGroupPossessed(count -> {
-                                    if (count < 6) {
-                                        createGroup();
-                                    }
-                                    else Toast.makeText(v.getContext(), "You can only create up to 6 groups as a free user. Upgrade to Premium for unlimited groups.", Toast.LENGTH_LONG).show();
-                                });
-                            }
-                        });
-            });
-        });
+        createButton.setOnClickListener(v -> createGroup());
 
         addMemberButton.setOnClickListener(v -> addMember());
         cancelButton.setOnClickListener(v -> dismiss());
