@@ -149,18 +149,20 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
 
     @SuppressLint({"DefaultLocale", "UseCompatLoadingForDrawables", "SetTextI18n"})
     private void handleDisplayBalance(double amount) {
-        if (amount > 0) {
-            headingTextView.setText("You are owed");
-            balanceTotalBackground.setText("VND " + String.format("%.2f", amount));
-            balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_green_background));
-        } else if (amount < 0) {
-            headingTextView.setText("You owe others");
-            balanceTotalBackground.setText("VND " + String.format("%.2f", Math.abs(amount)));
-            balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_red_background));
-        } else {
-            headingTextView.setText("You are all settled");
-            balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.round_gray));
-            balanceTotalBackground.setText("VND 0.00");
+        if (isAdded()){
+            if (amount > 0) {
+                headingTextView.setText("You are owed");
+                balanceTotalBackground.setText("VND " + String.format("%.2f", amount));
+                balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_green_background));
+            } else if (amount < 0) {
+                headingTextView.setText("You owe others");
+                balanceTotalBackground.setText("VND " + String.format("%.2f", Math.abs(amount)));
+                balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.rounded_red_background));
+            } else {
+                headingTextView.setText("You are all settled");
+                balanceTotalBackground.setBackground(getResources().getDrawable(R.drawable.round_gray));
+                balanceTotalBackground.setText("VND 0.00");
+            }
         }
     }
 

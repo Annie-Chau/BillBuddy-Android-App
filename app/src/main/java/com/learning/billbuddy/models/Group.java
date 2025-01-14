@@ -338,8 +338,7 @@ public class Group implements Serializable {
                     }
                 }));
             });
-
-            callback.onResult(processReimbursements(reimbursements)); // Return the result in the callback
+            callback.onResult(processReimbursements(reimbursements));
         });
     }
 
@@ -379,15 +378,6 @@ public class Group implements Serializable {
             netAmounts[i] = totalDebt[i] - totalCredit[i];
         }
 
-        System.out.println("Participant IDs:");
-        for (String id : ids) {
-            System.out.println(id);
-        }
-
-        System.out.println("\nNet Amounts:");
-        System.out.println(Arrays.toString(netAmounts));
-
-        System.out.println("\nDebt Settlements:");
         Log.d("Test", Arrays.toString(netAmounts) + ids);
         settleDebts(result, netAmounts, ids);
         return result;

@@ -277,6 +277,7 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
     /**
      * Load expenses and set up the initial list.
      */
+    @SuppressLint("NotifyDataSetChanged")
     private void loadExpenses() {
         Expense.fetchAllExpenses(allExpenses -> {
             // Filter expenses belonging to the current group
