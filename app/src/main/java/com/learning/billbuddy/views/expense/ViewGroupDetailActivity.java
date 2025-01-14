@@ -17,6 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -147,7 +149,6 @@ public class ViewGroupDetailActivity extends AppCompatActivity {
         // Set onClick for viewReimbursement
         viewReimbursement.setOnClickListener(v -> {
             ViewReimbursementDetail bottomSheet = new ViewReimbursementDetail();
-
 //            Double amount = getBalanceAmount(reimbursements);
 //            Log.d("amount", String.valueOf(amount));
 //            args.putDouble("amount", amount);
