@@ -80,7 +80,12 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
         recyclerView = view.findViewById(R.id.reimbursement_recycler_view);
         balanceTotalBackground = view.findViewById(R.id.reimbursement_amount);
 
-        balanceTotalBackground.setText(String.format("%.2f", amount));
+
+        currentGroup.getReimbursements(reimbursements -> {
+            Double amount = getBalanceAmount(reimbursements);
+            balanceTotalBackground.setText(String.format("%.2f", amount));
+        });
+
 
         User.getUsersByIds(Objects.requireNonNull(currentGroup.getMemberIDs()), users -> {
             Map<String, String> userMap = new HashMap<>();
@@ -121,7 +126,7 @@ public class ViewReimbursementDetail extends BottomSheetDialogFragment {
                 balanceTotalBackground.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.round_gray));
                 balanceTotalBackground.setText("VND 0.00");
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             Log.e("ViewReimbursementDetail", "Error updating total amount owed: ", e);
         }
 
