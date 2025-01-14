@@ -207,7 +207,6 @@ public class HomePage extends Fragment {
                 } else if (prevGroupList.size() > currentGroupList.size()) {
                     //perform delete
                     //find the group exist in groupList but not in currentGroupList
-
                     List<Group> groupsToRemove = new ArrayList<>();
 
                     groupAdapter.groupList.forEach(group -> {
@@ -225,9 +224,7 @@ public class HomePage extends Fragment {
                         if (index != -1) {
                             groupAdapter.groupList.remove(index);
                             groupAdapter.notifyItemRemoved(index);
-                        }
-                        if (index < groupAdapter.groupList.size() - 2) { //case delete top and net want need to show date
-                            groupAdapter.notifyItemChanged(index + 1);
+                            groupAdapter.notifyItemChanged(index);
                         }
                     });
 
