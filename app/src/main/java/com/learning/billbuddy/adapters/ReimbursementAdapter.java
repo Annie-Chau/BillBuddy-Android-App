@@ -109,7 +109,8 @@ public class ReimbursementAdapter extends RecyclerView.Adapter<ReimbursementAdap
                     splits,
                     new Date(),
                     "VND",
-                    true
+                    true,
+                    new Date()
             );
             notifyDataSetChanged();
             handler.sendEmptyMessage(1);
