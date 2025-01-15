@@ -93,6 +93,7 @@ public class HomePage extends Fragment {
         groupRecyclerView.setAdapter(groupAdapter);
 
         if (mAuth.getCurrentUser() == null) return view;
+        Log.d("HomePage", "Current user ID: " + mAuth.getCurrentUser().getPhotoUrl());
 
         User.fetchAllUsers(users -> {
             users.stream()
