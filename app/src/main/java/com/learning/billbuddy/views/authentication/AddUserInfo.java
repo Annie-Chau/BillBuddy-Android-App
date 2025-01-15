@@ -193,7 +193,7 @@ public class AddUserInfo extends AppCompatActivity {
             finish();
 
         } else {
-            String photoUrl = (userAuth != null ? Objects.requireNonNull(userAuth.getPhotoUrl()).toString() : "");
+            String photoUrl = (userAuth != null && userAuth.getPhotoUrl() != null? Objects.requireNonNull(userAuth.getPhotoUrl()).toString() : "");
             User.createUser(userId, name, email, phone, photoUrl, registrationMethod, new ArrayList<>(), false);
             Toast.makeText(AddUserInfo.this, "User created successfully!", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(AddUserInfo.this, Objects.equals(registrationMethod, "Google Account") ? MainActivity.class : Login.class);
