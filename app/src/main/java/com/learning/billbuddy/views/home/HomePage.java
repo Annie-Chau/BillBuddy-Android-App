@@ -95,6 +95,7 @@ public class HomePage extends Fragment {
         if (mAuth.getCurrentUser() == null) return view;
 
         User.fetchAllUsers(users -> {
+            if (mAuth.getCurrentUser() == null) return;
             users.stream()
                     .filter(user -> Objects.equals(user.getUserID(), Objects.requireNonNull(mAuth.getCurrentUser()).getUid()))
                     .findFirst()
