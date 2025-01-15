@@ -68,6 +68,8 @@ public class Profile extends Fragment {
         assert getArguments() != null;
         currentUser = (User) getArguments().getSerializable("user");
 
+        if (currentUser == null) return view;
+
         db.collection("users").document(userAuth.getUid()).get().addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
                 return;
@@ -78,7 +80,10 @@ public class Profile extends Fragment {
             phoneNumber.setText(currentUser.getPhoneNumber());
             email.setText(currentUser.getEmail());
         });
-        if (currentUser.getProfilePictureURL().equals("XXX") || currentUser.getProfilePictureURL().isEmpty()) {
+
+
+
+        if (currentUser.getProfilePictureURL().equals("XXX") || currentUser.getProfilePictureURL().isEmpty() || currentUser.getProfilePictureURL() == null) {
             Log.d("Profile", currentUser.getProfilePictureURL());
             profileImageTextView.setText(currentUser.getName().substring(0, 1));
             profileImageTextView.setVisibility(View.VISIBLE);
