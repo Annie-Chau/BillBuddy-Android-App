@@ -186,8 +186,7 @@ public class AddUserInfo extends AppCompatActivity {
             User.updateUser(
                     userId,
                     nameInput.getText().toString(),
-                    phoneInput.getText().toString(),
-                    "");
+                    phoneInput.getText().toString());
             Toast.makeText(AddUserInfo.this, "User updated successfully!", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(AddUserInfo.this, MainActivity.class);
             startActivity(intent);

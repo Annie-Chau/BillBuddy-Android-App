@@ -165,7 +165,7 @@ public class User implements Serializable {
                 .addOnFailureListener(e -> Log.e("User Creation", "Error creating user", e));
     }
 
-    public static void updateUser(String userId, String userName, String phoneNumber, String profilePictureURL) {
+    public static void updateUser(String userId, String userName, String phoneNumber) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         Log.d("User Update", "Updating user with ID: " + userId);
@@ -173,7 +173,7 @@ public class User implements Serializable {
         Log.d("User Update", "Updating user phoneNumber: " + phoneNumber);
         db.collection("users")
                 .document(userId)
-                .update("name", userName, "phoneNumber", phoneNumber, "profilePictureURL", profilePictureURL)
+                .update("name", userName, "phoneNumber", phoneNumber)
                 .addOnSuccessListener(aVoid -> Log.d("User Update", "User updated with ID: " + userId))
                 .addOnFailureListener(e -> Log.e("User Update", "Error updating user", e));
 
