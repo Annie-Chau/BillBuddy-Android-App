@@ -96,6 +96,7 @@ public class HomePage extends Fragment {
         Log.d("HomePage", "Current user ID: " + mAuth.getCurrentUser().getPhotoUrl());
 
         User.fetchAllUsers(users -> {
+            if (mAuth.getCurrentUser() == null) return;
             users.stream()
                     .filter(user -> Objects.equals(user.getUserID(), Objects.requireNonNull(mAuth.getCurrentUser()).getUid()))
                     .findFirst()
