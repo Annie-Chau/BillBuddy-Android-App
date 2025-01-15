@@ -184,7 +184,8 @@ public class AddExpenseBottomSheet extends BottomSheetDialogFragment {
                     expense.getSplits(),
                     expense.getTimestamp(),
                     expense.getCurrency(),
-                    false
+                    false,
+                    expense.getCreatedTime()
             );
 
             // Notify all users in the group, including the payer

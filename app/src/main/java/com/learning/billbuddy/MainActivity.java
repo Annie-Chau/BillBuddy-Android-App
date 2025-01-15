@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private final NavigationBarView.OnItemSelectedListener navListener =
             item -> {
                 int itemId = item.getItemId();
-                Fragment selectedFragment = null;
+                Fragment selectedFragment;
 
                 if (itemId == R.id.bottom_navigation_home) {
                     selectedFragment = new HomePage();

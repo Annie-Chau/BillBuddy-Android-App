@@ -80,6 +80,7 @@ public class AddUserInfo extends AppCompatActivity {
         if (!isEdit) {
             cancelTextView.setVisibility(View.INVISIBLE);
         }
+        this.userAuth = FirebaseAuth.getInstance().getCurrentUser();
 
         //heading
         userInfoFormHeadingTop = findViewById(R.id.user_info_form_heading_top);
@@ -115,24 +116,29 @@ public class AddUserInfo extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        if (currentUser != null) {
-            if (userAuth != null){
-                if (userAuth.getPhotoUrl() == null) {
-                    userAvatarText.setText(currentUser.getName().substring(0, 1));
-                    userAvatarText.setVisibility(View.VISIBLE);
-                    userAvatar.setVisibility(View.GONE);
-                } else {
-                    userAvatarText.setVisibility(View.GONE);
-                    userAvatar.setVisibility(View.VISIBLE);
-                    Glide.with(this).load(userAuth.getPhotoUrl()).circleCrop().into(userAvatar);
-                }
-            }
-             else {
+        if (currentUser == null) {
+            if (userAuth == null || userAuth.getPhotoUrl() == null) {
                 userAvatarText.setVisibility(View.GONE);
                 userAvatar.setVisibility(View.VISIBLE);
                 userAvatar.setImageDrawable(getDrawable(R.drawable.person_icon));
+            } else {
+                userAvatarText.setVisibility(View.GONE);
+                userAvatar.setVisibility(View.VISIBLE);
+                Glide.with(this).load(userAuth.getPhotoUrl()).circleCrop().into(userAvatar);
+            }
+
+        } else {
+            if (currentUser.getProfilePictureURL() == null || currentUser.getProfilePictureURL().equals("XXX") || currentUser.getProfilePictureURL().isEmpty()) {
+                Log.d("Profile", currentUser.getProfilePictureURL());
+                userAvatarText.setText(currentUser.getName().substring(0, 1));
+                userAvatarText.setVisibility(View.VISIBLE);
+            } else {
+                userAvatarText.setVisibility(View.GONE);
+                userAvatar.setVisibility(View.VISIBLE);
+                Glide.with(this).load(userAuth.getPhotoUrl()).circleCrop().into(userAvatar);
             }
         }
+
 
         // Change the avatar of the user
 //        changeAvatarButton.setOnClickListener(v -> openGalerry());
@@ -177,7 +183,6 @@ public class AddUserInfo extends AppCompatActivity {
 
         Boolean isEdit = getIntent().getBooleanExtra("isEdit", false);
         if (isEdit) {
-
             User.updateUser(
                     userId,
                     nameInput.getText().toString(),

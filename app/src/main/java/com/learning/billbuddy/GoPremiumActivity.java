@@ -40,10 +40,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import vn.zalopay.sdk.Environment;
-import vn.zalopay.sdk.ZaloPayError;
-import vn.zalopay.sdk.ZaloPaySDK;
-import vn.zalopay.sdk.listeners.PayOrderListener;
 
 public class GoPremiumActivity extends AppCompatActivity {
 
@@ -62,43 +58,44 @@ public class GoPremiumActivity extends AppCompatActivity {
         Button backButton = findViewById(R.id.backButton);
         selectPackageButton = findViewById(R.id.selectPackageButton);
 
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            User.fetchAllUsers(users -> {
+                users.stream()
+                        .filter(user -> Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid().equals(user.getUserID()))
+                        .findFirst()
+                        .ifPresent(
+                                user -> {
+                                    findViewById(R.id.free_plan).setSelected(!user.isPremium());
+                                    findViewById(R.id.premium_plan).setSelected(user.isPremium());
 
-        User.fetchAllUsers(users -> {
-            users.stream()
-                    .filter(user -> Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid().equals(user.getUserID()))
-                    .findFirst()
-                    .ifPresent(
-                            user -> {
-                                findViewById(R.id.free_plan).setSelected(!user.isPremium());
-                                findViewById(R.id.premium_plan).setSelected(user.isPremium());
+                                    TextView freePlanTitle = findViewById(R.id.free_plan_title);
+                                    TextView premiumPlanTitle = findViewById(R.id.premium_plan_title);
+                                    freePlanTitle.setTextColor(!user.isPremium() ? Color.WHITE : Color.BLACK);
+                                    premiumPlanTitle.setTextColor(user.isPremium() ? Color.WHITE : Color.BLACK);
 
-                                TextView freePlanTitle = findViewById(R.id.free_plan_title);
-                                TextView premiumPlanTitle = findViewById(R.id.premium_plan_title);
-                                freePlanTitle.setTextColor(!user.isPremium() ? Color.WHITE : Color.BLACK);
-                                premiumPlanTitle.setTextColor(user.isPremium() ? Color.WHITE : Color.BLACK);
+                                    TextView freePlanText = findViewById(R.id.free_plan_text);
+                                    TextView premiumPlanText = findViewById(R.id.premium_plan_text);
+                                    freePlanText.setTextColor(!user.isPremium() ? Color.WHITE : Color.parseColor("#888888"));
+                                    premiumPlanText.setTextColor(user.isPremium() ? Color.WHITE : Color.parseColor("#888888"));
 
-                                TextView freePlanText = findViewById(R.id.free_plan_text);
-                                TextView premiumPlanText = findViewById(R.id.premium_plan_text);
-                                freePlanText.setTextColor(!user.isPremium() ? Color.WHITE : Color.parseColor("#888888"));
-                                premiumPlanText.setTextColor(user.isPremium() ? Color.WHITE : Color.parseColor("#888888"));
+                                    findViewById(R.id.premium_plan_offer).setVisibility(user.isPremium() ? View.GONE : View.VISIBLE);
+                                    findViewById(R.id.premium_text).setVisibility(user.isPremium() ? View.VISIBLE : View.GONE);
 
-                                findViewById(R.id.premium_plan_offer).setVisibility(user.isPremium() ? View.GONE : View.VISIBLE);
-                                findViewById(R.id.premium_text).setVisibility(user.isPremium() ? View.VISIBLE : View.GONE);
-
-                                if (user.isPremium()) {
-                                    selectPackageButton.setText("PREMIUM MEMBERSHIP ACTIVE");
-                                    selectPackageButton.setTextColor(Color.BLACK);
-                                    selectPackageButton.setEnabled(false);
-                                    selectPackageButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#888888")));
-                                } else {
-                                    selectPackageButton.setText("UPGRADE TO PREMIUM MEMBERSHIP");
-                                    selectPackageButton.setTextColor(Color.WHITE);
-                                    selectPackageButton.setEnabled(true);
-                                    selectPackageButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primary)));
+                                    if (user.isPremium()) {
+                                        selectPackageButton.setText("PREMIUM MEMBERSHIP ACTIVE");
+                                        selectPackageButton.setTextColor(Color.BLACK);
+                                        selectPackageButton.setEnabled(false);
+                                        selectPackageButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#888888")));
+                                    } else {
+                                        selectPackageButton.setText("UPGRADE TO PREMIUM MEMBERSHIP");
+                                        selectPackageButton.setTextColor(Color.WHITE);
+                                        selectPackageButton.setEnabled(true);
+                                        selectPackageButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primary)));
+                                    }
                                 }
-                            }
-                    );
-        });
+                        );
+            });
+        }
 
         selectPackageButton.setOnClickListener(this::onPayClicked);
         paymentSheet = new PaymentSheet(this, this::onPaymentSheetResult);

@@ -250,7 +250,7 @@ public class Expense implements Serializable {
     // Method to create a new expense
     public static void createExpense(String groupID, String title, String avatarURL, Double amount, String notes,
                                      String billPictureURL, String payerID, List<String> participantIDs,
-                                     List<Map<String, Double>> splits, Date timestamp, String currency, Boolean isReimbursed) { // Updated parameter
+                                     List<Map<String, Double>> splits, Date timestamp, String currency, Boolean isReimbursed, Date createdTime) { // Updated parameter
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String expenseID = db.collection("expenses").document().getId();
 
@@ -265,10 +265,18 @@ public class Expense implements Serializable {
         expenseData.put("payerID", payerID);
         expenseData.put("participantIDs", participantIDs);
         expenseData.put("splits", splits); // Update to put List<Map>
+
+
+        //create new expense that copy the old expense except hour and minute and second
+        //set timeStamp with hour minute second to current
+        timestamp.setHours(new Date().getHours());
+        timestamp.setMinutes(new Date().getMinutes());
+        timestamp.setSeconds(new Date().getSeconds());
+
         expenseData.put("timestamp", timestamp);
         expenseData.put("currency", currency); // Add currency to the expense data
         expenseData.put("isReimbursed", isReimbursed); // Add isReimbursed to the expense data
-        expenseData.put("createdTime", new Date());
+        expenseData.put("createdTime", timestamp);
 
         // Add the new expense to the "expenses" collection in Firestore
         db.collection("expenses")

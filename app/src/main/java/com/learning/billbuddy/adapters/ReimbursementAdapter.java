@@ -18,6 +18,8 @@ import com.learning.billbuddy.models.Expense;
 import com.learning.billbuddy.models.Group;
 import com.learning.billbuddy.views.expense.ViewReimbursementDetail;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -109,7 +111,8 @@ public class ReimbursementAdapter extends RecyclerView.Adapter<ReimbursementAdap
                     splits,
                     new Date(),
                     "VND",
-                    true
+                    true,
+                    new Date()
             );
             notifyDataSetChanged();
             handler.sendEmptyMessage(1);

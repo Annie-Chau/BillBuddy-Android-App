@@ -23,7 +23,7 @@
             android:name=".GoPremiumActivity"
             android:exported="true" />
         <activity
-            android:name=".CheckoutActivity"
+            android:name=".EditGroupInfoActivity"
             android:exported="false" />
         <activity
             android:name=".views.aboutus.AboutUsPage"
